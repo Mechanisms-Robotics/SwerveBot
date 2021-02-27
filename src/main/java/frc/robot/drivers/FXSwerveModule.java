@@ -1,11 +1,14 @@
 package frc.robot.drivers;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.util.Units;
 
 /**
  * A hardware wrapper class for a swerve module.
@@ -21,9 +24,9 @@ public class FXSwerveModule implements SwerveModule {
   private static int speedEncoderCPR = 2048; // counts per revolution
   private static final double moduleGearRatio = 8.61; // : 1
   private static final double wheelDiameter = 0.0762; // m
-  private static final double ticksPerSecToMeterPerSec
-      = (wheelDiameter * Math.PI)
-      / (double)  (speedEncoderCPR * moduleGearRatio);
+  private static final double ticksPer100msToMeterPerSec
+      = ((wheelDiameter * Math.PI)
+      / (double)  (speedEncoderCPR * moduleGearRatio)) * 10.0;
 
   private static final double speedP = 0.0;
   private static final double speedI = 0.0;
@@ -83,11 +86,17 @@ public class FXSwerveModule implements SwerveModule {
 
   @Override
   public SwerveModuleState getState() {
-    return new SwerveModuleState();
+    return new SwerveModuleState(wheelMotor.getSelectedSensorVelocity() * ticksPer100msToMeterPerSec,
+        Rotation2d.fromDegrees(steeringEncoder.getAbsolutePosition()));
   }
 
   @Override
   public void setState(SwerveModuleState state) {
+    wheelMotor.set(ControlMode.Velocity, state.speedMetersPerSecond / ticksPer100msToMeterPerSec);
 
+    final double turnPower = steeringAnglePID.calculate(
+        Units.degreesToRadians(steeringEncoder.getAbsolutePosition()),
+        state.angle.getRadians());
+    steerMotor.set(ControlMode.PercentOutput, turnPower);
   }
 }
