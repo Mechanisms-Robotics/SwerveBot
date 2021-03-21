@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.util.Units;
  * A hardware wrapper class for a swerve module.
  */
 public class FXSwerveModule implements SwerveModule {
-
   private final WPI_TalonFX wheelMotor;
   private final WPI_TalonFX steerMotor;
   private final CANCoder steeringEncoder;
@@ -22,7 +21,7 @@ public class FXSwerveModule implements SwerveModule {
   private static final CANCoderConfiguration canCoderConfig;
 
   private static int speedEncoderCPR = 2048; // counts per revolution
-  private static final double moduleGearRatio = 8.61; // : 1
+  private static final double moduleGearRatio = 6.86; // : 1
   private static final double wheelDiameter = 0.0762; // m
   private static final double ticksPer100msToMeterPerSec
       = ((wheelDiameter * Math.PI)
@@ -58,8 +57,12 @@ public class FXSwerveModule implements SwerveModule {
    */
   public FXSwerveModule(int steerID, int wheelID, int encoderID,
       boolean steeringReversed, boolean wheelReversed) {
+    wheelMotor.restoreFactoryDefaults();
+    steerMotor.restoreFactoryDefaults();
+
     wheelMotor = new WPI_TalonFX(wheelID);
     wheelMotor.setInverted(wheelReversed);
+    wheelMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10);
 
     steerMotor = new WPI_TalonFX(steerID);
     steerMotor.setInverted(steeringReversed);
