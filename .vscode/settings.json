@@ -13,5 +13,7 @@
     "**/.settings": true,
     "**/.factorypath": true,
     "**/*~": true
-  }
+  },
+  "java.checkstyle.configuration": "${workspaceFolder}\\google_checks.xml",
+  "java.checkstyle.version": "8.41"
 }
