@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.util.Units;
+import java.lang.Math;
 
 /**
  * A hardware wrapper class for a swerve module.
@@ -26,25 +27,19 @@ public class FXSwerveModule implements SwerveModule {
   private static final double ticksPer100msToMeterPerSec
       = ((wheelDiameter * Math.PI)
       / (double)  (speedEncoderCPR * moduleGearRatio)) * 10.0;
+  private static final double steerEncoderCPR = 2048;
+  private static final double steerGearRatio = 12.8; // : 1
+  private static final double ticksToDegrees = 360.0 / (steerEncoderCPR * steerGearRatio);
 
   private static final double speedP = 0.0;
   private static final double speedI = 0.0;
   private static final double speedD = 0.0;
   private static final int speedPIDSlot = 0;
 
-  private static final double rotationP = 0.0;
-  private static final double rotationI = 0.0;
-  private static final double rotationD = 0.0;
-  private static final double rotationMaxSpeed = 0.0; // rad / sec
-  private static final double rotationMaxAccel = 0.0;
-
-  private static final ProfiledPIDController steeringAnglePID = new ProfiledPIDController(
-      rotationP, rotationI, rotationD,
-      new TrapezoidProfile.Constraints(
-          rotationMaxSpeed,
-          rotationMaxAccel
-    )
-  );
+  private static final double steerP = 0.0;
+  private static final double steerI = 0.0;
+  private static final double steerD = 0.0;
+  private static final int steerPIDSlot = 0;
 
   /**
    * Constructs a swerve module.
@@ -74,6 +69,11 @@ public class FXSwerveModule implements SwerveModule {
 
     steeringEncoder = new CANCoder(encoderID);
     steeringEncoder.configAllSettings(canCoderConfig);
+    steerMotor.configSelectedFeedbackCoefficient(ticksToDegrees, steerPIDSlot, 100);
+    steerMotor.setSelectedSensorPosition(steeringEncoder.getAbsolutePosition());
+    steerMotor.config_kP(steerPIDSlot, steerP);
+    steerMotor.config_kI(steerPIDSlot, steerI);
+    steerMotor.config_kD(steerPIDSlot, steerD);
   }
 
   /**
@@ -90,16 +90,21 @@ public class FXSwerveModule implements SwerveModule {
   @Override
   public SwerveModuleState getState() {
     return new SwerveModuleState(wheelMotor.getSelectedSensorVelocity() * ticksPer100msToMeterPerSec,
-        Rotation2d.fromDegrees(steeringEncoder.getAbsolutePosition()));
+        Rotation2d.fromDegrees(wrapAngle(steerMotor.getSelectedSensorPosition())));
   }
 
   @Override
   public void setState(SwerveModuleState state) {
     wheelMotor.set(ControlMode.Velocity, state.speedMetersPerSecond / ticksPer100msToMeterPerSec);
+    steerMotor.set(ControlMode.MotionMagic, unwrapAngle(state.angle.getDegrees()));
+  }
 
-    final double turnPower = steeringAnglePID.calculate(
-        Units.degreesToRadians(steeringEncoder.getAbsolutePosition()),
-        state.angle.getRadians());
-    steerMotor.set(ControlMode.PercentOutput, turnPower);
+  public double wrapAngle(double angle) {
+    return angle % (360 * Math.signum(angle));
+  }
+
+  public double unwrapAngle(double angle) {
+    int turns = (int)(steerMotor.getSelectedSensorPosition() / 360.0);
+    return angle + (turns * 360);
   }
 }
