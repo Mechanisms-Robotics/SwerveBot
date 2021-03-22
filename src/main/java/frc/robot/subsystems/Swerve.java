@@ -86,18 +86,18 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {}
 
-  public void drive(Translation2d desiredVelocity, double desiredAngularVelocity,
+  public void drive(Translation2d desiredTranslation, double desiredRotation,
       boolean fieldRelative) {
     SwerveModuleState[] states = kinematicController_.getDesiredWheelStates(
         fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-            desiredVelocity.getX(),
-            desiredVelocity.getY(),
-            desiredAngularVelocity,
+            desiredTranslation.getX(),
+            desiredTranslation.getY(),
+            desiredRotation,
             getHeading())
             : new ChassisSpeeds(
-                desiredVelocity.getX(),
-                desiredVelocity.getY(),
-                desiredAngularVelocity
+                desiredTranslation.getX(),
+                desiredTranslation.getY(),
+                desiredRotation
             )
     );
 
