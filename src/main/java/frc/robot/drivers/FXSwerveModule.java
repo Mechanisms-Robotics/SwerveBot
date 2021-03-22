@@ -19,7 +19,7 @@ public class FXSwerveModule implements SwerveModule {
   private final WPI_TalonFX steerMotor;
   private final CANCoder steeringEncoder;
 
-  private static final CANCoderConfiguration canCoderConfig;
+  private static CANCoderConfiguration canCoderConfig;
 
   private static int speedEncoderCPR = 2048; // counts per revolution
   private static final double moduleGearRatio = 6.86; // : 1
@@ -52,14 +52,12 @@ public class FXSwerveModule implements SwerveModule {
    */
   public FXSwerveModule(int steerID, int wheelID, int encoderID,
       boolean steeringReversed, boolean wheelReversed) {
-    wheelMotor.restoreFactoryDefaults();
-    steerMotor.restoreFactoryDefaults();
-
     wheelMotor = new WPI_TalonFX(wheelID);
+    wheelMotor.configFactoryDefault();
     wheelMotor.setInverted(wheelReversed);
-    wheelMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10);
 
     steerMotor = new WPI_TalonFX(steerID);
+    steerMotor.configFactoryDefault();
     steerMotor.setInverted(steeringReversed);
 
     wheelMotor.setSelectedSensorPosition(0.0);
@@ -67,8 +65,14 @@ public class FXSwerveModule implements SwerveModule {
     wheelMotor.config_kI(speedPIDSlot, speedI);
     wheelMotor.config_kD(speedPIDSlot, speedD);
 
+    canCoderConfig = new CANCoderConfiguration();
+    canCoderConfig.sensorDirection = false;
+    canCoderConfig.sensorCoefficient = 360.0 / 4096.0;
+    canCoderConfig.unitString = "degrees";
+
     steeringEncoder = new CANCoder(encoderID);
-    steeringEncoder.configAllSettings(canCoderConfig);
+    steeringEncoder.configAllSettings(canCoderConfig, 10);
+
     steerMotor.configSelectedFeedbackCoefficient(ticksToDegrees, steerPIDSlot, 100);
     steerMotor.setSelectedSensorPosition(steeringEncoder.getAbsolutePosition());
     steerMotor.config_kP(steerPIDSlot, steerP);
