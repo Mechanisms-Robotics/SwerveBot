@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.CANCoderConfiguration;
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
@@ -17,7 +16,6 @@ public class FXSwerveModule implements SwerveModule {
   private final WPI_TalonFX wheelMotor;
   private final WPI_TalonFX steerMotor;
   private final CANCoder steeringEncoder;
-  private final CANCoderConfiguration canCoderConfig;
 
   private static int speedEncoderCPR = 2048; // counts per revolution
   private static final double moduleGearRatio = 6.86; // : 1
@@ -64,13 +62,7 @@ public class FXSwerveModule implements SwerveModule {
     wheelMotor.config_kI(speedPIDSlot, speedI);
     wheelMotor.config_kD(speedPIDSlot, speedD);
 
-    canCoderConfig = new CANCoderConfiguration();
-    canCoderConfig.sensorDirection = false;
-    canCoderConfig.sensorCoefficient = 360.0 / 4096.0;
-    canCoderConfig.unitString = "degrees";
-
     steeringEncoder = new CANCoder(encoderID);
-    steeringEncoder.configAllSettings(canCoderConfig, 10);
 
     steerMotor.configSelectedFeedbackCoefficient(ticksToDegrees, steerPIDSlot, 100);
     steerMotor.setSelectedSensorPosition(steeringEncoder.getAbsolutePosition());
