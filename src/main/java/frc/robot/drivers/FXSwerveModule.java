@@ -3,8 +3,11 @@ package frc.robot.drivers;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 
+import com.ctre.phoenix.sensors.CANCoderConfiguration;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import java.lang.Math;
@@ -64,6 +67,8 @@ public class FXSwerveModule implements SwerveModule {
 
     steeringEncoder = new CANCoder(encoderID);
 
+    configCANCoder();
+
     steerMotor.configSelectedFeedbackCoefficient(ticksToDegrees, steerPIDSlot, 100);
     steerMotor.setSelectedSensorPosition(steeringEncoder.getAbsolutePosition());
     steerMotor.config_kP(steerPIDSlot, steerP);
@@ -92,6 +97,16 @@ public class FXSwerveModule implements SwerveModule {
   public void setState(SwerveModuleState state) {
     wheelMotor.set(ControlMode.Velocity, state.speedMetersPerSecond / ticksPer100msToMeterPerSec);
     steerMotor.set(ControlMode.MotionMagic, unwrapAngle(state.angle.getDegrees()));
+  }
+
+  public void configCANCoder() {
+    CANCoderConfiguration canCoderConfig = new CANCoderConfiguration();
+
+    canCoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
+    canCoderConfig.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
+    canCoderConfig.magnetOffsetDegrees = -steeringEncoder.getAbsolutePosition();
+
+    steeringEncoder.configAllSettings(canCoderConfig);
   }
 
   private double unwrapAngle(double angle) {
