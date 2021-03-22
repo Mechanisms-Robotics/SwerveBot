@@ -67,7 +67,6 @@ public class FXSwerveModule implements SwerveModule {
 
     steeringEncoder = new CANCoder(encoderID);
 
-
     steerMotor.configSelectedFeedbackCoefficient(ticksToDegrees, steerPIDSlot, 100);
     steerMotor.setSelectedSensorPosition(steeringEncoder.getAbsolutePosition());
     steerMotor.config_kP(steerPIDSlot, steerP);
@@ -98,6 +97,10 @@ public class FXSwerveModule implements SwerveModule {
     steerMotor.set(ControlMode.MotionMagic, unwrapAngle(state.angle.getDegrees()));
   }
 
+  /**
+   * Configure the CANCoder. Note that this resets the absolute encoder to 0 so 
+   * this can only be run when the module is in the 0 position.
+   */
   public void configCANCoder() {
     CANCoderConfiguration canCoderConfig = new CANCoderConfiguration();
 
