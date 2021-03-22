@@ -67,7 +67,6 @@ public class FXSwerveModule implements SwerveModule {
 
     steeringEncoder = new CANCoder(encoderID);
 
-    configCANCoder();
 
     steerMotor.configSelectedFeedbackCoefficient(ticksToDegrees, steerPIDSlot, 100);
     steerMotor.setSelectedSensorPosition(steeringEncoder.getAbsolutePosition());
