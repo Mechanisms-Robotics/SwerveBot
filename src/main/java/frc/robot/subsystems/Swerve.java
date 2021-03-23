@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.SerialPort.Port;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.drivers.FxSwerveModule;
-import frc.robot.drivers.NavX;
 import frc.robot.util.SwerveKinematicController;
 
 /**
@@ -77,7 +76,7 @@ public class Swerve extends SubsystemBase {
       "Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID
   );
 
-  private final NavX gyro = new NavX(Port.kUSB);
+  private final PigeonIMU gyro = new PigeonIMU(0);
 
   /////////////
   // METHODS //
@@ -86,6 +85,13 @@ public class Swerve extends SubsystemBase {
   @Override
   public void periodic() {}
 
+  /**
+   * Controls the swerve modules in coordination to drive a desired translation and rotation.
+   *
+   * @param desiredTranslation The desired translation to drive
+   * @param desiredRotation The desired rotation to drive
+   * @param fieldRelative Whether or not to drive realtive to the field
+   */
   public void drive(Translation2d desiredTranslation, double desiredRotation,
       boolean fieldRelative) {
     SwerveModuleState[] states = kinematicController_.getDesiredWheelStates(
@@ -104,6 +110,11 @@ public class Swerve extends SubsystemBase {
     setModuleStates(states);
   }
 
+  /**
+   * Sets all of the swerve module states sequentially.
+   *
+   * @param states What to set the states to
+   */
   public void setModuleStates(SwerveModuleState[] states) {
     SwerveDriveKinematics.normalizeWheelSpeeds(states, maxSpeed);
     flModule.setState(states[0]);
@@ -113,14 +124,17 @@ public class Swerve extends SubsystemBase {
   }
 
   public void zeroHeading() {
-    gyro.reset();
+    gyro.setYaw(0.0);
   }
 
+  /**
+   * Returns the swerve drive's heading as a Rotation2d.
+   *
+   * @return A Rotation2d representing the swerve drive's heading
+   */
   public Rotation2d getHeading() {
-    return gyro.getYaw();
-  }
-
-  public double getAngularVelocity() {
-    return gyro.getYawRateRadiansPerSec();
+    double[] ypr = new double[3];
+    gyro.getYawPitchRoll(ypr);
+    return Rotation2d.fromDegrees(ypr[0]);
   }
 }
