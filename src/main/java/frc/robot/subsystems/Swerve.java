@@ -119,6 +119,16 @@ public class Swerve extends SubsystemBase {
   }
 
   /**
+   * Calibrates all the swerve module's CANCoders. (Only run this when the modules are zeroed)
+   */
+  public void calibrateSwerveModules() {
+    flModule.calibrateAbsoluteEncoder();
+    frModule.calibrateAbsoluteEncoder();
+    blModule.calibrateAbsoluteEncoder();
+    brModule.calibrateAbsoluteEncoder();
+  }
+
+  /**
    * Returns the swerve drive's heading as a Rotation2d.
    *
    * @return A Rotation2d representing the swerve drive's heading
