@@ -21,4 +21,9 @@ public interface SwerveModule {
    * @param state The SwerveModuleState to set the module to
    */
   public void setState(SwerveModuleState state);
+
+  /**
+   * Calibrate the absolute encoder.
+   */
+  public void calibrateAbsoluteEncoder();
 }
