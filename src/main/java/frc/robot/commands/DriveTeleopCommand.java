@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
@@ -63,11 +62,11 @@ public class DriveTeleopCommand extends CommandBase {
     Translation2d desiredTranslation = new Translation2d(translationX.get(), translationY.get());
     double desiredRotation = rotation.get();
 
-    swerve.drive(desiredTranslation, desiredRotation, fieldOriented);
+    swerve.driveOpenLoop(desiredTranslation, desiredRotation, fieldOriented);
   }
 
   @Override
   public void end(boolean interrupted) {
-    swerve.drive(new Translation2d(), 0.0, false);
+    swerve.driveOpenLoop(new Translation2d(), 0.0, false);
   }
 }

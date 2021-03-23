@@ -15,10 +15,6 @@ import frc.robot.util.SwerveKinematicController;
  */
 public class Swerve extends SubsystemBase {
 
-  ///////////////
-  // CONSTANTS //
-  //////////////
-
   // The center of the robot is the origin point for all locations
   private static final double driveBaseWidth = 1.0; // m
   private static final double driveBaseLength = 1.0; // m
@@ -57,11 +53,7 @@ public class Swerve extends SubsystemBase {
           brModuleLocation
       );
 
-  private static final double maxSpeed = 5; // m / s
-
-  //////////////
-  // HARDWARE //
-  //////////////
+  private static final double maxSpeed = 4.5; // m / s
 
   private final FxSwerveModule flModule = new FxSwerveModule(
       "Front Left", flWheelMotorID, flSteerMotorID, flSteerEncoderID
@@ -78,10 +70,6 @@ public class Swerve extends SubsystemBase {
 
   private final PigeonIMU gyro = new PigeonIMU(0);
 
-  /////////////
-  // METHODS //
-  /////////////
-
   @Override
   public void periodic() {}
 
@@ -92,7 +80,7 @@ public class Swerve extends SubsystemBase {
    * @param desiredRotation The desired rotation to drive
    * @param fieldRelative Whether or not to drive realtive to the field
    */
-  public void drive(Translation2d desiredTranslation, double desiredRotation,
+  public void driveOpenLoop(Translation2d desiredTranslation, double desiredRotation,
       boolean fieldRelative) {
     SwerveModuleState[] states = kinematicController_.getDesiredWheelStates(
         fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -123,6 +111,9 @@ public class Swerve extends SubsystemBase {
     brModule.setState(states[3]);
   }
 
+  /**
+   * Zeros the gryo heading.
+   */
   public void zeroHeading() {
     gyro.setYaw(0.0);
   }
