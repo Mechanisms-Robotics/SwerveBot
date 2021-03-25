@@ -1,12 +1,16 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
+import edu.wpi.first.wpilibj.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpiutil.math.VecBuilder;
 import frc.robot.drivers.FxSwerveModule;
 import frc.robot.util.SwerveKinematicController;
 
@@ -45,13 +49,23 @@ public class Swerve extends SubsystemBase {
   private static final int brSteerMotorID = 7;
   private static final int brSteerEncoderID = 3;
 
-  private static final SwerveKinematicController kinematicController_ =
+  private static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
+      flModuleLocation,
+      frModuleLocation,
+      blModuleLocation,
+      brModuleLocation
+  );
+
+  private static final SwerveKinematicController kinematicController =
       new SwerveKinematicController(
           flModuleLocation,
           frModuleLocation,
           blModuleLocation,
           brModuleLocation
       );
+
+  private static SwerveDrivePoseEstimator poseEstimator;
+  private static Pose2d currentPose = new Pose2d();
 
   private static final double maxSpeed = 4.5; // m / s
 
@@ -70,8 +84,37 @@ public class Swerve extends SubsystemBase {
 
   private final PigeonIMU gyro = new PigeonIMU(0);
 
+  /**
+   * Constructs the Swerve subsystem.
+   */
+  public Swerve() {
+    poseEstimator = new SwerveDrivePoseEstimator(
+        getHeading(),
+        new Pose2d(),
+        kinematics,
+        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+        VecBuilder.fill(Units.degreesToRadians(0.01)),
+        VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30))
+    );
+  }
+
   @Override
-  public void periodic() {}
+  public void periodic() {
+    updateOdometry();
+  }
+
+  /**
+   * Updates the odometry based using the SwerveDrivePoseEstimator.
+   */
+  private void updateOdometry() {
+    currentPose = poseEstimator.update(
+        getHeading(),
+        flModule.getState(),
+        frModule.getState(),
+        blModule.getState(),
+        brModule.getState()
+    );
+  }
 
   /**
    * Controls the swerve modules in coordination to drive a desired translation and rotation.
@@ -82,7 +125,7 @@ public class Swerve extends SubsystemBase {
    */
   public void driveOpenLoop(Translation2d desiredTranslation, double desiredRotation,
       boolean fieldRelative) {
-    SwerveModuleState[] states = kinematicController_.getDesiredWheelStates(
+    SwerveModuleState[] states = kinematicController.getDesiredWheelStates(
         fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
             desiredTranslation.getX(),
             desiredTranslation.getY(),
