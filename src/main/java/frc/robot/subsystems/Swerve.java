@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.loopTime;
-
 import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.estimator.SwerveDrivePoseEstimator;
@@ -21,6 +19,9 @@ import frc.robot.util.SwerveKinematicController;
  * The base swerve drive class, controls all swerve modules in coordination.
  */
 public class Swerve extends SubsystemBase {
+
+  public static final double maxVelocity = 4.5; // m / s
+  public static final double maxRotationalVelocity = Math.PI; // rads/s
 
   // The center of the robot is the origin point for all locations
   private static final double driveBaseWidth = 1.0; // m
@@ -68,8 +69,6 @@ public class Swerve extends SubsystemBase {
   );
 
   private final SwerveDrivePoseEstimator poseEstimator;
-
-  private static final double maxSpeed = 4.5; // m / s
 
   private final FxSwerveModule flModule = new FxSwerveModule(
       "Front Left", flWheelMotorID, flSteerMotorID, flSteerEncoderID
@@ -214,7 +213,7 @@ public class Swerve extends SubsystemBase {
    * @param states What to set the states to
    */
   private void setModuleStates(SwerveModuleState[] states) {
-    SwerveDriveKinematics.normalizeWheelSpeeds(states, maxSpeed);
+    SwerveDriveKinematics.normalizeWheelSpeeds(states, maxVelocity);
     flModule.setState(states[0]);
     frModule.setState(states[1]);
     blModule.setState(states[2]);
