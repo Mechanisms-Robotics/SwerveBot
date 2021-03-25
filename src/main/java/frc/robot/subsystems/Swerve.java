@@ -106,7 +106,7 @@ public class Swerve extends SubsystemBase {
   /**
    * Updates the odometry based using the SwerveDrivePoseEstimator.
    */
-  public void updateOdometry() {
+  private void updateOdometry() {
     currentPose = poseEstimator.update(
         getHeading(),
         flModule.getState(),
