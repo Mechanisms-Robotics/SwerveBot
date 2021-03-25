@@ -80,6 +80,11 @@ public class SwerveKinematicController {
                            SwerveModuleState[] currentStates, double dt) {
     SwerveModuleState[] controlStates = getControlWheelStates(pose, reference,
       currentStates, desiredRobotSpeed);
+    
+    for (int i = 0; i < moduleLocations.length; i++) {
+      controlStates[i] = SwerveModuleState.optimize(controlStates[i], currentStates[i].angle);
+    }
+
     double[][] controlSpeeds = new double[moduleLocations.length][2];
     double[] steeringSpeeds = getControlSteerSpeeds(controlStates, currentStates, dt);
     for (int i = 0; i < moduleLocations.length; i++) {
@@ -107,6 +112,11 @@ public class SwerveKinematicController {
   public double[][] update(ChassisSpeeds desiredRobotSpeed, SwerveModuleState[] currentStates,
                            double dt) {
     SwerveModuleState[] controlStates = getDesiredWheelStates(desiredRobotSpeed);
+
+    for (int i = 0; i < moduleLocations.length; i++) {
+      controlStates[i] = SwerveModuleState.optimize(controlStates[i], currentStates[i].angle);
+    }
+
     double[][] controlSpeeds = new double[moduleLocations.length][2];
     double[] steeringSpeeds = getControlSteerSpeeds(controlStates, currentStates, dt);
     for (int i = 0; i < moduleLocations.length; i++) {
