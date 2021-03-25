@@ -2,7 +2,7 @@ package frc.robot.drivers;
 
 import static frc.robot.Constants.loopTime;
 import static frc.robot.Constants.startupCanTimeout;
-import static frc.robot.Constants.talionPrimaryPid;
+import static frc.robot.Constants.talonPrimaryPid;
 
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
@@ -76,7 +76,7 @@ public class FxSwerveModule implements SwerveModule {
     wheelMotor.setInverted(TalonFXInvertType.CounterClockwise);
     wheelMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, startupCanTimeout);
     wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
-        talionPrimaryPid, startupCanTimeout);
+        talonPrimaryPid, startupCanTimeout);
     wheelMotor.config_kP(speedPIDSlot, wheelSpeedP, startupCanTimeout);
     wheelMotor.config_kI(speedPIDSlot, wheelSpeedI, startupCanTimeout);
     wheelMotor.config_kD(speedPIDSlot, wheelSpeedD, startupCanTimeout);
@@ -88,8 +88,8 @@ public class FxSwerveModule implements SwerveModule {
     steerMotor.configFactoryDefault(startupCanTimeout);
     steerMotor.setInverted(TalonFXInvertType.Clockwise);
     steerMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
-        talionPrimaryPid, startupCanTimeout);
-    steerMotor.setSelectedSensorPosition(steeringEncoder.getAbsolutePosition(), talionPrimaryPid,
+        talonPrimaryPid, startupCanTimeout);
+    steerMotor.setSelectedSensorPosition(steeringEncoder.getAbsolutePosition(), talonPrimaryPid,
         startupCanTimeout);
     steerMotor.config_kP(steerMotionSlot, steerMotionP, startupCanTimeout);
     steerMotor.config_kI(steerMotionSlot, steerMotionI, startupCanTimeout);
@@ -122,7 +122,7 @@ public class FxSwerveModule implements SwerveModule {
   public void setState(SwerveModuleState state) {
     if (velocityMode) {
       velocityMode = false;
-      steerMotor.selectProfileSlot(steerMotionSlot, talionPrimaryPid);
+      steerMotor.selectProfileSlot(steerMotionSlot, talonPrimaryPid);
     }
     wheelMotor.set(TalonFXControlMode.Velocity,
         state.speedMetersPerSecond / ticksPer100msToMeterPerSec);
@@ -134,7 +134,7 @@ public class FxSwerveModule implements SwerveModule {
   public void setVelocity(double wheelSpeed, double steeringSpeed) {
     if (!velocityMode) {
       velocityMode = true;
-      steerMotor.selectProfileSlot(steerSpeedSlot, talionPrimaryPid);
+      steerMotor.selectProfileSlot(steerSpeedSlot, talonPrimaryPid);
     }
     wheelMotor.set(TalonFXControlMode.Velocity,
         wheelSpeed / ticksPer100msToMeterPerSec);
