@@ -23,6 +23,21 @@ public interface SwerveModule {
   public void setState(SwerveModuleState state);
 
   /**
+   * Sets the wheel and steering speed of the module.
+   *
+   * @param wheelSpeed The speed in m/s to set the wheel speed to.
+   * @param steeringSpeed The speed in rads/s to s
+   */
+  public void setVelocity(double wheelSpeed, double steeringSpeed);
+
+  /**
+   * Get the rotational speed of the modules.
+   *
+   * @return The modules steering speed in rads/s
+   */
+  public double getSteeringSpeed();
+
+  /**
    * Calibrate the absolute encoder.
    */
   public void calibrateAbsoluteEncoder();
