@@ -16,21 +16,17 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
-import java.lang.Math;
 
-/**
- * A hardware wrapper class for a swerve module that uses Falcon500s.
- */
+/** A hardware wrapper class for a swerve module that uses Falcon500s. */
 public class FxSwerveModule implements SwerveModule {
 
   private static int falconCPR = 2048; // counts per revolution
   private static final double moduleGearRatio = 6.86; // : 1
   private static final double wheelDiameter = 0.1016; // m
-  private static final double ticksPer100msToMeterPerSec
-      = ((wheelDiameter * Math.PI)
-      / (double)  (falconCPR * moduleGearRatio)) * 10.0;
+  private static final double ticksPer100msToMeterPerSec =
+      ((wheelDiameter * Math.PI) / (double) (falconCPR * moduleGearRatio)) * 10.0;
   private static final double steerGearRatio = 12.8; // : 1
-  private static final double degreesToTicks =  (falconCPR * steerGearRatio) / 360;
+  private static final double degreesToTicks = (falconCPR * steerGearRatio) / 360;
 
   private static final double wheelSpeedP = 0.0;
   private static final double wheelSpeedI = 0.0;
@@ -60,14 +56,19 @@ public class FxSwerveModule implements SwerveModule {
   /**
    * Constructs a swerve module.
    *
-   * @param steerId          The CAN ID of the Spark Max used to control the steering
-   * @param wheelId          The CAN Id of the Spark Max used to control the wheel
-   * @param encoderId        The CAN ID of the CANCoder used to determine the angle of the module
+   * @param steerId The CAN ID of the Spark Max used to control the steering
+   * @param wheelId The CAN Id of the Spark Max used to control the wheel
+   * @param encoderId The CAN ID of the CANCoder used to determine the angle of the module
    * @param steeringReversed Wether or not the motor used for steering is reversed
-   * @param wheelReversed    Wether or not the motor used for the wheel is reversed
+   * @param wheelReversed Wether or not the motor used for the wheel is reversed
    */
-  public FxSwerveModule(String name, int steerId, int wheelId,
-      int encoderId, boolean steeringReversed, boolean wheelReversed) {
+  public FxSwerveModule(
+      String name,
+      int steerId,
+      int wheelId,
+      int encoderId,
+      boolean steeringReversed,
+      boolean wheelReversed) {
 
     moduleName = name;
 
@@ -75,8 +76,8 @@ public class FxSwerveModule implements SwerveModule {
     wheelMotor.configFactoryDefault(startupCanTimeout);
     wheelMotor.setInverted(TalonFXInvertType.CounterClockwise);
     wheelMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, startupCanTimeout);
-    wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
-        talonPrimaryPid, startupCanTimeout);
+    wheelMotor.configSelectedFeedbackSensor(
+        TalonFXFeedbackDevice.IntegratedSensor, talonPrimaryPid, startupCanTimeout);
     wheelMotor.config_kP(speedPIDSlot, wheelSpeedP, startupCanTimeout);
     wheelMotor.config_kI(speedPIDSlot, wheelSpeedI, startupCanTimeout);
     wheelMotor.config_kD(speedPIDSlot, wheelSpeedD, startupCanTimeout);
@@ -87,10 +88,10 @@ public class FxSwerveModule implements SwerveModule {
     steerMotor = new WPI_TalonFX(steerId);
     steerMotor.configFactoryDefault(startupCanTimeout);
     steerMotor.setInverted(TalonFXInvertType.Clockwise);
-    steerMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,
-        talonPrimaryPid, startupCanTimeout);
-    steerMotor.setSelectedSensorPosition(steeringEncoder.getAbsolutePosition(), talonPrimaryPid,
-        startupCanTimeout);
+    steerMotor.configSelectedFeedbackSensor(
+        TalonFXFeedbackDevice.IntegratedSensor, talonPrimaryPid, startupCanTimeout);
+    steerMotor.setSelectedSensorPosition(
+        steeringEncoder.getAbsolutePosition(), talonPrimaryPid, startupCanTimeout);
     steerMotor.config_kP(steerMotionSlot, steerMotionP, startupCanTimeout);
     steerMotor.config_kI(steerMotionSlot, steerMotionI, startupCanTimeout);
     steerMotor.config_kD(steerMotionSlot, steerMotionD, startupCanTimeout);
@@ -104,8 +105,8 @@ public class FxSwerveModule implements SwerveModule {
    *
    * @param name Unique name for this swerve module.
    * @param steeringId The CAN ID of the Spark Max used to control the steering
-   * @param wheelId    The CAN Id of the Spark Max used to control the wheel
-   * @param encoderId  The CAN ID of the CANCoder used to determine the angle of the module
+   * @param wheelId The CAN Id of the Spark Max used to control the wheel
+   * @param encoderId The CAN ID of the CANCoder used to determine the angle of the module
    */
   public FxSwerveModule(String name, int steeringId, int wheelId, int encoderId) {
     this(name, steeringId, wheelId, encoderId, false, false);
@@ -124,10 +125,10 @@ public class FxSwerveModule implements SwerveModule {
       velocityMode = false;
       steerMotor.selectProfileSlot(steerMotionSlot, talonPrimaryPid);
     }
-    wheelMotor.set(TalonFXControlMode.Velocity,
-        state.speedMetersPerSecond / ticksPer100msToMeterPerSec);
-    steerMotor.set(TalonFXControlMode.MotionMagic,
-        unwrapAngle(state.angle.getDegrees()) * degreesToTicks);
+    wheelMotor.set(
+        TalonFXControlMode.Velocity, state.speedMetersPerSecond / ticksPer100msToMeterPerSec);
+    steerMotor.set(
+        TalonFXControlMode.MotionMagic, unwrapAngle(state.angle.getDegrees()) * degreesToTicks);
   }
 
   @Override
@@ -136,10 +137,9 @@ public class FxSwerveModule implements SwerveModule {
       velocityMode = true;
       steerMotor.selectProfileSlot(steerSpeedSlot, talonPrimaryPid);
     }
-    wheelMotor.set(TalonFXControlMode.Velocity,
-        wheelSpeed / ticksPer100msToMeterPerSec);
-    steerMotor.set(TalonFXControlMode.Velocity,
-        Math.toDegrees(steeringSpeed) * degreesToTicks * 10);
+    wheelMotor.set(TalonFXControlMode.Velocity, wheelSpeed / ticksPer100msToMeterPerSec);
+    steerMotor.set(
+        TalonFXControlMode.Velocity, Math.toDegrees(steeringSpeed) * degreesToTicks * 10);
   }
 
   @Override
@@ -159,10 +159,10 @@ public class FxSwerveModule implements SwerveModule {
   }
 
   private void bootCanCoder() {
-    steeringEncoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, loopTime,
-        startupCanTimeout);
-    steeringEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180,
-        startupCanTimeout);
+    steeringEncoder.setStatusFramePeriod(
+        CANCoderStatusFrame.SensorData, loopTime, startupCanTimeout);
+    steeringEncoder.configAbsoluteSensorRange(
+        AbsoluteSensorRange.Signed_PlusMinus180, startupCanTimeout);
     if (steeringEncoder.configGetCustomParam(customParamIdx, startupCanTimeout) != uniqueId) {
       DriverStation.reportError("Swerve module[" + moduleName + "] needs to be recalibrate", false);
     }
