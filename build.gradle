@@ -1,6 +1,5 @@
 plugins {
     id "java"
-    id 'checkstyle'
     id "edu.wpi.first.GradleRIO" version "2021.2.2"
 }
 
@@ -8,14 +7,6 @@ sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
-
-
-checkstyle {
-    toolVersion = '8.40'
-    configFile = file("$projectDir/google_checks.xml")
-    showViolations = true
-    ignoreFailures = false
-}
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
 // This is added by GradleRIO's backing project EmbeddedTools.
