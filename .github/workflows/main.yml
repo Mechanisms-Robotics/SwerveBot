@@ -34,6 +34,6 @@ jobs:
       run: ./gradlew build
       
     # Check the code formatting
-    - name: Check Formating
+    - name: Check Formatting
       run: ./gradlew spotlessCheck
 
