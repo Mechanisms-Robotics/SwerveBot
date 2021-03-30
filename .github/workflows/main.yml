@@ -32,3 +32,8 @@ jobs:
     # Runs a single command using the runners shell
     - name: Compile and run tests on robot code
       run: ./gradlew build
+      
+    # Check the code formatting
+    - name: Check Formating
+      run: ./gradlew spotlessCheck
+
