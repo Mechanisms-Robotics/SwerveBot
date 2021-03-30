@@ -81,6 +81,7 @@ jar {
 
 // Spotless Config
 spotless {
+    enforceCheck false
     java {
         target fileTree('.') {
             include '**/*.java'
