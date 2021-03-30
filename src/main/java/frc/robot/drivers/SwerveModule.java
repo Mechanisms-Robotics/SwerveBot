@@ -2,16 +2,13 @@ package frc.robot.drivers;
 
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 
-/**
- * This interface defines the api needed to control a swerve module fully.
- */
+/** This interface defines the api needed to control a swerve module fully. */
 public interface SwerveModule {
 
   /**
    * Get the current state of the module.
    *
-   * @return A SwerveModuleState representing the current speed
-   *     and rotation of the module
+   * @return A SwerveModuleState representing the current speed and rotation of the module
    */
   public SwerveModuleState getState();
 
@@ -37,8 +34,6 @@ public interface SwerveModule {
    */
   public double getSteeringSpeed();
 
-  /**
-   * Calibrate the absolute encoder.
-   */
+  /** Calibrate the absolute encoder. */
   public void calibrateAbsoluteEncoder();
 }

@@ -15,9 +15,7 @@ import edu.wpi.first.wpiutil.math.VecBuilder;
 import frc.robot.drivers.FxSwerveModule;
 import frc.robot.util.SwerveKinematicController;
 
-/**
- * The base swerve drive class, controls all swerve modules in coordination.
- */
+/** The base swerve drive class, controls all swerve modules in coordination. */
 public class Swerve extends SubsystemBase {
 
   public static final double maxVelocity = 4.5; // m / s
@@ -27,18 +25,14 @@ public class Swerve extends SubsystemBase {
   private static final double driveBaseWidth = 1.0; // m
   private static final double driveBaseLength = 1.0; // m
 
-  private static final Translation2d flModuleLocation = new Translation2d(
-      -driveBaseWidth / 2.0, driveBaseLength / 2.0
-  );
-  private static final Translation2d frModuleLocation = new Translation2d(
-      driveBaseWidth / 2.0, driveBaseLength / 2.0
-  );
-  private static final Translation2d blModuleLocation = new Translation2d(
-      -driveBaseWidth / 2.0, -driveBaseLength / 2.0
-  );
-  private static final Translation2d brModuleLocation = new Translation2d(
-      driveBaseWidth / 2.0, -driveBaseLength / 2.0
-  );
+  private static final Translation2d flModuleLocation =
+      new Translation2d(-driveBaseWidth / 2.0, driveBaseLength / 2.0);
+  private static final Translation2d frModuleLocation =
+      new Translation2d(driveBaseWidth / 2.0, driveBaseLength / 2.0);
+  private static final Translation2d blModuleLocation =
+      new Translation2d(-driveBaseWidth / 2.0, -driveBaseLength / 2.0);
+  private static final Translation2d brModuleLocation =
+      new Translation2d(driveBaseWidth / 2.0, -driveBaseLength / 2.0);
 
   private static final int flWheelMotorID = 0;
   private static final int flSteerMotorID = 1;
@@ -53,35 +47,24 @@ public class Swerve extends SubsystemBase {
   private static final int brSteerMotorID = 7;
   private static final int brSteerEncoderID = 3;
 
-  private static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
-      flModuleLocation,
-      frModuleLocation,
-      blModuleLocation,
-      brModuleLocation
-  );
+  private static final SwerveDriveKinematics kinematics =
+      new SwerveDriveKinematics(
+          flModuleLocation, frModuleLocation, blModuleLocation, brModuleLocation);
 
   private final SwerveKinematicController kinematicController =
       new SwerveKinematicController(
-          flModuleLocation,
-          frModuleLocation,
-          blModuleLocation,
-          brModuleLocation
-  );
+          flModuleLocation, frModuleLocation, blModuleLocation, brModuleLocation);
 
   private final SwerveDrivePoseEstimator poseEstimator;
 
-  private final FxSwerveModule flModule = new FxSwerveModule(
-      "Front Left", flWheelMotorID, flSteerMotorID, flSteerEncoderID
-  );
-  private final FxSwerveModule frModule = new FxSwerveModule(
-      "Front Right", frWheelMotorID, frSteerMotorID, frSteerEncoderID
-  );
-  private final FxSwerveModule blModule = new FxSwerveModule(
-      "Back Left", blWheelMotorID, blSteerMotorID, blSteerEncoderID
-  );
-  private final FxSwerveModule brModule = new FxSwerveModule(
-      "Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID
-  );
+  private final FxSwerveModule flModule =
+      new FxSwerveModule("Front Left", flWheelMotorID, flSteerMotorID, flSteerEncoderID);
+  private final FxSwerveModule frModule =
+      new FxSwerveModule("Front Right", frWheelMotorID, frSteerMotorID, frSteerEncoderID);
+  private final FxSwerveModule blModule =
+      new FxSwerveModule("Back Left", blWheelMotorID, blSteerMotorID, blSteerEncoderID);
+  private final FxSwerveModule brModule =
+      new FxSwerveModule("Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID);
 
   private final PigeonIMU gyro = new PigeonIMU(0);
 
@@ -91,31 +74,29 @@ public class Swerve extends SubsystemBase {
   private Pose2d desiredPose = null;
   private double lastUpdate = -1;
 
-  /**
-   * Constructs the Swerve subsystem.
-   */
+  /** Constructs the Swerve subsystem. */
   public Swerve() {
-    poseEstimator = new SwerveDrivePoseEstimator(
-        getHeading(),
-        new Pose2d(),
-        kinematics,
-        VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-        VecBuilder.fill(Units.degreesToRadians(0.01)),
-        VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30))
-    );
+    poseEstimator =
+        new SwerveDrivePoseEstimator(
+            getHeading(),
+            new Pose2d(),
+            kinematics,
+            VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
+            VecBuilder.fill(Units.degreesToRadians(0.01)),
+            VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
   }
 
   @Override
   public void periodic() {
 
     // Update the pose of the robot
-    currentPose = poseEstimator.update(
-        getHeading(),
-        flModule.getState(),
-        frModule.getState(),
-        blModule.getState(),
-        brModule.getState()
-    );
+    currentPose =
+        poseEstimator.update(
+            getHeading(),
+            flModule.getState(),
+            frModule.getState(),
+            blModule.getState(),
+            brModule.getState());
 
     // If we don't have a previous update then wait for the
     // next update so we can calculate the correct loop time
@@ -133,8 +114,8 @@ public class Swerve extends SubsystemBase {
       if (desiredPose == null) {
         speeds = kinematicController.update(desiredSpeed, currentStates, dt);
       } else {
-        speeds = kinematicController.update(currentPose, desiredPose, desiredSpeed, currentStates,
-            dt);
+        speeds =
+            kinematicController.update(currentPose, desiredPose, desiredSpeed, currentStates, dt);
       }
       setModuleSpeeds(speeds);
     } else {
@@ -174,9 +155,8 @@ public class Swerve extends SubsystemBase {
   }
 
   /**
-   * Controls the swerve modules in coordination to drive to a desired point and be at
-   * a desired speed at that point. Note that all values MUST be felid relative unlike
-   * the open loop method.
+   * Controls the swerve modules in coordination to drive to a desired point and be at a desired
+   * speed at that point. Note that all values MUST be felid relative unlike the open loop method.
    *
    * @param desiredSpeed The desired speed to have at the desired pose
    * @param desiredPose The desired pose to be at
@@ -186,13 +166,17 @@ public class Swerve extends SubsystemBase {
       kinematicController.reset();
     }
     this.desiredPose = desiredPose;
-    this.desiredSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(desiredSpeed.vxMetersPerSecond,
-        desiredSpeed.vyMetersPerSecond, desiredSpeed.omegaRadiansPerSecond, getHeading());
+    this.desiredSpeed =
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            desiredSpeed.vxMetersPerSecond,
+            desiredSpeed.vyMetersPerSecond,
+            desiredSpeed.omegaRadiansPerSecond,
+            getHeading());
   }
 
   /**
-   * Reset the kinematic controller. This should be called every time the robot
-   * changes to a different trajectory\control state.
+   * Reset the kinematic controller. This should be called every time the robot changes to a
+   * different trajectory\control state.
    */
   public void resetController() {
     kinematicController.reset();
@@ -241,16 +225,12 @@ public class Swerve extends SubsystemBase {
     return states;
   }
 
-  /**
-   * Zeros the gryo heading.
-   */
+  /** Zeros the gryo heading. */
   public void zeroHeading() {
     gyro.setYaw(0.0);
   }
 
-  /**
-   * Calibrates all the swerve module's CANCoders. (Only run this when the modules are zeroed)
-   */
+  /** Calibrates all the swerve module's CANCoders. (Only run this when the modules are zeroed) */
   public void calibrateSwerveModules() {
     flModule.calibrateAbsoluteEncoder();
     frModule.calibrateAbsoluteEncoder();

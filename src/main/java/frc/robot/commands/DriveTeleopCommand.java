@@ -5,9 +5,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
 import java.util.function.Supplier;
 
-/**
- * Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x.
- */
+/** Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x. */
 public class DriveTeleopCommand extends CommandBase {
 
   private static final double maxTranslationalVelocityRate = 3.0; // m/s per second
@@ -23,7 +21,6 @@ public class DriveTeleopCommand extends CommandBase {
   private final SlewRateLimiter vyRateLimiter;
   private final SlewRateLimiter vrRateLimiter;
 
-
   private final boolean fieldOriented;
 
   /**
@@ -35,8 +32,12 @@ public class DriveTeleopCommand extends CommandBase {
    * @param fieldOriented Whether or not driving is field oriented
    * @param swerve Instance of Swerve
    */
-  public DriveTeleopCommand(Supplier<Double> driverX, Supplier<Double> driverY,
-      Supplier<Double> driverRotation, boolean fieldOriented, Swerve swerve) {
+  public DriveTeleopCommand(
+      Supplier<Double> driverX,
+      Supplier<Double> driverY,
+      Supplier<Double> driverRotation,
+      boolean fieldOriented,
+      Swerve swerve) {
     vxSupplier = driverX;
     vySupplier = driverY;
     vrSupplier = driverRotation;
@@ -60,8 +61,11 @@ public class DriveTeleopCommand extends CommandBase {
    * @param driverRotation Right joystick x, which acts as desired rotation of the swerve drive
    * @param swerve Instance of Swerve
    */
-  public DriveTeleopCommand(Supplier<Double> driverX, Supplier<Double> driverY,
-      Supplier<Double> driverRotation, Swerve swerve) {
+  public DriveTeleopCommand(
+      Supplier<Double> driverX,
+      Supplier<Double> driverY,
+      Supplier<Double> driverRotation,
+      Swerve swerve) {
     this(driverX, driverY, driverRotation, true, swerve);
   }
 
