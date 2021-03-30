@@ -3,26 +3,22 @@ package frc.robot.util;
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
- * A controller class for Thrustmaster T-16000M joysticks, PS4 controllers, or Xbox controllers.
- * It wraps the WPILib Joystick methods to make it more user friendly.
+ * A controller class for Thrustmaster T-16000M joysticks, PS4 controllers, or Xbox controllers. It
+ * wraps the WPILib Joystick methods to make it more user friendly.
  */
 public class LazyController {
   private ControllerType type;
   private Joystick controller1;
   private Joystick controller2;
 
-  /**
-   * A controller type.
-   */
+  /** A controller type. */
   public enum ControllerType {
     Joysticks,
     PS4,
     Xbox;
   }
 
-  /**
-   * Corresponds to the POV or DPAD of the controller.
-   */
+  /** Corresponds to the POV or DPAD of the controller. */
   public enum Pov {
     UP,
     UP_RIGHT,
@@ -35,9 +31,7 @@ public class LazyController {
     NONE;
   }
 
-  /**
-   * Corresponds to buttons on the controller.
-   */
+  /** Corresponds to buttons on the controller. */
   public enum ControllerButton {
     SQUARE(1),
     X(2),
@@ -99,7 +93,8 @@ public class LazyController {
     this.type = ControllerType.Joysticks;
   }
 
-  /** Constructs a LazyController of type PS4.
+  /**
+   * Constructs a LazyController of type PS4.
    *
    * @param id The ID of the controller
    */
