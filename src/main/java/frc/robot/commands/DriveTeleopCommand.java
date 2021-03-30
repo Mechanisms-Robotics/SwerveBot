@@ -5,9 +5,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
 import java.util.function.Supplier;
 
-/**
- * Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x.
- */
+/** Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x. */
 public class DriveTeleopCommand extends CommandBase {
   private Swerve swerve;
   private Supplier<Double> translationX;
@@ -25,8 +23,12 @@ public class DriveTeleopCommand extends CommandBase {
    * @param fieldOriented Whether or not driving is field oriented
    * @param swerve Instance of Swerve
    */
-  public DriveTeleopCommand(Supplier<Double> translationX, Supplier<Double> translationY,
-      Supplier<Double> rotation, boolean fieldOriented, Swerve swerve) {
+  public DriveTeleopCommand(
+      Supplier<Double> translationX,
+      Supplier<Double> translationY,
+      Supplier<Double> rotation,
+      boolean fieldOriented,
+      Swerve swerve) {
     this.translationX = translationX;
     this.translationY = translationY;
     this.rotation = rotation;
@@ -45,8 +47,11 @@ public class DriveTeleopCommand extends CommandBase {
    * @param rotation Right joystick x, which acts as desired rotation of the swerve drive
    * @param swerve Instance of Swerve
    */
-  public DriveTeleopCommand(Supplier<Double> translationX, Supplier<Double> translationY,
-      Supplier<Double> rotation, Swerve swerve) {
+  public DriveTeleopCommand(
+      Supplier<Double> translationX,
+      Supplier<Double> translationY,
+      Supplier<Double> rotation,
+      Swerve swerve) {
     this.translationX = translationX;
     this.translationY = translationY;
     this.rotation = rotation;

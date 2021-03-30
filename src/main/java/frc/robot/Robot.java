@@ -50,18 +50,14 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
   }
 
-  /**
-   * This function is called once each time the robot enters Disabled mode.
-   */
+  /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {}
 
   @Override
   public void disabledPeriodic() {}
 
-  /**
-   * This function is called once each time the robot enters Autonomous mode.
-   */
+  /** This function is called once each time the robot enters Autonomous mode. */
   @Override
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
@@ -72,15 +68,11 @@ public class Robot extends TimedRobot {
     }
   }
 
-  /**
-   * This function is called periodically during Autonomous mode.
-   */
+  /** This function is called periodically during Autonomous mode. */
   @Override
   public void autonomousPeriodic() {}
 
-  /**
-   * This function is called periodically during Teleop mode.
-   */
+  /** This function is called periodically during Teleop mode. */
   @Override
   public void teleopInit() {
     // This makes sure that the autonomous stops running when
@@ -92,9 +84,7 @@ public class Robot extends TimedRobot {
     }
   }
 
-  /**
-   * This function is called periodically during Teleop mode.
-   */
+  /** This function is called periodically during Teleop mode. */
   @Override
   public void teleopPeriodic() {}
 
@@ -104,9 +94,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().cancelAll();
   }
 
-  /**
-   * This function is called periodically during test mode.
-   */
+  /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
 }
