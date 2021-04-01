@@ -57,6 +57,12 @@ public class DriveTrajectoryCommand extends CommandBase {
 
     swerve.resetController();
 
+    swerveControllerCommand.schedule();
     swerveControllerCommand.andThen(() -> swerve.driveOpenLoop(0, 0, 0, false));
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    swerve.resetController();
   }
 }
