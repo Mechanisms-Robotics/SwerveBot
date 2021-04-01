@@ -139,15 +139,15 @@ public class Swerve extends SubsystemBase {
    * @param dx Speed in m/s in the x direction
    * @param dy Speed in m/s in the y direction
    * @param dr Rotation speed in rads/s
-   * @param felidRelative True if the speeds are felid relative otherwise false
+   * @param fieldRelative True if the speeds are felid relative otherwise false
    */
-  public void driveOpenLoop(double dx, double dy, double dr, boolean felidRelative) {
+  public void driveOpenLoop(double dx, double dy, double dr, boolean fieldRelative) {
     if (desiredPose != null) {
       this.desiredPose = null;
       kinematicController.reset();
     }
 
-    if (felidRelative) {
+    if (fieldRelative) {
       desiredSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(dx, dy, dr, getHeading());
     } else {
       desiredSpeed = new ChassisSpeeds(dx, dy, dr);
@@ -156,7 +156,7 @@ public class Swerve extends SubsystemBase {
 
   /**
    * Controls the swerve modules in coordination to drive to a desired point and be at a desired
-   * speed at that point. Note that all values MUST be felid relative unlike the open loop method.
+   * speed at that point. Note that all values MUST be field relative unlike the open loop method.
    *
    * @param desiredSpeed The desired speed to have at the desired pose
    * @param desiredPose The desired pose to be at
