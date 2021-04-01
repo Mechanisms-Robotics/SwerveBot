@@ -56,7 +56,7 @@ public class DriveTrajectoryCommand extends CommandBase {
             swerve);
 
     swerve.resetController();
-    
+
     swerveControllerCommand.andThen(() -> swerve.driveOpenLoop(0, 0, 0, false));
   }
 
