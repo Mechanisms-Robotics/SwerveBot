@@ -196,7 +196,7 @@ public class Swerve extends SubsystemBase {
    *
    * @param states What to set the states to
    */
-  private void setModuleStates(SwerveModuleState[] states) {
+  public void setModuleStates(SwerveModuleState[] states) {
     SwerveDriveKinematics.normalizeWheelSpeeds(states, maxVelocity);
     flModule.setState(states[0]);
     frModule.setState(states[1]);
@@ -247,5 +247,18 @@ public class Swerve extends SubsystemBase {
     double[] ypr = new double[3];
     gyro.getYawPitchRoll(ypr);
     return Rotation2d.fromDegrees(ypr[0]);
+  }
+
+  /**
+   * Returns the swerve drive's current pose.
+   *
+   * @return A Pose2d representing the swerve drive's current pose
+   */
+  public Pose2d getPose() {
+    return this.currentPose;
+  }
+
+  public SwerveDriveKinematics getKinematics() {
+    return kinematics;
   }
 }
