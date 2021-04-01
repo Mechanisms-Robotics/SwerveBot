@@ -160,7 +160,7 @@ public class FxSwerveModule implements SwerveModule {
 
   private void bootCanCoder() {
     steeringEncoder.setStatusFramePeriod(
-        CANCoderStatusFrame.SensorData, loopTime, startupCanTimeout);
+        CANCoderStatusFrame.SensorData, (int) (loopTime * 1000), startupCanTimeout);
     steeringEncoder.configAbsoluteSensorRange(
         AbsoluteSensorRange.Signed_PlusMinus180, startupCanTimeout);
     if (steeringEncoder.configGetCustomParam(customParamIdx, startupCanTimeout) != uniqueId) {
