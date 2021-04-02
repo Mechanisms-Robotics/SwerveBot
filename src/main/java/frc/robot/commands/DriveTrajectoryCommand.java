@@ -30,7 +30,10 @@ public class DriveTrajectoryCommand extends CommandBase {
 
   public DriveTrajectoryCommand(Trajectory trajectory, Swerve swerve) {
     this.trajectory = trajectory;
+
     this.swerve = swerve;
+    this.swerve.resetController();
+    addRequirements(swerve);
   }
 
   @Override
@@ -54,8 +57,6 @@ public class DriveTrajectoryCommand extends CommandBase {
             thetaPIDController,
             swerve::setModuleStates,
             swerve);
-
-    swerve.resetController();
 
     swerveControllerCommand.andThen(() -> swerve.driveOpenLoop(0, 0, 0, false));
   }
