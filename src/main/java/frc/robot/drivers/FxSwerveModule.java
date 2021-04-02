@@ -5,6 +5,7 @@ import static frc.robot.Constants.startupCanTimeout;
 import static frc.robot.Constants.talonPrimaryPid;
 
 import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
@@ -81,6 +82,8 @@ public class FxSwerveModule implements SwerveModule {
     wheelMotor.config_kP(speedPIDSlot, wheelSpeedP, startupCanTimeout);
     wheelMotor.config_kI(speedPIDSlot, wheelSpeedI, startupCanTimeout);
     wheelMotor.config_kD(speedPIDSlot, wheelSpeedD, startupCanTimeout);
+    // TODO: Replace with actual values
+    wheelMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 10, 15, 0.5));
 
     steeringEncoder = new CANCoder(encoderId);
     bootCanCoder();
@@ -98,6 +101,8 @@ public class FxSwerveModule implements SwerveModule {
     steerMotor.config_kP(steerSpeedSlot, steerSpeedP, startupCanTimeout);
     steerMotor.config_kI(steerSpeedSlot, steerSpeedI, startupCanTimeout);
     steerMotor.config_kD(steerSpeedSlot, steerSpeedD, startupCanTimeout);
+    // TODO: Replace with actual values
+    steerMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 10, 15, 0.5));
   }
 
   /**
