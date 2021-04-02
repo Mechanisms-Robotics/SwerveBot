@@ -7,37 +7,33 @@ import java.util.Map;
 
 public class AutoChooser {
 
-  private Swerve swerve = null;
+  private final Swerve swerve;
+
+  private final Map<String, AutoCommand> autoChoices;
+
+  private final SendableChooser<AutoCommand> chooser = new SendableChooser<>();
 
   public AutoChooser(Swerve swerve) {
     this.swerve = swerve;
-  }
 
-  private Map<String, AutoCommand> autoChoices =
-      new HashMap<String, AutoCommand>() {
-        {
-          put("None", null);
-          put("Slalom", new Slalom(swerve));
-        }
-      };
+    this.autoChoices =
+        new HashMap<String, AutoCommand>() {
+          {
+            put("None", null);
+            put("Slalom", new Slalom(swerve));
+          }
+        };
 
-  public AutoCommand getAuto(String choice) {
-    if (choice != null) {
-      return this.autoChoices.get(choice);
+    this.chooser.setDefaultOption("SELECT AUTO!", null);
+
+    for (Map.Entry<String, AutoCommand> autoChoice : autoChoices.entrySet()) {
+      this.chooser.addOption(autoChoice.getKey(), autoChoice.getValue());
     }
 
-    return autoChoices.get("None");
+    this.chooser.getSelected();
   }
 
   public SendableChooser<AutoCommand> getAutoChooser() {
-    SendableChooser<AutoCommand> chooser = new SendableChooser<>();
-    chooser.setDefaultOption("SELECT AUTO!", null);
-
-    for (Map.Entry<String, AutoCommand> autoChoice : autoChoices.entrySet()) {
-      chooser.addOption(autoChoice.getKey(), autoChoice.getValue());
-    }
-
-    chooser.getSelected();
-    return chooser;
+    return this.chooser;
   }
 }
