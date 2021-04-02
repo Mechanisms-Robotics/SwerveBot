@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.commands.DriveTeleopCommand;
 import frc.robot.subsystems.Swerve;
 
 /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -28,14 +29,12 @@ public class RobotContainer {
 
   private void configureDefaultCommands() {
     // Drive the robot relative to the field
-    swerve.setDefaultCommand(
-        new RunCommand(
-            () ->
-                swerve.driveOpenLoop(
-                    driverController.getX(Hand.kLeft),
-                    driverController.getY(Hand.kLeft),
-                    driverController.getX(Hand.kRight),
-                    true)));
+    new DriveTeleopCommand(
+        () -> driverController.getX(Hand.kLeft),
+        () -> driverController.getY(Hand.kLeft),
+        () -> driverController.getX(Hand.kRight),
+        swerve
+    );
   }
 
   public Command getAutonomousCommand() {
