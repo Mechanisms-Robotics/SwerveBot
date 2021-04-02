@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.auto.AutoChooser;
 import frc.robot.subsystems.Swerve;
@@ -17,6 +18,8 @@ public class RobotContainer {
 
   public RobotContainer() {
     configureButtonBindings();
+
+    SmartDashboard.putData("Auto Chooser", autoChooser.getAutoChooser());
   }
 
   private void configureButtonBindings() {}
