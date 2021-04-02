@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.VecBuilder;
-import frc.robot.drivers.FxSwerveModule;
 import frc.robot.util.SwerveKinematicController;
 
 /** The base swerve drive class, controls all swerve modules in coordination. */
