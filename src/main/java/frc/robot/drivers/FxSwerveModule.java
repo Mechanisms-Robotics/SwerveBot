@@ -47,6 +47,13 @@ public class FxSwerveModule implements SwerveModule {
   private static final int uniqueId = 1602616989;
   private static final int customParamIdx = 0;
 
+  private static final double currentLimitWheel = 30.0; // Amps
+  private static final double currentLimitSteer = 10.0; // Amps
+  private static final double currentTriggerWheel = 35.0; // Amps
+  private static final double currentTriggerSteer = 15; // Amps
+  private static final double currentTimeWheel = 0.5; // Secs
+  private static final double currentTimeSteer = 0.1; // Secs
+
   private final WPI_TalonFX wheelMotor;
   private final WPI_TalonFX steerMotor;
   private final CANCoder steeringEncoder;
@@ -83,7 +90,9 @@ public class FxSwerveModule implements SwerveModule {
     wheelMotor.config_kI(speedPIDSlot, wheelSpeedI, startupCanTimeout);
     wheelMotor.config_kD(speedPIDSlot, wheelSpeedD, startupCanTimeout);
     // TODO: Replace with actual values
-    wheelMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 10, 15, 0.5));
+    wheelMotor.configSupplyCurrentLimit(
+        new SupplyCurrentLimitConfiguration(
+            true, currentLimitWheel, currentTriggerWheel, currentTimeWheel));
 
     steeringEncoder = new CANCoder(encoderId);
     bootCanCoder();
@@ -102,7 +111,9 @@ public class FxSwerveModule implements SwerveModule {
     steerMotor.config_kI(steerSpeedSlot, steerSpeedI, startupCanTimeout);
     steerMotor.config_kD(steerSpeedSlot, steerSpeedD, startupCanTimeout);
     // TODO: Replace with actual values
-    steerMotor.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 10, 15, 0.5));
+    steerMotor.configSupplyCurrentLimit(
+        new SupplyCurrentLimitConfiguration(
+            true, currentLimitSteer, currentTriggerSteer, currentTimeSteer));
   }
 
   /**
