@@ -56,14 +56,14 @@ public class Swerve extends SubsystemBase {
 
   private final SwerveDrivePoseEstimator poseEstimator;
 
-  private final FxSwerveModule flModule =
-      new FxSwerveModule("Front Left", flWheelMotorID, flSteerMotorID, flSteerEncoderID);
-  private final FxSwerveModule frModule =
-      new FxSwerveModule("Front Right", frWheelMotorID, frSteerMotorID, frSteerEncoderID);
-  private final FxSwerveModule blModule =
-      new FxSwerveModule("Back Left", blWheelMotorID, blSteerMotorID, blSteerEncoderID);
-  private final FxSwerveModule brModule =
-      new FxSwerveModule("Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID);
+  private final SwerveModule flModule =
+      new SwerveModule("Front Left", flWheelMotorID, flSteerMotorID, flSteerEncoderID);
+  private final SwerveModule frModule =
+      new SwerveModule("Front Right", frWheelMotorID, frSteerMotorID, frSteerEncoderID);
+  private final SwerveModule blModule =
+      new SwerveModule("Back Left", blWheelMotorID, blSteerMotorID, blSteerEncoderID);
+  private final SwerveModule brModule =
+      new SwerveModule("Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID);
 
   private final PigeonIMU gyro = new PigeonIMU(0);
 
@@ -213,7 +213,7 @@ public class Swerve extends SubsystemBase {
   /**
    * Get the states of all the current modules.
    *
-   * @return A list of SwerevModulesState(s)
+   * @return A list of SwerveModulesState(s)
    */
   public SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
