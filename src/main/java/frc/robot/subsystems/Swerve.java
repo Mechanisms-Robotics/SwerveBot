@@ -1,12 +1,10 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.util.Units;
@@ -25,13 +23,13 @@ public class Swerve extends SubsystemBase {
   private static final double driveBaseLength = 1.0; // m
 
   private static final Translation2d flModuleLocation =
-      new Translation2d(-driveBaseWidth / 2.0, driveBaseLength / 2.0);
+      new Translation2d(-driveBaseLength / 2.0, driveBaseWidth / 2.0);
   private static final Translation2d frModuleLocation =
-      new Translation2d(driveBaseWidth / 2.0, driveBaseLength / 2.0);
+      new Translation2d(driveBaseLength / 2.0, driveBaseWidth / 2.0);
   private static final Translation2d blModuleLocation =
-      new Translation2d(-driveBaseWidth / 2.0, -driveBaseLength / 2.0);
+      new Translation2d(-driveBaseLength / 2.0, -driveBaseWidth / 2.0);
   private static final Translation2d brModuleLocation =
-      new Translation2d(driveBaseWidth / 2.0, -driveBaseLength / 2.0);
+      new Translation2d(driveBaseLength / 2.0, -driveBaseWidth / 2.0);
 
   private static final int flWheelMotorID = 0;
   private static final int flSteerMotorID = 1;
@@ -67,12 +65,6 @@ public class Swerve extends SubsystemBase {
 
   private final PigeonIMU gyro = new PigeonIMU(0);
 
-  private Pose2d currentPose = new Pose2d();
-  private boolean velocityControl = false;
-  private ChassisSpeeds desiredSpeed = new ChassisSpeeds();
-  private Pose2d desiredPose = null;
-  private double lastUpdate = -1;
-
   /** Constructs the Swerve subsystem. */
   public Swerve() {
     poseEstimator =
@@ -83,111 +75,19 @@ public class Swerve extends SubsystemBase {
             VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
             VecBuilder.fill(Units.degreesToRadians(0.01)),
             VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+
+    this.register();
+    this.setName("Swerve Drive");
   }
 
   @Override
   public void periodic() {
-
-    // Update the pose of the robot
-    currentPose =
-        poseEstimator.update(
-            getHeading(),
-            flModule.getState(),
-            frModule.getState(),
-            blModule.getState(),
-            brModule.getState());
-
-    // If we don't have a previous update then wait for the
-    // next update so we can calculate the correct loop time
-    if (lastUpdate < 0) {
-      lastUpdate = Timer.getFPGATimestamp();
-      return;
-    }
-
-    double dt = Timer.getFPGATimestamp() - lastUpdate;
-    SwerveModuleState[] currentStates = getModuleStates();
-
-    // Update the swerve module control
-    if (velocityControl) {
-      double[][] speeds;
-      if (desiredPose == null) {
-        speeds = kinematicController.update(desiredSpeed, currentStates, dt);
-      } else {
-        speeds =
-            kinematicController.update(currentPose, desiredPose, desiredSpeed, currentStates, dt);
-      }
-      setModuleSpeeds(speeds);
-    } else {
-      SwerveModuleState[] states;
-      if (desiredPose == null) {
-        states = kinematicController.getDesiredWheelStates(desiredSpeed);
-      } else {
-        states = kinematicController.getDesiredWheelStates(desiredSpeed);
-      }
-      for (int i = 0; i < 4; i++) {
-        states[i] = SwerveModuleState.optimize(states[i], currentStates[i].angle);
-      }
-      setModuleStates(states);
-    }
-    lastUpdate = Timer.getFPGATimestamp();
-  }
-
-  /**
-   * Controls the swerve modules in coordination to drive a desired translation and rotation.
-   *
-   * @param dx Speed in m/s in the x direction
-   * @param dy Speed in m/s in the y direction
-   * @param dr Rotation speed in rads/s
-   * @param fieldRelative True if the speeds are felid relative otherwise false
-   */
-  public void driveOpenLoop(double dx, double dy, double dr, boolean fieldRelative) {
-    if (desiredPose != null) {
-      this.desiredPose = null;
-      kinematicController.reset();
-    }
-
-    if (fieldRelative) {
-      desiredSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(dx, dy, dr, getHeading());
-    } else {
-      desiredSpeed = new ChassisSpeeds(dx, dy, dr);
-    }
-  }
-
-  /**
-   * Controls the swerve modules in coordination to drive to a desired point and be at a desired
-   * speed at that point. Note that all values MUST be field relative unlike the open loop method.
-   *
-   * @param desiredSpeed The desired speed to have at the desired pose
-   * @param desiredPose The desired pose to be at
-   */
-  public void driveClosedLoop(ChassisSpeeds desiredSpeed, Pose2d desiredPose) {
-    if (this.desiredPose == null) {
-      kinematicController.reset();
-    }
-    this.desiredPose = desiredPose;
-    this.desiredSpeed =
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            desiredSpeed.vxMetersPerSecond,
-            desiredSpeed.vyMetersPerSecond,
-            desiredSpeed.omegaRadiansPerSecond,
-            getHeading());
-  }
-
-  /**
-   * Reset the kinematic controller. This should be called every time the robot changes to a
-   * different trajectory\control state.
-   */
-  public void resetController() {
-    kinematicController.reset();
-  }
-
-  /**
-   * Weather or not to use all velocity control on the swerve module.
-   *
-   * @param useVelocityMode True for velocity mode false for non-velocity mode
-   */
-  public void setVelocityMode(boolean useVelocityMode) {
-    velocityControl = useVelocityMode;
+    poseEstimator.update(
+        getHeading(),
+        flModule.getState(),
+        frModule.getState(),
+        blModule.getState(),
+        brModule.getState());
   }
 
   /**
@@ -195,7 +95,7 @@ public class Swerve extends SubsystemBase {
    *
    * @param states What to set the states to
    */
-  private void setModuleStates(SwerveModuleState[] states) {
+  public void setModuleStates(SwerveModuleState[] states) {
     SwerveDriveKinematics.normalizeWheelSpeeds(states, maxVelocity);
     flModule.setState(states[0]);
     frModule.setState(states[1]);
@@ -203,7 +103,7 @@ public class Swerve extends SubsystemBase {
     brModule.setState(states[3]);
   }
 
-  private void setModuleSpeeds(double[][] speeds) {
+  public void setModuleSpeeds(double[][] speeds) {
     flModule.setVelocity(speeds[0][0], speeds[0][1]);
     frModule.setVelocity(speeds[1][0], speeds[1][1]);
     blModule.setVelocity(speeds[2][0], speeds[2][1]);
@@ -246,5 +146,21 @@ public class Swerve extends SubsystemBase {
     double[] ypr = new double[3];
     gyro.getYawPitchRoll(ypr);
     return Rotation2d.fromDegrees(ypr[0]);
+  }
+
+  public Pose2d getPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  public SwerveKinematicController getController() {
+    return kinematicController;
+  }
+
+  public SwerveDriveKinematics getKinematics() {
+    return kinematics;
+  }
+
+  public void stop() {
+    setModuleSpeeds(new double[][] {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}});
   }
 }
