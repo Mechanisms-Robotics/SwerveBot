@@ -6,25 +6,36 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.auto.AutoChooser;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
+import frc.robot.auto.Slalom;
 import frc.robot.subsystems.Swerve;
+import java.util.Map;
 
 /** The container for the robot. Contains subsystems, OI devices, and commands. */
 public class RobotContainer {
 
   private final Swerve swerve = new Swerve();
 
-  private final AutoChooser autoChooser = new AutoChooser(swerve);
+  private enum AutoCommandSelector {
+    NONE,
+    SLALOM
+  }
 
   public RobotContainer() {
     configureButtonBindings();
-
-    SmartDashboard.putData("Auto Chooser", autoChooser.getAutoChooser());
   }
 
   private void configureButtonBindings() {}
 
+  private AutoCommandSelector selectAutoCommand() {
+    return AutoCommandSelector.NONE;
+  }
+
   public Command getAutonomousCommand() {
-    return autoChooser.getAutoChooser().getSelected();
+    return new SelectCommand(
+        Map.ofEntries(
+            Map.entry(AutoCommandSelector.NONE, null),
+            Map.entry(AutoCommandSelector.SLALOM, new Slalom(swerve))),
+        this::selectAutoCommand);
   }
 }

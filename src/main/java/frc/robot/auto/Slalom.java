@@ -5,20 +5,22 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DriveTrajectoryCommand;
 import frc.robot.subsystems.Swerve;
 import java.util.ArrayList;
 
-public class Slalom extends AutoCommand {
+public class Slalom extends SequentialCommandGroup {
   private Trajectory slalomTrajectory;
-
-  private final Swerve swerve;
 
   private final TrajectoryConfig config = new TrajectoryConfig(Swerve.maxVelocity * 0.9, 3.0);
 
   public Slalom(Swerve swerve) {
-    this.swerve = swerve;
-    addRequirements(swerve);
+    this.generateTrajectories();
+
+    swerve.resetController();
+    addCommands(
+        new DriveTrajectoryCommand(slalomTrajectory, swerve).andThen(swerve::resetController));
   }
 
   public void generateTrajectories() {
@@ -40,22 +42,5 @@ public class Slalom extends AutoCommand {
 
       this.slalomTrajectory = TrajectoryGenerator.generateTrajectory(points, config);
     }
-  }
-
-  @Override
-  public void initialize() {
-    if (this.slalomTrajectory == null) {
-      this.generateTrajectories();
-    }
-  }
-
-  @Override
-  public void execute() {
-    new DriveTrajectoryCommand(slalomTrajectory, this.swerve);
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-    this.swerve.resetController();
   }
 }
