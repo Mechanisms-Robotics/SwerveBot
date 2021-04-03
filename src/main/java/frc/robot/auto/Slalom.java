@@ -20,10 +20,10 @@ public class Slalom extends SequentialCommandGroup {
 
     swerve.resetController();
     addCommands(
-        new DriveTrajectoryCommand(slalomTrajectory, swerve).andThen(swerve::resetController));
+        new DriveTrajectoryCommand(this.slalomTrajectory, swerve).andThen(swerve::resetController));
   }
 
-  public void generateTrajectories() {
+  private void generateTrajectories() {
     {
       ArrayList<Pose2d> points = new ArrayList<>();
 
