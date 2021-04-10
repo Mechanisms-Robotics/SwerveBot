@@ -42,13 +42,9 @@ public class Swerve extends SubsystemBase {
   private static final int blSteerEncoderID = 2;
   private static final int brWheelMotorID = 6;
   private static final int brSteerMotorID = 7;
-  private static final int brSteerEncoderID = 3;
+  private static final int brSteerEncoderID = 3;      
 
-  private static final SwerveDriveKinematics kinematics =
-      new SwerveDriveKinematics(
-          flModuleLocation, frModuleLocation, blModuleLocation, brModuleLocation);
-
-  private final SwerveKinematicController kinematicController =
+  private final SwerveKinematicController controller =
       new SwerveKinematicController(
           flModuleLocation, frModuleLocation, blModuleLocation, brModuleLocation);
 
@@ -71,7 +67,8 @@ public class Swerve extends SubsystemBase {
         new SwerveDrivePoseEstimator(
             getHeading(),
             new Pose2d(),
-            kinematics,
+            new SwerveDriveKinematics(
+              flModuleLocation, frModuleLocation, blModuleLocation, brModuleLocation),
             VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
             VecBuilder.fill(Units.degreesToRadians(0.01)),
             VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
@@ -153,11 +150,7 @@ public class Swerve extends SubsystemBase {
   }
 
   public SwerveKinematicController getController() {
-    return kinematicController;
-  }
-
-  public SwerveDriveKinematics getKinematics() {
-    return kinematics;
+    return controller;
   }
 
   public void stop() {
