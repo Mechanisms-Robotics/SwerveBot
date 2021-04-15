@@ -19,5 +19,5 @@ public final class Constants {
   public static final double loopTime = 0.01; // s
   public static final int talonPrimaryPid = 0;
   public static final int falconCPR = 2048; // counts per revolution
-  public static final boolean useSwerveVelocityControl = true;
+  public static final boolean useSwerveVelocityControl = false;
 }

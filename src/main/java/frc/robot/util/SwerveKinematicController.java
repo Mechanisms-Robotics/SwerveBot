@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 public class SwerveKinematicController {
 
   // Gains for the kinematic controller
-  private final double gainX; // meters per sec per meter per sec (of error)
-  private final double gainY; // meters per sec per meter per sec (of error)
-  private final double gainTheta;
+  public final double gainX; // meters per sec per meter per sec (of error)
+  public final double gainY; // meters per sec per meter per sec (of error)
+  public final double gainTheta;
   private final double gainSteering;
 
   private final Pose2d[] moduleLocations;
