@@ -1,69 +1,55 @@
 package frc.robot.commands;
 
-import java.util.function.Supplier;
-
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.subsystems.Swerve;
-import frc.robot.util.SwerveKinematicController;
 
-public class DriveTrajectoryCommand extends CommandBase {
+/** This command is used for driving a trajectories during autonomous. */
+public class DriveTrajectoryCommand extends SwerveControllerCommand {
 
-    private
+  // Bit of a convention break. Normally you would not make something like a controller a static
+  // variable. This is because if there where multiple instances of the command running then they
+  // would all be updating the same control with would cause issues. However in this case I didn't
+  // want to recreate the the large controller class every time a new trajectory is run.
+  // I also know that because this command requires a system the schedular will
+  // only ever one one DriveTrajectoryCommand at once. So this is 'safe' in this instance.
 
-    private final PIDController xController;
-    private final PIDController yController;
-    private final ProfiledPIDCommand thetaController;
+  private static final double xGain = 0.0;
+  private static final double yGain = 0.0;
+  private static final double thetaGain = 0.0;
+  private static final double maxThetaVelocity = 1.571; // radians per second
+  private static final double maxThetaAcceleration = maxThetaVelocity / 2.0;
 
-    private final Timer timer = new Timer();
-    private final Trajectory trajectory;
-    private final Supplier<Rotation2d> headingSupplier;
-    private final Swerve swerve;
-    private final SwerveKinematicController controller;
+  private static final PIDController xController = new PIDController(xGain, 0.0, 0.0);
+  private static final PIDController yController = new PIDController(yGain, 0.0, 0.0);
+  private static final ProfiledPIDController thetaController =
+      new ProfiledPIDController(
+          thetaGain,
+          0.0,
+          0.0,
+          new TrapezoidProfile.Constraints(maxThetaVelocity, maxThetaAcceleration));
 
-    private Rotation2d currentHeading;
-
-    public DriveTrajectoryCommand(Trajectory trajectory, Swerve swerve, Supplier<Rotation2d> headingSupplier) {
-        this.trajectory = trajectory;
-        this.swerve = swerve;
-        this.controller = swerve.getController();
-        this.headingSupplier = headingSupplier;
-
-        xController = new PIDController(controller.gainX, 0.0, 0.0);
-        yController = new PIDController(controller.gainY, 0.0, 0.0);
-
-        super.addRequirements(swerve);
-    }
-
-    @Override
-    public void initialize() {
-        super.initialize();
-        timer.reset();
-        timer.start();
-        controller.reset();
-    }
-    
-    @Override
-    public void execute() {
-        if (headingSupplier != null) {
-            currentHeading = headingSupplier.get();
-        }
-        final double currentTime = timer.get();
-
-        final var desiredState = trajectory.sample(currentTime);
-
-        final double xFF = desiredState.velocityMetersPerSecond * desiredState.poseMeters.getRotation().getCos();
-        final double yFF = desiredState.velocityMetersPerSecond * desiredState.poseMeters.getRotation().getSin();
-        final double rotationFF =
-
-        final var speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xFF, yFF, rotationFF, swerve.getHeading());
-
-        var moduleStates = controller.update(desiredState., currentStates, dt)
-
-    }
+  /**
+   * Drive a given trajectory. The heading along the trajectory will be the heading of the robot at
+   * the final pose in the trajectory.
+   *
+   * @param xyTrajectory The trajectory that the center of the robot will follow. Note that the
+   *     heading at the end of this trajectory defines the heading of the robot along the entire
+   *     trajectory.
+   * @param swerve An instance of a swerve drive.
+   */
+  public DriveTrajectoryCommand(Trajectory xyTrajectory, Swerve swerve) {
+    super(
+        xyTrajectory,
+        swerve::getPose,
+        swerve.getKinematics(),
+        xController,
+        yController,
+        thetaController,
+        swerve::setModuleStates,
+        swerve);
+  }
 }

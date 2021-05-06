@@ -5,12 +5,12 @@ import edu.wpi.first.wpilibj.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.VecBuilder;
-import frc.robot.util.SwerveKinematicController;
 
 /** The base swerve drive class, controls all swerve modules in coordination. */
 public class Swerve extends SubsystemBase {
@@ -42,10 +42,10 @@ public class Swerve extends SubsystemBase {
   private static final int blSteerEncoderID = 2;
   private static final int brWheelMotorID = 6;
   private static final int brSteerMotorID = 7;
-  private static final int brSteerEncoderID = 3;      
+  private static final int brSteerEncoderID = 3;
 
-  private final SwerveKinematicController controller =
-      new SwerveKinematicController(
+  private final SwerveDriveKinematics kinematics =
+      new SwerveDriveKinematics(
           flModuleLocation, frModuleLocation, blModuleLocation, brModuleLocation);
 
   private final SwerveDrivePoseEstimator poseEstimator;
@@ -67,8 +67,7 @@ public class Swerve extends SubsystemBase {
         new SwerveDrivePoseEstimator(
             getHeading(),
             new Pose2d(),
-            new SwerveDriveKinematics(
-              flModuleLocation, frModuleLocation, blModuleLocation, brModuleLocation),
+            kinematics,
             VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
             VecBuilder.fill(Units.degreesToRadians(0.01)),
             VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
@@ -87,6 +86,28 @@ public class Swerve extends SubsystemBase {
         brModule.getState());
   }
 
+  public void driveVelocity(
+      double xVelocity, double yVelocity, double rotationVelocity, boolean fieldRelative) {
+    // If felid relative is updated
+    ChassisSpeeds speeds;
+    if (fieldRelative) {
+      speeds =
+          ChassisSpeeds.fromFieldRelativeSpeeds(
+              xVelocity, yVelocity, rotationVelocity, getHeading());
+    } else {
+      speeds = new ChassisSpeeds(xVelocity, yVelocity, rotationVelocity);
+    }
+
+    SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+    SwerveModuleState[] currentStates = getModuleStates();
+    for (int i = 0; i < states.length; i++) {
+      states[i] = SwerveModuleState.optimize(states[i], currentStates[i].angle);
+    }
+
+    SwerveDriveKinematics.normalizeWheelSpeeds(states, maxVelocity);
+    setModuleStates(states);
+  }
+
   /**
    * Sets all of the swerve module states sequentially.
    *
@@ -98,13 +119,6 @@ public class Swerve extends SubsystemBase {
     frModule.setState(states[1]);
     blModule.setState(states[2]);
     brModule.setState(states[3]);
-  }
-
-  public void setModuleSpeeds(double[][] speeds) {
-    flModule.setVelocity(speeds[0][0], speeds[0][1]);
-    frModule.setVelocity(speeds[1][0], speeds[1][1]);
-    blModule.setVelocity(speeds[2][0], speeds[2][1]);
-    brModule.setVelocity(speeds[3][0], speeds[3][1]);
   }
 
   /**
@@ -134,6 +148,10 @@ public class Swerve extends SubsystemBase {
     brModule.calibrateAbsoluteEncoder();
   }
 
+  public SwerveDriveKinematics getKinematics() {
+    return kinematics;
+  }
+
   /**
    * Returns the swerve drive's heading as a Rotation2d.
    *
@@ -149,11 +167,11 @@ public class Swerve extends SubsystemBase {
     return poseEstimator.getEstimatedPosition();
   }
 
-  public SwerveKinematicController getController() {
-    return controller;
-  }
-
+  /** Stop all motors on the drive train */
   public void stop() {
-    setModuleSpeeds(new double[][] {{0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}, {0.0, 0.0}});
+    flModule.stop();
+    frModule.stop();
+    blModule.stop();
+    brModule.stop();
   }
 }

@@ -103,17 +103,10 @@ public class SwerveModule {
     steerMotor.setSelectedSensorPosition(
         steeringEncoder.getAbsolutePosition() * degreesToTicks, talonPrimaryPid, startupCanTimeout);
 
-    // Configure velocity mode
-    steerMotor.selectProfileSlot(velocityPidSlot, talonPrimaryPid);
-    velocityMode = true;
-
     // Config steering motor PID
     steerMotor.config_kP(motionMagicPidSlot, 0.0, startupCanTimeout);
     steerMotor.config_kI(motionMagicPidSlot, 0.0, startupCanTimeout);
     steerMotor.config_kD(motionMagicPidSlot, 0.0, startupCanTimeout);
-    steerMotor.config_kP(velocityPidSlot, 0.0, startupCanTimeout);
-    steerMotor.config_kI(velocityPidSlot, 0.0, startupCanTimeout);
-    steerMotor.config_kD(velocityPidSlot, 0.0, startupCanTimeout);
   }
 
   /**
@@ -141,22 +134,6 @@ public class SwerveModule {
         TalonFXControlMode.Velocity, state.speedMetersPerSecond / ticksPer100msToMeterPerSec);
     steerMotor.set(
         TalonFXControlMode.MotionMagic, unwrapAngle(state.angle.getDegrees()) * degreesToTicks);
-  }
-
-  /**
-   * Sets the wheel and steering speed of the module.
-   *
-   * @param wheelSpeed The speed in m/s to set the wheel speed to.
-   * @param steeringSpeed The speed in rads/s to s
-   */
-  public void setVelocity(double wheelSpeed, double steeringSpeed) {
-    if (!velocityMode) {
-      velocityMode = true;
-      steerMotor.selectProfileSlot(velocityPidSlot, talonPrimaryPid);
-    }
-    wheelMotor.set(TalonFXControlMode.Velocity, wheelSpeed / ticksPer100msToMeterPerSec);
-    steerMotor.set(
-        TalonFXControlMode.Velocity, Math.toDegrees(steeringSpeed) * degreesToTicks * 10);
   }
 
   /**
@@ -190,5 +167,11 @@ public class SwerveModule {
   private double unwrapAngle(double angle) {
     int turns = (int) (steerMotor.getSelectedSensorPosition() / 360.0);
     return angle + (turns * 360);
+  }
+
+  /** Stop the wheel and steering robot */
+  public void stop() {
+    steerMotor.set(TalonFXControlMode.PercentOutput, 0.0);
+    wheelMotor.set(TalonFXControlMode.PercentOutput, 0.0);
   }
 }
