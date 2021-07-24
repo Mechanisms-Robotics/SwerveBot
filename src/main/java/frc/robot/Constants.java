@@ -18,4 +18,5 @@ public final class Constants {
   public static final int canTimeout = 10; // ms
   public static final double loopTime = 0.01; // s
   public static final int talonPrimaryPid = 0;
+  public static final int falconCPR = 2048; // counts per revolution
 }
