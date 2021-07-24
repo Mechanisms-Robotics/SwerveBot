@@ -30,11 +30,12 @@ public class RobotContainer {
 
   private void configureDefaultCommands() {
     // Drive the robot relative to the field\
-    swerve.setDefaultCommand(new DriveTeleopCommand(
-        () -> driverController.getX(Hand.kLeft),
-        () -> driverController.getY(Hand.kLeft),
-        () -> driverController.getX(Hand.kRight),
-        swerve));
+    swerve.setDefaultCommand(
+        new DriveTeleopCommand(
+            () -> driverController.getX(Hand.kLeft),
+            () -> driverController.getY(Hand.kLeft),
+            () -> driverController.getX(Hand.kRight),
+            swerve));
   }
 
   public Command getAutonomousCommand() {
@@ -43,8 +44,7 @@ public class RobotContainer {
 
   public void runSwerveCalibration() {
     // Run a non-interruptible command that calibrates the swerve drive.
-    CommandScheduler.getInstance().schedule(
-      false, new RunCommand(() -> swerve.calibrateSwerveModules(),
-      swerve));
+    CommandScheduler.getInstance()
+        .schedule(false, new RunCommand(() -> swerve.calibrateSwerveModules(), swerve));
   }
 }

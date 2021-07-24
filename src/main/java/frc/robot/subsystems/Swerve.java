@@ -60,7 +60,7 @@ public class Swerve extends SubsystemBase implements Loggable {
       new SwerveModule("Back Left", blWheelMotorID, blSteerMotorID, blSteerEncoderID);
   private final SwerveModule brModule =
       new SwerveModule("Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID);
-  
+
   private final PigeonIMU gyro = new PigeonIMU(0);
 
   /** Constructs the Swerve subsystem. */
@@ -159,7 +159,7 @@ public class Swerve extends SubsystemBase implements Loggable {
    *
    * @return A Rotation2d representing the swerve drive's heading
    */
-  @Log (methodName = "getDegrees", name = "Gyro Heading")
+  @Log(methodName = "getDegrees", name = "Gyro Heading")
   public Rotation2d getHeading() {
     double[] ypr = new double[3];
     gyro.getYawPitchRoll(ypr);
