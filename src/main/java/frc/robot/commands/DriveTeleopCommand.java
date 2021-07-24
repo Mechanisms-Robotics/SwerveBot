@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
+
 import java.util.function.Supplier;
 
 /** Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x. */
@@ -14,6 +15,7 @@ public class DriveTeleopCommand extends CommandBase {
   private static final double maxRotationalVelocity = Swerve.maxRotationalVelocity;
 
   private final Swerve swerve;
+
   private final Supplier<Double> vxSupplier;
   private final Supplier<Double> vySupplier;
   private final Supplier<Double> vrSupplier;

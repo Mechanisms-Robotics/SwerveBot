@@ -11,9 +11,11 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.VecBuilder;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 
 /** The base swerve drive class, controls all swerve modules in coordination. */
-public class Swerve extends SubsystemBase {
+public class Swerve extends SubsystemBase implements Loggable {
 
   public static final double maxVelocity = 4.5; // m / s
   public static final double maxRotationalVelocity = Math.PI; // rads/s
@@ -58,7 +60,7 @@ public class Swerve extends SubsystemBase {
       new SwerveModule("Back Left", blWheelMotorID, blSteerMotorID, blSteerEncoderID);
   private final SwerveModule brModule =
       new SwerveModule("Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID);
-
+  
   private final PigeonIMU gyro = new PigeonIMU(0);
 
   /** Constructs the Swerve subsystem. */
@@ -157,12 +159,20 @@ public class Swerve extends SubsystemBase {
    *
    * @return A Rotation2d representing the swerve drive's heading
    */
+  @Log (methodName = "getDegrees", name = "Gyro Heading")
   public Rotation2d getHeading() {
     double[] ypr = new double[3];
     gyro.getYawPitchRoll(ypr);
     return Rotation2d.fromDegrees(ypr[0]);
   }
 
+  /**
+   * Get the current pose of the robot.
+   *
+   * @return A Pose2d that represents the position of the robot
+   */
+  @Log(methodName = "getX", name = "Drive Estimated X")
+  @Log(methodName = "getY", name = "Drive Estimated Y")
   public Pose2d getPose() {
     return poseEstimator.getEstimatedPosition();
   }
