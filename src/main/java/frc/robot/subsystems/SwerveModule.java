@@ -67,7 +67,6 @@ public class SwerveModule {
   private final WPI_TalonFX steerMotor;
   private final CANCoder steeringEncoder;
   private final String moduleName;
-  private boolean velocityMode;
 
   /**
    * Constructs a swerve module.
@@ -126,10 +125,6 @@ public class SwerveModule {
    * @param state The SwerveModuleState to set the module to
    */
   public void setState(SwerveModuleState state) {
-    if (velocityMode) {
-      velocityMode = false;
-      steerMotor.selectProfileSlot(motionMagicPidSlot, talonPrimaryPid);
-    }
     wheelMotor.set(
         TalonFXControlMode.Velocity, state.speedMetersPerSecond / ticksPer100msToMeterPerSec);
     steerMotor.set(
