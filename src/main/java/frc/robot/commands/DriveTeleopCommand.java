@@ -13,6 +13,10 @@ public class DriveTeleopCommand extends CommandBase {
   private static final double maxTranslationalVelocity = Swerve.maxVelocity * 0.90;
   private static final double maxRotationalVelocity = Swerve.maxRotationalVelocity;
 
+  private static final double dxDeadband = 0.1;
+  private static final double dyDeadband = 0.1;
+  private static final double drDeadband = 0.1;
+
   private final Swerve swerve;
 
   private final Supplier<Double> vxSupplier;
@@ -65,15 +69,20 @@ public class DriveTeleopCommand extends CommandBase {
       Supplier<Double> driverY,
       Supplier<Double> driverRotation,
       Swerve swerve) {
-    this(driverX, driverY, driverRotation, true, swerve);
+    this(driverX, driverY, driverRotation, false, swerve);
   }
 
   @Override
   public void execute() {
     // Get driver input
-    final double dx = vxRateLimiter.calculate(vxSupplier.get() * maxTranslationalVelocity);
-    final double dy = vyRateLimiter.calculate(vySupplier.get() * maxTranslationalVelocity);
-    final double dr = vrRateLimiter.calculate(vrSupplier.get() * maxRotationalVelocity);
+    double dx = vxRateLimiter.calculate(vxSupplier.get() * maxTranslationalVelocity);
+    double dy = vyRateLimiter.calculate(vySupplier.get() * maxTranslationalVelocity);
+    double dr = vrRateLimiter.calculate(vrSupplier.get() * maxRotationalVelocity);
+
+    dx = (Math.abs(dx) > this.dxDeadband) ? dx : 0;
+    dy = (Math.abs(dy) > this.dyDeadband) ? dy : 0;
+    dr = (Math.abs(dr) > this.drDeadband) ? dr : 0;
+
     swerve.driveVelocity(dx, dy, dr, fieldOriented);
   }
 

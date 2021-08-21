@@ -43,8 +43,6 @@ public class RobotContainer {
   }
 
   public void runSwerveCalibration() {
-    // Run a non-interruptible command that calibrates the swerve drive.
-    CommandScheduler.getInstance()
-        .schedule(false, new RunCommand(() -> swerve.calibrateSwerveModules(), swerve));
+    swerve.calibrateSwerveModules();
   }
 }

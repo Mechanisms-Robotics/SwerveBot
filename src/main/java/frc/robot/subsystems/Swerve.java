@@ -33,18 +33,18 @@ public class Swerve extends SubsystemBase implements Loggable {
   private static final Translation2d brModuleLocation =
       new Translation2d(driveBaseLength / 2.0, -driveBaseWidth / 2.0);
 
-  private static final int flWheelMotorID = 0;
-  private static final int flSteerMotorID = 1;
-  private static final int flSteerEncoderID = 0;
-  private static final int frWheelMotorID = 2;
-  private static final int frSteerMotorID = 3;
-  private static final int frSteerEncoderID = 1;
-  private static final int blWheelMotorID = 4;
-  private static final int blSteerMotorID = 5;
-  private static final int blSteerEncoderID = 2;
-  private static final int brWheelMotorID = 6;
-  private static final int brSteerMotorID = 7;
-  private static final int brSteerEncoderID = 3;
+  private static final int flWheelMotorID = 12;
+  private static final int flSteerMotorID = 13;
+  private static final int flSteerEncoderID = 12;
+  private static final int frWheelMotorID = 14;
+  private static final int frSteerMotorID = 15;
+  private static final int frSteerEncoderID = 14;
+  private static final int blWheelMotorID = 10;
+  private static final int blSteerMotorID = 11;
+  private static final int blSteerEncoderID = 10;
+  private static final int brWheelMotorID = 16;
+  private static final int brSteerMotorID = 17;
+  private static final int brSteerEncoderID = 16;
 
   private final SwerveDriveKinematics kinematics =
       new SwerveDriveKinematics(
@@ -61,7 +61,7 @@ public class Swerve extends SubsystemBase implements Loggable {
   private final SwerveModule brModule =
       new SwerveModule("Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID);
 
-  private final PigeonIMU gyro = new PigeonIMU(0);
+  private final PigeonIMU gyro = new PigeonIMU(1);
 
   /** Constructs the Swerve subsystem. */
   public Swerve() {

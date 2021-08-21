@@ -19,9 +19,11 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 
 /** A hardware wrapper class for a swerve module that uses Falcon500s. */
-public class SwerveModule {
+public class SwerveModule implements Loggable {
 
   private static final double moduleGearRatio = 6.86; // : 1
   private static final double wheelDiameter = 0.1016; // meters
@@ -73,7 +75,7 @@ public class SwerveModule {
    *
    * @param name The unique name of this swerve module
    * @param wheelMotorId The CAN ID of the Spark Max used to control the wheel
-   * @param wheelId The CAN Id of the Spark Max used to control the steering
+   * @param steeringMotorId The CAN Id of the Spark Max used to control the steering
    * @param angleEncoderId The CAN ID of the CANCoder used to determine the angle of the module
    */
   public SwerveModule(String name, int wheelMotorId, int steeringMotorId, int angleEncoderId) {
@@ -87,7 +89,7 @@ public class SwerveModule {
     wheelMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, startupCanTimeout);
 
     // Configure wheel motor PID
-    wheelMotor.config_kP(velocityPidSlot, 0.0, startupCanTimeout);
+    wheelMotor.config_kP(velocityPidSlot, 0.01, startupCanTimeout);
     wheelMotor.config_kI(velocityPidSlot, 0.0, startupCanTimeout);
     wheelMotor.config_kD(velocityPidSlot, 0.0, startupCanTimeout);
 
@@ -136,16 +138,24 @@ public class SwerveModule {
    *
    * @return The modules steering speed in rads/s
    */
+  @Log
   public double getSteeringSpeed() {
     return Math.toRadians(steeringEncoder.getVelocity());
   }
 
+  @Log
+  public double getSteeringAngle() { return steeringEncoder.getAbsolutePosition(); }
+
+  public String configureLogName() {return moduleName;}
+
   /** Calibrate the absolute encoder. */
   public void calibrateAbsoluteEncoder() {
     steeringEncoder.configAllSettings(angleEncoderConfig);
+    steeringEncoder.configMagnetOffset(0.0);
     steeringEncoder.configMagnetOffset(-steeringEncoder.getAbsolutePosition(), startupCanTimeout);
     steeringEncoder.setPositionToAbsolute(startupCanTimeout);
     steeringEncoder.configSetCustomParam(uniqueId, 0, startupCanTimeout);
+    steeringEncoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
     bootCanCoder();
   }
 
