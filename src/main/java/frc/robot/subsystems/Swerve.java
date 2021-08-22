@@ -46,6 +46,8 @@ public class Swerve extends SubsystemBase implements Loggable {
   private static final int brSteerMotorID = 17;
   private static final int brSteerEncoderID = 16;
 
+  private static final int gyroID = 1;
+
   private final SwerveDriveKinematics kinematics =
       new SwerveDriveKinematics(
           flModuleLocation, frModuleLocation, blModuleLocation, brModuleLocation);
@@ -61,7 +63,7 @@ public class Swerve extends SubsystemBase implements Loggable {
   private final SwerveModule brModule =
       new SwerveModule("Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID);
 
-  private final PigeonIMU gyro = new PigeonIMU(1);
+  private final PigeonIMU gyro = new PigeonIMU(gyroID);
 
   /** Constructs the Swerve subsystem. */
   public Swerve() {
@@ -90,7 +92,7 @@ public class Swerve extends SubsystemBase implements Loggable {
 
   public void driveVelocity(
       double xVelocity, double yVelocity, double rotationVelocity, boolean fieldRelative) {
-    // If felid relative is updated
+    // If field relative is updated
     ChassisSpeeds speeds;
     if (fieldRelative) {
       speeds =
@@ -111,7 +113,7 @@ public class Swerve extends SubsystemBase implements Loggable {
   }
 
   /**
-   * Sets all of the swerve module states sequentially.
+   * Sets all the swerve module states sequentially.
    *
    * @param states What to set the states to
    */
@@ -137,7 +139,7 @@ public class Swerve extends SubsystemBase implements Loggable {
     return states;
   }
 
-  /** Zeros the gryo heading. */
+  /** Zeros the gyro heading. */
   public void zeroHeading() {
     gyro.setYaw(0.0);
   }

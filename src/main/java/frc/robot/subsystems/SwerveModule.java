@@ -28,7 +28,7 @@ public class SwerveModule implements Loggable {
   private static final double moduleGearRatio = 6.86; // : 1
   private static final double wheelDiameter = 0.1016; // meters
   private static final double ticksPer100msToMeterPerSec =
-      ((wheelDiameter * Math.PI) / (double) (falconCPR * moduleGearRatio)) * 10.0;
+      ((wheelDiameter * Math.PI) / (falconCPR * moduleGearRatio)) * 10.0;
   private static final double steerGearRatio = 12.8; // : 1
   private static final double degreesToTicks = (falconCPR * steerGearRatio) / 360;
   private static final int uniqueId = 5123457;
@@ -75,7 +75,7 @@ public class SwerveModule implements Loggable {
    *
    * @param name The unique name of this swerve module
    * @param wheelMotorId The CAN ID of the Spark Max used to control the wheel
-   * @param steeringMotorId The CAN Id of the Spark Max used to control the steering
+   * @param steeringMotorId The CAN ID of the Spark Max used to control the steering
    * @param angleEncoderId The CAN ID of the CANCoder used to determine the angle of the module
    */
   public SwerveModule(String name, int wheelMotorId, int steeringMotorId, int angleEncoderId) {
