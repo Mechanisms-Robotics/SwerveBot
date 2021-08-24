@@ -19,6 +19,7 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -127,6 +128,8 @@ public class SwerveModule implements Loggable {
    * @param state The SwerveModuleState to set the module to
    */
   public void setState(SwerveModuleState state) {
+    SmartDashboard.putNumber(this.moduleName + " Velocity", state.speedMetersPerSecond);
+    SmartDashboard.putNumber(this.moduleName + " Steering Angle", state.angle.getDegrees());
     wheelMotor.set(
         TalonFXControlMode.Velocity, state.speedMetersPerSecond / ticksPer100msToMeterPerSec);
     steerMotor.set(
