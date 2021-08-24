@@ -46,6 +46,11 @@ public class Swerve extends SubsystemBase implements Loggable {
   private static final int brSteerMotorID = 17;
   private static final int brSteerEncoderID = 16;
 
+  private static final double flAngleOffset = 0.0;
+  private static final double frAngleOffset = 0.0;
+  private static final double blAngleOffset = 0.0;
+  private static final double brAngleOffset = 0.0;
+
   private static final int gyroID = 1;
 
   private final SwerveDriveKinematics kinematics =
@@ -55,13 +60,17 @@ public class Swerve extends SubsystemBase implements Loggable {
   private final SwerveDrivePoseEstimator poseEstimator;
 
   private final SwerveModule flModule =
-      new SwerveModule("Front Left", flWheelMotorID, flSteerMotorID, flSteerEncoderID);
+      new SwerveModule(
+          "Front Left", flWheelMotorID, flSteerMotorID, flSteerEncoderID, flAngleOffset);
   private final SwerveModule frModule =
-      new SwerveModule("Front Right", frWheelMotorID, frSteerMotorID, frSteerEncoderID);
+      new SwerveModule(
+          "Front Right", frWheelMotorID, frSteerMotorID, frSteerEncoderID, frAngleOffset);
   private final SwerveModule blModule =
-      new SwerveModule("Back Left", blWheelMotorID, blSteerMotorID, blSteerEncoderID);
+      new SwerveModule(
+          "Back Left", blWheelMotorID, blSteerMotorID, blSteerEncoderID, blAngleOffset);
   private final SwerveModule brModule =
-      new SwerveModule("Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID);
+      new SwerveModule(
+          "Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID, brAngleOffset);
 
   private final PigeonIMU gyro = new PigeonIMU(gyroID);
 
@@ -142,14 +151,6 @@ public class Swerve extends SubsystemBase implements Loggable {
   /** Zeros the gyro heading. */
   public void zeroHeading() {
     gyro.setYaw(0.0);
-  }
-
-  /** Calibrates all the swerve module's CANCoders. (Only run this when the modules are zeroed) */
-  public void calibrateSwerveModules() {
-    flModule.calibrateAbsoluteEncoder();
-    frModule.calibrateAbsoluteEncoder();
-    blModule.calibrateAbsoluteEncoder();
-    brModule.calibrateAbsoluteEncoder();
   }
 
   public SwerveDriveKinematics getKinematics() {
