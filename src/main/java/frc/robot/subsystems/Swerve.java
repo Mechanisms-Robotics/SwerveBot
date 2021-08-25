@@ -21,17 +21,17 @@ public class Swerve extends SubsystemBase implements Loggable {
   public static final double maxRotationalVelocity = Math.PI; // rads/s
 
   // The center of the robot is the origin point for all locations
-  private static final double driveBaseWidth = 1.0; // m
-  private static final double driveBaseLength = 1.0; // m
+  private static final double driveBaseWidth = 0.44; // m
+  private static final double driveBaseLength = 0.44; // m
 
   private static final Translation2d flModuleLocation =
-      new Translation2d(-driveBaseLength / 2.0, driveBaseWidth / 2.0);
-  private static final Translation2d frModuleLocation =
       new Translation2d(driveBaseLength / 2.0, driveBaseWidth / 2.0);
-  private static final Translation2d blModuleLocation =
-      new Translation2d(-driveBaseLength / 2.0, -driveBaseWidth / 2.0);
-  private static final Translation2d brModuleLocation =
+  private static final Translation2d frModuleLocation =
       new Translation2d(driveBaseLength / 2.0, -driveBaseWidth / 2.0);
+  private static final Translation2d blModuleLocation =
+      new Translation2d(-driveBaseLength / 2.0, driveBaseWidth / 2.0);
+  private static final Translation2d brModuleLocation =
+      new Translation2d(-driveBaseLength / 2.0, -driveBaseWidth / 2.0);
 
   private static final int flWheelMotorID = 12;
   private static final int flSteerMotorID = 13;
@@ -46,10 +46,10 @@ public class Swerve extends SubsystemBase implements Loggable {
   private static final int brSteerMotorID = 17;
   private static final int brSteerEncoderID = 16;
 
-  private static final double flAngleOffset = 0.0;
-  private static final double frAngleOffset = 0.0;
-  private static final double blAngleOffset = 0.0;
-  private static final double brAngleOffset = 0.0;
+  private static final double flAngleOffset = 11.250;
+  private static final double frAngleOffset = 52.646;
+  private static final double blAngleOffset = 204.697;
+  private static final double brAngleOffset = 221.045;
 
   private static final int gyroID = 1;
 
@@ -112,7 +112,6 @@ public class Swerve extends SubsystemBase implements Loggable {
     }
 
     SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
-    SwerveModuleState[] currentStates = getModuleStates();
 
     SwerveDriveKinematics.normalizeWheelSpeeds(states, maxVelocity);
     setModuleStates(states);
@@ -183,5 +182,14 @@ public class Swerve extends SubsystemBase implements Loggable {
     frModule.stop();
     blModule.stop();
     brModule.stop();
+  }
+
+  /** Resets all the Swerve Modules' internal encoders to the absolute position */
+  public void resetToAbsolute() {
+    System.out.println("AAAAAAAAAAAAAAAAAAAAAAAH");
+    flModule.resetToAbsolute();
+    frModule.resetToAbsolute();
+    blModule.resetToAbsolute();
+    brModule.resetToAbsolute();
   }
 }

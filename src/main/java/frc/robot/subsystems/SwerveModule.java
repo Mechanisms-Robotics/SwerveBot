@@ -7,13 +7,7 @@ import static frc.robot.Constants.falconCPR;
 import static frc.robot.Constants.startupCanTimeout;
 import static frc.robot.Constants.talonPrimaryPid;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
@@ -36,7 +30,7 @@ public class SwerveModule implements Loggable {
   private static final double ticksPer100msToMeterPerSec =
       ((wheelDiameter * Math.PI) / (falconCPR * moduleGearRatio)) * 10.0;
   private static final double steerGearRatio = 12.8; // : 1
-  private static final double degreesToTicks = (falconCPR * steerGearRatio) / 360;
+  private static final double degreesToTicks = (falconCPR * steerGearRatio) / 360.0;
   private static final int velocityPidSlot = 0;
   private static final int motionMagicPidSlot = 1;
 
@@ -44,11 +38,11 @@ public class SwerveModule implements Loggable {
   private static final TalonFXConfiguration steeringMotorConfig = new TalonFXConfiguration();
   private static final CANCoderConfiguration angleEncoderConfig = new CANCoderConfiguration();
 
-  private static final double steeringKp = 0.4;
+  private static final double steeringKp = 0.2;
   private static final double steeringKi = 0.0;
   private static final double steeringKd = 3.0;
 
-  private static final double wheelKp = 0.10;
+  private static final double wheelKp = 0.01;
   private static final double wheelKi = 0.0;
   private static final double wheelKd = 0.0;
   private static final double wheelKs = 0.0;
@@ -127,10 +121,10 @@ public class SwerveModule implements Loggable {
     // Setup steering motor
     steerMotor = new WPI_TalonFX(steeringMotorId);
     steerMotor.configAllSettings(steeringMotorConfig, startupCanTimeout);
-    steerMotor.setInverted(TalonFXInvertType.Clockwise);
-    steerMotor.setSelectedSensorPosition(
-        steeringEncoder.getAbsolutePosition() * degreesToTicks, talonPrimaryPid, startupCanTimeout);
+    steerMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    steerMotor.setInverted(TalonFXInvertType.CounterClockwise);
     steerMotor.setNeutralMode(NeutralMode.Coast);
+    steerMotor.selectProfileSlot(motionMagicPidSlot, 0);
 
     // Config steering motor PID
     steerMotor.config_kP(motionMagicPidSlot, steeringKp, startupCanTimeout);
@@ -141,8 +135,14 @@ public class SwerveModule implements Loggable {
 
   @Log.ToString
   public Rotation2d getSteeringAngle() {
-    return Rotation2d.fromDegrees(steeringEncoder.getAbsolutePosition());
+    return Rotation2d.fromDegrees(steeringEncoder.getAbsolutePosition() - angleOffset);
   }
+
+  @Log
+  public double getSteeringAngleMotor() {
+    return steerMotor.getSelectedSensorPosition() / degreesToTicks;
+  }
+
   /**
    * Get the current state of the module.
    *
@@ -160,7 +160,7 @@ public class SwerveModule implements Loggable {
    */
   public void setState(SwerveModuleState state) {
     // Custom optimize command, since default WPILib optimize assumes continuous controller which CTRE is not
-    desiredState = CTREModuleState.optimize(desiredState, getState().angle);
+    desiredState = CTREModuleState.optimize(state, getState().angle);
     final double velocity = desiredState.speedMetersPerSecond / ticksPer100msToMeterPerSec;
     wheelMotor.set(
         ControlMode.Velocity,
@@ -174,7 +174,7 @@ public class SwerveModule implements Loggable {
         (Math.abs(desiredState.speedMetersPerSecond) <= (Swerve.maxVelocity * 0.01))
             ? lastAngle
             : desiredState.angle.getDegrees();
-    steerMotor.set(ControlMode.Position, angle / degreesToTicks);
+    steerMotor.set(ControlMode.Position, angle * ((falconCPR * steerGearRatio) / 360.0));
     lastAngle = angle;
   }
 
@@ -182,8 +182,8 @@ public class SwerveModule implements Loggable {
     return moduleName;
   }
 
-  private void resetToAbsolute() {
-    double absolutePosition = (getSteeringAngle().getDegrees() - angleOffset) * degreesToTicks;
+  public void resetToAbsolute() {
+    double absolutePosition = getSteeringAngle().getDegrees() * degreesToTicks;
     steerMotor.setSelectedSensorPosition(absolutePosition);
   }
 
