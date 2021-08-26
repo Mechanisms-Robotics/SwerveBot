@@ -150,7 +150,8 @@ public class SwerveModule implements Loggable {
    */
   public SwerveModuleState getState() {
     return new SwerveModuleState(
-        wheelMotor.getSelectedSensorVelocity() * ticksPer100msToMeterPerSec, getSteeringAngle());
+        wheelMotor.getSelectedSensorVelocity() * ticksPer100msToMeterPerSec,
+            Rotation2d.fromDegrees(wheelMotor.getSelectedSensorPosition() / degreesToTicks));
   }
 
   /**
