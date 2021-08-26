@@ -3,9 +3,8 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.falconCPR;
 import static frc.robot.Constants.startupCanTimeout;
-import static frc.robot.Constants.talonPrimaryPid;
+import static frc.robot.util.Units.*;
 
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
@@ -25,12 +24,9 @@ import io.github.oblarg.oblog.annotations.Log;
 /** A hardware wrapper class for a swerve module that uses Falcon500s. */
 public class SwerveModule implements Loggable {
 
-  private static final double moduleGearRatio = 6.86; // : 1
+  private static final double wheelGearRatio = 6.86; // : 1
   private static final double wheelDiameter = 0.1016; // meters
-  private static final double ticksPer100msToMeterPerSec =
-      ((wheelDiameter * Math.PI) / (falconCPR * moduleGearRatio)) * 10.0;
   private static final double steerGearRatio = 12.8; // : 1
-  private static final double degreesToTicks = (falconCPR * steerGearRatio) / 360.0;
   private static final int velocityPidSlot = 0;
   private static final int motionMagicPidSlot = 1;
 
@@ -83,9 +79,7 @@ public class SwerveModule implements Loggable {
   private final CANCoder steeringEncoder;
   private final String moduleName;
 
-  @Log.ToString private SwerveModuleState desiredState;
-
-  @Log private double lastAngle;
+  private double lastAngle;
   private double angleOffset;
 
   /**
@@ -133,14 +127,35 @@ public class SwerveModule implements Loggable {
     resetToAbsolute();
   }
 
+  /**
+   * Get the steering angle based on the absolute encoder
+   *
+   * @return Steering angle in degrees.
+   */
   @Log.ToString
   public Rotation2d getSteeringAngle() {
     return Rotation2d.fromDegrees(steeringEncoder.getAbsolutePosition() - angleOffset);
   }
 
+  /**
+   * Get the steering angle based on the internal falcon encoder.
+   *
+   * @return Steering angle in degrees.
+   */
   @Log
   public double getSteeringAngleMotor() {
-    return steerMotor.getSelectedSensorPosition() / degreesToTicks;
+    return falconToDegrees(steerMotor.getSelectedSensorPosition(), steerGearRatio);
+  }
+
+  /**
+   * Get the wheel velocity in meters per second.
+   *
+   * @return Swerve wheel velocity in meters per second.
+   */
+  @Log
+  public double getWheelVelocity() {
+    return falconToMPS(
+        wheelMotor.getSelectedSensorVelocity(), Math.PI * wheelDiameter, wheelGearRatio);
   }
 
   /**
@@ -150,8 +165,7 @@ public class SwerveModule implements Loggable {
    */
   public SwerveModuleState getState() {
     return new SwerveModuleState(
-        wheelMotor.getSelectedSensorVelocity() * ticksPer100msToMeterPerSec,
-            Rotation2d.fromDegrees(wheelMotor.getSelectedSensorPosition() / degreesToTicks));
+        getWheelVelocity(), Rotation2d.fromDegrees(getSteeringAngleMotor()));
   }
 
   /**
@@ -160,9 +174,11 @@ public class SwerveModule implements Loggable {
    * @param state The SwerveModuleState to set the module to
    */
   public void setState(SwerveModuleState state) {
-    // Custom optimize command, since default WPILib optimize assumes continuous controller which CTRE is not
-    desiredState = CTREModuleState.optimize(state, getState().angle);
-    final double velocity = desiredState.speedMetersPerSecond / ticksPer100msToMeterPerSec;
+    // Custom optimize command, since default WPILib optimize assumes continuous controller which
+    // CTRE is not
+    state = CTREModuleState.optimize(state, getState().angle);
+    final double velocity =
+        MPSToFalcon(state.speedMetersPerSecond, Math.PI * wheelDiameter, wheelGearRatio);
     wheelMotor.set(
         ControlMode.Velocity,
         velocity,
@@ -172,19 +188,20 @@ public class SwerveModule implements Loggable {
     // The speed of the wheel is really low (less than 0.01% Max speed) don't
     // steer. This prevents jittering
     final double angle =
-        (Math.abs(desiredState.speedMetersPerSecond) <= (Swerve.maxVelocity * 0.01))
+        (Math.abs(state.speedMetersPerSecond) <= (Swerve.maxVelocity * 0.01))
             ? lastAngle
-            : desiredState.angle.getDegrees();
-    steerMotor.set(ControlMode.Position, angle * ((falconCPR * steerGearRatio) / 360.0));
+            : state.angle.getDegrees();
+    steerMotor.set(ControlMode.Position, degreesToFalcon(angle, steerGearRatio));
     lastAngle = angle;
   }
 
+  /** Configure the name of the log. Used by the Oblog logging system. */
   public String configureLogName() {
     return moduleName;
   }
 
-  public void resetToAbsolute() {
-    double absolutePosition = getSteeringAngle().getDegrees() * degreesToTicks;
+  private void resetToAbsolute() {
+    double absolutePosition = degreesToFalcon(getSteeringAngle().getDegrees(), steerGearRatio);
     steerMotor.setSelectedSensorPosition(absolutePosition);
   }
 

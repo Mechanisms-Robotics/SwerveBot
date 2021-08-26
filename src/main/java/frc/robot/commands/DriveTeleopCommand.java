@@ -8,8 +8,8 @@ import java.util.function.Supplier;
 /** Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x. */
 public class DriveTeleopCommand extends CommandBase {
 
-  private static final double maxTranslationalVelocityRate = 4.2; // m/s per second
-  private static final double maxRotationVelocityRate = Math.PI; // rads/s per second
+  private static final double maxTranslationalVelocityRate = 8; // m/s per second
+  private static final double maxRotationVelocityRate = 2 * Math.PI; // rads/s per second
   private static final double maxTranslationalVelocity = Swerve.maxVelocity * 0.90;
   private static final double maxRotationalVelocity = Swerve.maxRotationalVelocity;
 
