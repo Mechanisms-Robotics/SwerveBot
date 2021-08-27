@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
+
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -74,6 +76,10 @@ public class Swerve extends SubsystemBase implements Loggable {
 
   private final PigeonIMU gyro = new PigeonIMU(gyroID);
 
+  private final double headingStabilizationKp = 0.05;
+  private Rotation2d stabilizationHeading;
+  private boolean turning;
+
   /** Constructs the Swerve subsystem. */
   public Swerve() {
     poseEstimator =
@@ -101,6 +107,21 @@ public class Swerve extends SubsystemBase implements Loggable {
 
   public void driveVelocity(
       double xVelocity, double yVelocity, double rotationVelocity, boolean fieldRelative) {
+
+    // Heading stabilization loop
+    if (Math.abs(rotationVelocity) < 0.01) {
+      // If we where turning then stoped turning lock in current heading
+      if (turning) {
+        stabilizationHeading = getHeading();
+        turning = false;
+      } else {
+        final double error = getHeading().minus(stabilizationHeading).getDegrees();
+        rotationVelocity += error * headingStabilizationKp; 
+      }
+    } else {
+      turning = true;
+    }
+
     // If field relative is updated
     ChassisSpeeds speeds;
     if (fieldRelative) {
