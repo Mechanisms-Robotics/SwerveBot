@@ -3,6 +3,7 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.canTimeout;
 import static frc.robot.Constants.startupCanTimeout;
 import static frc.robot.util.Units.*;
 
@@ -37,8 +38,9 @@ public class SwerveModule implements Loggable {
   private static final double steeringKp = 0.2;
   private static final double steeringKi = 0.0;
   private static final double steeringKd = 3.0;
+  private static final double steeringDeadband = 75; // ticks
 
-  private static final double wheelKp = 0.01;
+  private static final double wheelKp = 0.1;
   private static final double wheelKi = 0.0;
   private static final double wheelKd = 0.0;
   private static final double wheelKs = 0.0;
@@ -124,6 +126,7 @@ public class SwerveModule implements Loggable {
     steerMotor.config_kP(motionMagicPidSlot, steeringKp, startupCanTimeout);
     steerMotor.config_kI(motionMagicPidSlot, steeringKi, startupCanTimeout);
     steerMotor.config_kD(motionMagicPidSlot, steeringKd, startupCanTimeout);
+    steerMotor.configAllowableClosedloopError(motionMagicPidSlot, steeringDeadband, startupCanTimeout);
     resetToAbsolute();
   }
 

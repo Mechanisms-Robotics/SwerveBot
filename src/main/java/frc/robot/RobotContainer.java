@@ -22,6 +22,8 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
     configureDefaultCommands();
+
+    swerve.zeroHeading();
   }
 
   private void configureButtonBindings() {

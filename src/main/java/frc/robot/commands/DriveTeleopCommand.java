@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.SlewRateLimiter;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
 import java.util.function.Supplier;
@@ -8,7 +9,7 @@ import java.util.function.Supplier;
 /** Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x. */
 public class DriveTeleopCommand extends CommandBase {
 
-  private static final double maxTranslationalVelocityRate = 8; // m/s per second
+  private static final double maxTranslationalVelocityRate = 4; // m/s per second
   private static final double maxRotationVelocityRate = 2 * Math.PI; // rads/s per second
   private static final double maxTranslationalVelocity = Swerve.maxVelocity * 0.90;
   private static final double maxRotationalVelocity = Swerve.maxRotationalVelocity;
@@ -69,7 +70,7 @@ public class DriveTeleopCommand extends CommandBase {
       Supplier<Double> driverY,
       Supplier<Double> driverRotation,
       Swerve swerve) {
-    this(driverX, driverY, driverRotation, false, swerve);
+    this(driverX, driverY, driverRotation, true, swerve);
   }
 
   @Override
@@ -78,6 +79,9 @@ public class DriveTeleopCommand extends CommandBase {
     double dx = vxRateLimiter.calculate(vxSupplier.get() * maxTranslationalVelocity);
     double dy = vyRateLimiter.calculate(vySupplier.get() * maxTranslationalVelocity);
     double dr = vrRateLimiter.calculate(vrSupplier.get() * maxRotationalVelocity);
+    SmartDashboard.putNumber("Swerve vX", dx);
+    SmartDashboard.putNumber("Swerve vY", dy);
+    SmartDashboard.putNumber("Swerve vR", dr);
 
     dx = (Math.abs(dx) > this.dxDeadband) ? dx : 0;
     dy = (Math.abs(dy) > this.dyDeadband) ? dy : 0;
