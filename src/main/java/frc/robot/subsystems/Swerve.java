@@ -183,12 +183,4 @@ public class Swerve extends SubsystemBase implements Loggable {
     blModule.stop();
     brModule.stop();
   }
-
-  /** Resets all the Swerve Modules' internal encoders to the absolute position */
-  public void resetToAbsolute() {
-    flModule.resetToAbsolute();
-    frModule.resetToAbsolute();
-    blModule.resetToAbsolute();
-    brModule.resetToAbsolute();
-  }
 }
