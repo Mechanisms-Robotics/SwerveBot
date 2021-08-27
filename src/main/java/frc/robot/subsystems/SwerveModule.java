@@ -35,7 +35,7 @@ public class SwerveModule implements Loggable {
   private static final TalonFXConfiguration steeringMotorConfig = new TalonFXConfiguration();
   private static final CANCoderConfiguration angleEncoderConfig = new CANCoderConfiguration();
 
-  private static final double steeringKp = 0.2;
+  private static final double steeringKp = 0.6;
   private static final double steeringKi = 0.0;
   private static final double steeringKd = 3.0;
   private static final double steeringDeadband = 75; // ticks
