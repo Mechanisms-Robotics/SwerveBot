@@ -40,9 +40,10 @@ public class SwerveModule implements Loggable {
   private static final double steeringKd = 3.0;
   private static final double steeringDeadband = 75; // ticks
 
-  private static final double wheelKp = 0.1;
+  private static final double wheelKp = 0.01;
   private static final double wheelKi = 0.0;
   private static final double wheelKd = 0.0;
+  private static final double wheelKf = 0.05;
   private static final double wheelKs = 0.0;
   private static final double wheelKv = 0.0;
   private static final double wheelKa = 0.0;
@@ -108,6 +109,7 @@ public class SwerveModule implements Loggable {
     wheelMotor.config_kP(velocityPidSlot, wheelKp, startupCanTimeout);
     wheelMotor.config_kI(velocityPidSlot, wheelKi, startupCanTimeout);
     wheelMotor.config_kD(velocityPidSlot, wheelKd, startupCanTimeout);
+    wheelMotor.config_kF(velocityPidSlot, wheelKf, startupCanTimeout);
     wheelMotor.setNeutralMode(NeutralMode.Brake);
 
     // Setup steering encoder

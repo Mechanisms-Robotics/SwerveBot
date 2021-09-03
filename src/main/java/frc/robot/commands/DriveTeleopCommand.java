@@ -14,9 +14,9 @@ public class DriveTeleopCommand extends CommandBase {
   private static final double maxTranslationalVelocity = Swerve.maxVelocity * 0.90;
   private static final double maxRotationalVelocity = Swerve.maxRotationalVelocity;
 
-  private static final double dxDeadband = 0.1;
-  private static final double dyDeadband = 0.1;
-  private static final double drDeadband = 0.1;
+  private static final double dxDeadband = 0.075;
+  private static final double dyDeadband = 0.075;
+  private static final double drDeadband = 0.075;
 
   private final Swerve swerve;
 

@@ -76,8 +76,8 @@ public class Swerve extends SubsystemBase implements Loggable {
 
   private final PigeonIMU gyro = new PigeonIMU(gyroID);
 
-  private final double headingStabilizationKp = 0.05;
-  private Rotation2d stabilizationHeading;
+  private PIDController headingStabilizationPID;
+  private Rotation2d stabilizationHeading = new Rotation2d();
   private boolean turning;
 
   /** Constructs the Swerve subsystem. */
@@ -90,6 +90,9 @@ public class Swerve extends SubsystemBase implements Loggable {
             VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
             VecBuilder.fill(Units.degreesToRadians(0.01)),
             VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+
+    headingStabilizationPID = new PIDController(0.005, 0.0, 0.0);
+    headingStabilizationPID.setTolerance(1.0);
 
     this.register();
     this.setName("Swerve Drive");
@@ -115,8 +118,7 @@ public class Swerve extends SubsystemBase implements Loggable {
         stabilizationHeading = getHeading();
         turning = false;
       } else {
-        final double error = getHeading().minus(stabilizationHeading).getDegrees();
-        rotationVelocity += error * headingStabilizationKp; 
+        rotationVelocity += headingStabilizationPID.calculate(getHeading().getDegrees(), stabilizationHeading.getDegrees());
       }
     } else {
       turning = true;
