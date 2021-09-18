@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
-
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -118,7 +117,9 @@ public class Swerve extends SubsystemBase implements Loggable {
         stabilizationHeading = getHeading();
         turning = false;
       } else {
-        rotationVelocity += headingStabilizationPID.calculate(getHeading().getDegrees(), stabilizationHeading.getDegrees());
+        rotationVelocity +=
+            headingStabilizationPID.calculate(
+                getHeading().getDegrees(), stabilizationHeading.getDegrees());
       }
     } else {
       turning = true;
