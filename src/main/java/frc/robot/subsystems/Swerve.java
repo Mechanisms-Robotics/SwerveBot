@@ -79,6 +79,11 @@ public class Swerve extends SubsystemBase implements Loggable {
   private Rotation2d stabilizationHeading = new Rotation2d();
   private boolean turning;
 
+  // Field Oriented Rotation
+  private boolean forEnabled = false;
+  private PIDController forPID;
+  private Rotation2d forHeading = new Rotation2d();
+
   /** Constructs the Swerve subsystem. */
   public Swerve() {
     poseEstimator =
@@ -92,6 +97,10 @@ public class Swerve extends SubsystemBase implements Loggable {
 
     headingStabilizationPID = new PIDController(0.005, 0.0, 0.0);
     headingStabilizationPID.setTolerance(1.0);
+
+    // TODO: Tune
+    forPID = new PIDController(0.005, 0.0, 0.0);
+    forPID.setTolerance(5.0);
 
     this.register();
     this.setName("Swerve Drive");
@@ -117,6 +126,9 @@ public class Swerve extends SubsystemBase implements Loggable {
         stabilizationHeading = getHeading();
         turning = false;
       } else {
+        if (forEnabled)
+          rotationVelocity += forPID.calculate(getHeading().getDegrees(), forHeading.getDegrees());
+
         rotationVelocity +=
             headingStabilizationPID.calculate(
                 getHeading().getDegrees(), stabilizationHeading.getDegrees());
@@ -166,6 +178,16 @@ public class Swerve extends SubsystemBase implements Loggable {
     states[2] = blModule.getState();
     states[3] = brModule.getState();
     return states;
+  }
+
+  /** Sets whether to use FOR (Field Oriented Rotation) control or not. * */
+  public void setFOREnabled(boolean isEnabled) {
+    this.forEnabled = isEnabled;
+  }
+
+  /** Updates desired heading for FOR (Field Oriented Rotation) control. * */
+  public void setFORDesiredHeading(Rotation2d desiredHeading) {
+    forHeading = desiredHeading;
   }
 
   /** Zeros the gyro heading. */

@@ -18,7 +18,7 @@ import io.github.oblarg.oblog.annotations.Log;
 public class Accelerator extends SubsystemBase implements Loggable {
   private static final int ACCELERATOR_MOTOR_ID = 40;
 
-  private static final double ACCELERATOR_GEAR_RATIO = 1.0;
+  private static final double ACCELERATOR_GEAR_RATIO = 1.0; // TODO: Update
 
   private static final TalonFXConfiguration ACCELERATOR_MOTOR_CONFIG = new TalonFXConfiguration();
   private static final int VELOCITY_PID_SLOT = 0;
