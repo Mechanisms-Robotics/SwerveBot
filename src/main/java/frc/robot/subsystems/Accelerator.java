@@ -18,7 +18,7 @@ import io.github.oblarg.oblog.annotations.Log;
 public class Accelerator extends SubsystemBase implements Loggable {
   private static final int ACCELERATOR_MOTOR_ID = 40;
 
-  private static final double ACCELERATOR_GEAR_RATIO = 1.0;
+  private static final double ACCELERATOR_GEAR_RATIO = 2.25;
 
   private static final TalonFXConfiguration ACCELERATOR_MOTOR_CONFIG = new TalonFXConfiguration();
   private static final int VELOCITY_PID_SLOT = 0;
@@ -44,7 +44,7 @@ public class Accelerator extends SubsystemBase implements Loggable {
 
   public Accelerator() {
     acceleratorMotor.configAllSettings(ACCELERATOR_MOTOR_CONFIG, startupCanTimeout);
-    acceleratorMotor.setInverted(TalonFXInvertType.Clockwise);
+    acceleratorMotor.setInverted(TalonFXInvertType.CounterClockwise);
     acceleratorMotor.setNeutralMode(NeutralMode.Coast);
     acceleratorMotor.selectProfileSlot(VELOCITY_PID_SLOT, 0);
   }
@@ -57,12 +57,23 @@ public class Accelerator extends SubsystemBase implements Loggable {
     acceleratorMotor.set(ControlMode.Velocity, RPMToFalcon(rpm, ACCELERATOR_GEAR_RATIO));
   }
 
+  /**
+   * Get the velocity of the accelerator rollers.
+   *
+   * @return Velocity in RPM
+   */
   @Log
   public double getVelocity() {
     return falconToRPM(acceleratorMotor.getSelectedSensorVelocity(), ACCELERATOR_GEAR_RATIO);
   }
 
   public void stop() {
+    acceleratorMotor.setNeutralMode(NeutralMode.Brake);
+    acceleratorMotor.set(ControlMode.PercentOutput, 0.0);
+  }
+
+  public void coast() {
+    acceleratorMotor.setNeutralMode(NeutralMode.Coast);
     acceleratorMotor.set(ControlMode.PercentOutput, 0.0);
   }
 }

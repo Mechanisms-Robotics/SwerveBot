@@ -16,9 +16,9 @@ import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
 public class Shooter extends SubsystemBase implements Loggable {
-  private static final int SHOOTER_MOTOR_ID = 40;
-  private static final int SHOOTER_FOLLOWER_MOTOR_ID = 41;
-  private static final double SHOOTER_GEAR_RATIO = 1.0;
+  private static final int SHOOTER_MOTOR_ID = 50;
+  private static final int SHOOTER_FOLLOWER_MOTOR_ID = 51;
+  private static final double SHOOTER_GEAR_RATIO = 1.09;
 
   private static final TalonFXConfiguration SHOOTER_MOTOR_CONFIG = new TalonFXConfiguration();
   private static final int SHOOTER_PID_SLOT = 0;
@@ -32,13 +32,13 @@ public class Shooter extends SubsystemBase implements Loggable {
   private static final int HOOD_SERVO_PWM_PORT = 0;
 
   static {
-    // TODO: Determine how much current the spindexer draws nominally and
-    final var acceleratorCurrentLimit = new SupplyCurrentLimitConfiguration();
-    acceleratorCurrentLimit.currentLimit = 10; // Amps
-    acceleratorCurrentLimit.triggerThresholdCurrent = 15; // Amps
-    acceleratorCurrentLimit.triggerThresholdTime = 0.5; // sec
-    acceleratorCurrentLimit.enable = true;
-    SHOOTER_MOTOR_CONFIG.supplyCurrLimit = acceleratorCurrentLimit;
+    // TODO: Determine how much current the shooter draws nominally and
+    final var shooterCurrentLimit = new SupplyCurrentLimitConfiguration();
+    shooterCurrentLimit.currentLimit = 30; // Amps
+    shooterCurrentLimit.triggerThresholdCurrent = 40; // Amps
+    shooterCurrentLimit.triggerThresholdTime = 0.2; // sec
+    shooterCurrentLimit.enable = true;
+    SHOOTER_MOTOR_CONFIG.supplyCurrLimit = shooterCurrentLimit;
 
     // TODO: Tune
     final var velocityLoopConfig = new SlotConfiguration();
@@ -54,17 +54,16 @@ public class Shooter extends SubsystemBase implements Loggable {
 
   public Shooter() {
     shooterMotor.configAllSettings(SHOOTER_MOTOR_CONFIG, startupCanTimeout);
-    shooterMotor.setInverted(TalonFXInvertType.CounterClockwise);
-    shooterMotor.setNeutralMode(NeutralMode.Brake);
+    shooterMotor.setInverted(TalonFXInvertType.Clockwise);
+    shooterMotor.setNeutralMode(NeutralMode.Coast);
     shooterMotor.selectProfileSlot(SHOOTER_PID_SLOT, 0);
 
     shooterFollowMotor.configAllSettings(SHOOTER_MOTOR_CONFIG, startupCanTimeout);
     shooterFollowMotor.follow(shooterMotor);
-    shooterFollowMotor.setInverted(InvertType.FollowMaster);
-    shooterMotor.setNeutralMode(NeutralMode.Brake);
+    shooterFollowMotor.setInverted(InvertType.OpposeMaster);
+    shooterFollowMotor.setNeutralMode(NeutralMode.Coast);
 
     hoodServo.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
-    ;
   }
 
   public void setOpenLoop(double percentOutput) {
