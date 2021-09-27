@@ -18,6 +18,7 @@ public class ShootCommand extends CommandBase {
   private final Accelerator accelerator;
   private final Spindexer spindexer;
 
+  public ShootCommand(Shooter shooter, Accelerator accelerator, Spindexer spindexer) {
   public ShootCommand(
       Supplier<Boolean> increaseHoodButtonSupplier,
       Supplier<Boolean> decreaseHoodButtonSupplier,
@@ -30,12 +31,14 @@ public class ShootCommand extends CommandBase {
     this.shooter = shooter;
     this.accelerator = accelerator;
     this.spindexer = spindexer;
-    addRequirements(shooter, accelerator, spindexer);
+    addRequirements(shooter, accelerator);
   }
 
   @Override
   public void initialize() {
     shooter.setHoodRawPosition(0.0);
+    spindexer.setOpenLoop(0.40);
+
     // TODO: Switch to PID once Tuned
     // shooter.setVelocity(SHOOTER_RPM);
     // accelerator.setVelocity(ACCELERATOR_RPM);
@@ -60,6 +63,5 @@ public class ShootCommand extends CommandBase {
     shooter.stop();
     accelerator.stop();
     spindexer.stop();
-    spindexer.deployGate();
   }
 }
