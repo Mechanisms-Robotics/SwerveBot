@@ -8,10 +8,8 @@ import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpiutil.math.MathUtil;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -28,9 +26,6 @@ public class Shooter extends SubsystemBase implements Loggable {
           0.0, // kV
           0.0 // kA
           );
-
-  private static final int HOOD_SERVO_PWM_PORT = 0;
-  private static final double HOOD_STEP_AMOUNT = 0.01;
 
   static {
     // TODO: Determine how much current the shooter draws nominally and
@@ -51,7 +46,6 @@ public class Shooter extends SubsystemBase implements Loggable {
 
   private final WPI_TalonFX shooterMotor = new WPI_TalonFX(SHOOTER_MOTOR_ID);
   private final WPI_TalonFX shooterFollowMotor = new WPI_TalonFX(SHOOTER_FOLLOWER_MOTOR_ID);
-  private final Servo hoodServo = new Servo(HOOD_SERVO_PWM_PORT);
 
   public Shooter() {
     shooterMotor.configAllSettings(SHOOTER_MOTOR_CONFIG, startupCanTimeout);
@@ -63,8 +57,6 @@ public class Shooter extends SubsystemBase implements Loggable {
     shooterFollowMotor.follow(shooterMotor);
     shooterFollowMotor.setInverted(InvertType.OpposeMaster);
     shooterFollowMotor.setNeutralMode(NeutralMode.Coast);
-
-    hoodServo.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
   }
 
   public void setOpenLoop(double percentOutput) {
@@ -86,27 +78,5 @@ public class Shooter extends SubsystemBase implements Loggable {
 
   public void stop() {
     shooterMotor.set(ControlMode.PercentOutput, 0.0);
-  }
-
-  public void setHoodRawPosition(double rawPosition) {
-    MathUtil.clamp(rawPosition, -1.0, 1.0);
-
-    // Set speed is the speed of the pwm pulse not the speed of the servo
-    // PWM speed commands the servo position.
-    hoodServo.setSpeed(rawPosition);
-  }
-
-  public void increaseHood() {
-    double currentPos = hoodServo.getSpeed();
-    double wantedPos = currentPos + HOOD_STEP_AMOUNT;
-    MathUtil.clamp(wantedPos, -1.0, 1.0);
-    hoodServo.setSpeed(wantedPos);
-  }
-
-  public void decreaseHood() {
-    double currentPos = hoodServo.getSpeed();
-    double wantedPos = currentPos - HOOD_STEP_AMOUNT;
-    MathUtil.clamp(wantedPos, -1.0, 1.0);
-    hoodServo.setSpeed(wantedPos);
   }
 }
