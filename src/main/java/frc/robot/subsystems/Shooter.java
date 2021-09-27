@@ -30,6 +30,7 @@ public class Shooter extends SubsystemBase implements Loggable {
           );
 
   private static final int HOOD_SERVO_PWM_PORT = 0;
+  private static final double HOOD_STEP_AMOUNT = 0.01;
 
   static {
     // TODO: Determine how much current the shooter draws nominally and
@@ -93,5 +94,19 @@ public class Shooter extends SubsystemBase implements Loggable {
     // Set speed is the speed of the pwm pulse not the speed of the servo
     // PWM speed commands the servo position.
     hoodServo.setSpeed(rawPosition);
+  }
+
+  public void increaseHood() {
+    double currentPos = hoodServo.getSpeed();
+    double wantedPos = currentPos + HOOD_STEP_AMOUNT;
+    MathUtil.clamp(wantedPos, -1.0, 1.0);
+    hoodServo.setSpeed(wantedPos);
+  }
+
+  public void decreaseHood() {
+    double currentPos = hoodServo.getSpeed();
+    double wantedPos = currentPos - HOOD_STEP_AMOUNT;
+    MathUtil.clamp(wantedPos, -1.0, 1.0);
+    hoodServo.setSpeed(wantedPos);
   }
 }

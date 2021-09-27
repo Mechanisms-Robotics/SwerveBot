@@ -20,8 +20,8 @@ public class Spindexer extends SubsystemBase implements Loggable {
   private static final int SPINDEXER_MOTOR_ID = 30;
   private static final int RAMP_SOLENOID_FORWARD_ID = 2; // TODO: Get id from wiring
   private static final int RAMP_SOLENOID_REVERSE_ID = 3; // TODO: Get id from wiring
-  private static final int GATE_SOLENOID_FORWARD_ID = 4; // TODO: Get id from wiring
-  private static final int GATE_SOLENOID_REVERSE_ID = 5; // TODO: Get id from wiring
+  private static final int GATE_SOLENOID_FORWARD_ID = 7; // TODO: Get id from wiring
+  private static final int GATE_SOLENOID_REVERSE_ID = 0; // TODO: Get id from wiring
 
   private static final DoubleSolenoid.Value RAMP_DEPLOYED = DoubleSolenoid.Value.kForward;
   private static final DoubleSolenoid.Value RAMP_RETRACTED = DoubleSolenoid.Value.kReverse;
@@ -61,6 +61,8 @@ public class Spindexer extends SubsystemBase implements Loggable {
     spindexerMotor.setInverted(TalonFXInvertType.Clockwise);
     spindexerMotor.setNeutralMode(NeutralMode.Coast);
     spindexerMotor.selectProfileSlot(VELOCITY_PID_SLOT, 0);
+
+    deployGate();
   }
 
   public void setOpenLoop(double percentOutput) {
