@@ -28,6 +28,7 @@ public class ShootCommand extends CommandBase {
     // accelerator.setVelocity(ACCELERATOR_RPM);
 
     spindexer.retractGate();
+    spindexer.deployRamp();
     spindexer.setOpenLoop(0.35);
     shooter.setOpenLoop(Constants.shooterShootSpeed);
     accelerator.setOpenLoop(Constants.acceleratorShootSpeed);
@@ -38,5 +39,7 @@ public class ShootCommand extends CommandBase {
     shooter.stop();
     accelerator.stop();
     spindexer.stop();
+    spindexer.deployGate();
+    spindexer.retractRamp();
   }
 }

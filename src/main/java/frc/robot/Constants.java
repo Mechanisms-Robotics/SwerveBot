@@ -24,5 +24,5 @@ public final class Constants {
   // Currently open loop precentage
   public static final double shooterShootSpeed = 0.70;
   public static final double acceleratorShootSpeed = 0.70;
-  public static final double spindexerShootSpeed = 0.35;
+  public static final double spindexerShootSpeed = 0.40;
 }

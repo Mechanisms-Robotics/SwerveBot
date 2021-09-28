@@ -34,6 +34,7 @@ public class SpinupCommand extends CommandBase {
     shooter.setOpenLoop(Constants.shooterShootSpeed);
     timer.reset();
     timer.start();
+    spindexer.retractRamp();
   }
 
   @Override
