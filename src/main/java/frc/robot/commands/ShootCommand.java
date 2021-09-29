@@ -21,17 +21,15 @@ public class ShootCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    spindexer.setOpenLoop(0.40);
-
     // TODO: Switch to PID once Tuned
     // shooter.setVelocity(SHOOTER_RPM);
     // accelerator.setVelocity(ACCELERATOR_RPM);
 
-    spindexer.retractGate();
-    spindexer.deployRamp();
-    spindexer.setOpenLoop(0.35);
-    shooter.setOpenLoop(Constants.shooterShootSpeed);
     accelerator.setOpenLoop(Constants.acceleratorShootSpeed);
+    spindexer.deployRamp();
+    spindexer.retractGate();
+    spindexer.setOpenLoop(Constants.spindexerShootSpeed);
+    shooter.setOpenLoop(Constants.shooterShootSpeed);
   }
 
   @Override

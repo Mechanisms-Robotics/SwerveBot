@@ -16,7 +16,7 @@ public class SpinupCommand extends CommandBase {
   public final Shooter shooter;
   public final Accelerator accelerator;
   public final Spindexer spindexer;
-  public final double spinupTime = 1.5;
+  public final double spinupTime = 1.0;
   public final Timer timer = new Timer();
 
   public SpinupCommand(Shooter shooter, Accelerator accelerator, Spindexer spindexer) {

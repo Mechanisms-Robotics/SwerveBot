@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.ContinuousJogHoodCommand;
+import frc.robot.commands.FastShootCommand;
 import frc.robot.commands.ShootCommand;
 import frc.robot.commands.SpinupCommand;
 import frc.robot.subsystems.*;
@@ -26,6 +27,7 @@ public class RobotContainer {
   private final XboxController driverController = new XboxController(0);
   private final XboxController operatorController = new XboxController(1);
   private final Button shootTrigger = new Button(() -> driverController.getRawAxis(3) > 0.1);
+  private final Button fastShootButton = new Button(() -> driverController.getAButton());
   private final Button hoodJogForward = new Button(() -> driverController.getBumper(Hand.kRight));
   private final Button hoodJogReverse = new Button(() -> driverController.getBumper(Hand.kLeft));
 
@@ -39,6 +41,8 @@ public class RobotContainer {
         new SequentialCommandGroup(
             new SpinupCommand(shooter, accelerator, spindexer),
             new ShootCommand(shooter, accelerator, spindexer)));
+
+    fastShootButton.toggleWhenPressed(new FastShootCommand(shooter, accelerator, spindexer));
 
     hoodJogForward.toggleWhenPressed(new ContinuousJogHoodCommand(hood, false));
     hoodJogReverse.toggleWhenPressed(new ContinuousJogHoodCommand(hood, true));
