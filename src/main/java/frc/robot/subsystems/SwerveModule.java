@@ -3,7 +3,6 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.canTimeout;
 import static frc.robot.Constants.startupCanTimeout;
 import static frc.robot.util.Units.*;
 
@@ -25,30 +24,30 @@ import io.github.oblarg.oblog.annotations.Log;
 /** A hardware wrapper class for a swerve module that uses Falcon500s. */
 public class SwerveModule implements Loggable {
 
-  private static final double wheelGearRatio = 6.86; // : 1
-  private static final double wheelDiameter = 0.1016; // meters
-  private static final double steerGearRatio = 12.8; // : 1
-  private static final int velocityPidSlot = 0;
-  private static final int motionMagicPidSlot = 1;
+  private static final double WHEEL_GEAR_RATIO = 6.86; // : 1
+  private static final double WHEEL_DIAMETER = 0.1016; // meters
+  private static final double STEER_GEAR_RATIO = 12.8; // : 1
+  private static final int VELOCITY_PID_SLOT = 0;
+  private static final int MOTION_MAGIC_PID_SLOT = 1;
 
-  private static final TalonFXConfiguration wheelMotorConfig = new TalonFXConfiguration();
-  private static final TalonFXConfiguration steeringMotorConfig = new TalonFXConfiguration();
-  private static final CANCoderConfiguration angleEncoderConfig = new CANCoderConfiguration();
+  private static final TalonFXConfiguration WHEEL_MOTOR_CONFIG = new TalonFXConfiguration();
+  private static final TalonFXConfiguration STEERING_MOTOR_CONFIG = new TalonFXConfiguration();
+  private static final CANCoderConfiguration CONFIGURATION = new CANCoderConfiguration();
 
-  private static final double steeringKp = 0.6;
-  private static final double steeringKi = 0.0;
-  private static final double steeringKd = 3.0;
-  private static final double steeringDeadband = 75; // ticks
+  private static final double STEERING_KP = 0.6;
+  private static final double STEERING_KI = 0.0;
+  private static final double STEERING_KD = 3.0;
+  private static final double STEERING_DEADBAND = 75; // ticks
 
-  private static final double wheelKp = 0.01;
-  private static final double wheelKi = 0.0;
-  private static final double wheelKd = 0.0;
-  private static final double wheelKf = 0.05;
-  private static final double wheelKs = 0.0;
-  private static final double wheelKv = 0.0;
-  private static final double wheelKa = 0.0;
-  private static final SimpleMotorFeedforward wheelFeedforward =
-      new SimpleMotorFeedforward(wheelKs, wheelKv, wheelKa);
+  private static final double WHEEL_KP = 0.01;
+  private static final double WHEEL_KI = 0.0;
+  private static final double WHEEL_KD = 0.0;
+  private static final double WHEEL_KF = 0.05;
+  private static final double WHEEL_KS = 0.0;
+  private static final double WHEEL_KV = 0.0;
+  private static final double WHEEL_KA = 0.0;
+  private static final SimpleMotorFeedforward WHEEL_FEEDFORWARD =
+      new SimpleMotorFeedforward(WHEEL_KS, WHEEL_KV, WHEEL_KA);
 
   static {
     // Wheel Motor Current Limiting
@@ -57,10 +56,10 @@ public class SwerveModule implements Loggable {
     wheelMotorCurrentLimit.currentLimit = 30; // Amps
     wheelMotorCurrentLimit.triggerThresholdCurrent = 35; // Amps
     wheelMotorCurrentLimit.triggerThresholdTime = 0.5; // Seconds
-    wheelMotorConfig.supplyCurrLimit = wheelMotorCurrentLimit;
+    WHEEL_MOTOR_CONFIG.supplyCurrLimit = wheelMotorCurrentLimit;
 
     // Configure wheel motor current limiting
-    wheelMotorConfig.voltageCompSaturation = 12.0; // Volts
+    WHEEL_MOTOR_CONFIG.voltageCompSaturation = 12.0; // Volts
 
     // Configure steering motor current limiting
     var steeringMotorCurrentLimit = new SupplyCurrentLimitConfiguration();
@@ -68,13 +67,13 @@ public class SwerveModule implements Loggable {
     steeringMotorCurrentLimit.currentLimit = 15; // Amps
     steeringMotorCurrentLimit.triggerThresholdCurrent = 25; // Amps
     steeringMotorCurrentLimit.triggerThresholdTime = 0.5; // Seconds
-    steeringMotorConfig.supplyCurrLimit = steeringMotorCurrentLimit;
+    STEERING_MOTOR_CONFIG.supplyCurrLimit = steeringMotorCurrentLimit;
 
-    steeringMotorConfig.voltageCompSaturation = 8.0; // Volts
+    STEERING_MOTOR_CONFIG.voltageCompSaturation = 8.0; // Volts
 
-    angleEncoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
-    angleEncoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
-    angleEncoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
+    CONFIGURATION.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+    CONFIGURATION.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
+    CONFIGURATION.sensorTimeBase = SensorTimeBase.PerSecond;
   }
 
   private final WPI_TalonFX wheelMotor;
@@ -101,34 +100,35 @@ public class SwerveModule implements Loggable {
 
     // Setup wheel motor
     wheelMotor = new WPI_TalonFX(wheelMotorId);
-    wheelMotor.configAllSettings(wheelMotorConfig, startupCanTimeout);
+    wheelMotor.configAllSettings(WHEEL_MOTOR_CONFIG, startupCanTimeout);
     wheelMotor.setInverted(TalonFXInvertType.CounterClockwise);
     wheelMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, startupCanTimeout);
 
     // Configure wheel motor PID
-    wheelMotor.config_kP(velocityPidSlot, wheelKp, startupCanTimeout);
-    wheelMotor.config_kI(velocityPidSlot, wheelKi, startupCanTimeout);
-    wheelMotor.config_kD(velocityPidSlot, wheelKd, startupCanTimeout);
-    wheelMotor.config_kF(velocityPidSlot, wheelKf, startupCanTimeout);
+    wheelMotor.config_kP(VELOCITY_PID_SLOT, WHEEL_KP, startupCanTimeout);
+    wheelMotor.config_kI(VELOCITY_PID_SLOT, WHEEL_KI, startupCanTimeout);
+    wheelMotor.config_kD(VELOCITY_PID_SLOT, WHEEL_KD, startupCanTimeout);
+    wheelMotor.config_kF(VELOCITY_PID_SLOT, WHEEL_KF, startupCanTimeout);
     wheelMotor.setNeutralMode(NeutralMode.Brake);
 
     // Setup steering encoder
     steeringEncoder = new CANCoder(angleEncoderId);
-    steeringEncoder.configAllSettings(angleEncoderConfig);
+    steeringEncoder.configAllSettings(CONFIGURATION);
 
     // Setup steering motor
     steerMotor = new WPI_TalonFX(steeringMotorId);
-    steerMotor.configAllSettings(steeringMotorConfig, startupCanTimeout);
+    steerMotor.configAllSettings(STEERING_MOTOR_CONFIG, startupCanTimeout);
     steerMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
     steerMotor.setInverted(TalonFXInvertType.CounterClockwise);
     steerMotor.setNeutralMode(NeutralMode.Coast);
-    steerMotor.selectProfileSlot(motionMagicPidSlot, 0);
+    steerMotor.selectProfileSlot(MOTION_MAGIC_PID_SLOT, 0);
 
     // Config steering motor PID
-    steerMotor.config_kP(motionMagicPidSlot, steeringKp, startupCanTimeout);
-    steerMotor.config_kI(motionMagicPidSlot, steeringKi, startupCanTimeout);
-    steerMotor.config_kD(motionMagicPidSlot, steeringKd, startupCanTimeout);
-    steerMotor.configAllowableClosedloopError(motionMagicPidSlot, steeringDeadband, startupCanTimeout);
+    steerMotor.config_kP(MOTION_MAGIC_PID_SLOT, STEERING_KP, startupCanTimeout);
+    steerMotor.config_kI(MOTION_MAGIC_PID_SLOT, STEERING_KI, startupCanTimeout);
+    steerMotor.config_kD(MOTION_MAGIC_PID_SLOT, STEERING_KD, startupCanTimeout);
+    steerMotor.configAllowableClosedloopError(
+        MOTION_MAGIC_PID_SLOT, STEERING_DEADBAND, startupCanTimeout);
     resetToAbsolute();
   }
 
@@ -149,7 +149,7 @@ public class SwerveModule implements Loggable {
    */
   @Log
   public double getSteeringAngleMotor() {
-    return falconToDegrees(steerMotor.getSelectedSensorPosition(), steerGearRatio);
+    return falconToDegrees(steerMotor.getSelectedSensorPosition(), STEER_GEAR_RATIO);
   }
 
   /**
@@ -160,7 +160,7 @@ public class SwerveModule implements Loggable {
   @Log
   public double getWheelVelocity() {
     return falconToMPS(
-        wheelMotor.getSelectedSensorVelocity(), Math.PI * wheelDiameter, wheelGearRatio);
+        wheelMotor.getSelectedSensorVelocity(), Math.PI * WHEEL_DIAMETER, WHEEL_GEAR_RATIO);
   }
 
   /**
@@ -183,12 +183,12 @@ public class SwerveModule implements Loggable {
     // CTRE is not
     state = CTREModuleState.optimize(state, getState().angle);
     final double velocity =
-        MPSToFalcon(state.speedMetersPerSecond, Math.PI * wheelDiameter, wheelGearRatio);
+        MPSToFalcon(state.speedMetersPerSecond, Math.PI * WHEEL_DIAMETER, WHEEL_GEAR_RATIO);
     wheelMotor.set(
         ControlMode.Velocity,
         velocity,
         DemandType.ArbitraryFeedForward,
-        wheelFeedforward.calculate(velocity));
+        WHEEL_FEEDFORWARD.calculate(velocity));
 
     // The speed of the wheel is really low (less than 0.01% Max speed) don't
     // steer. This prevents jittering
@@ -196,7 +196,7 @@ public class SwerveModule implements Loggable {
         (Math.abs(state.speedMetersPerSecond) <= (Swerve.maxVelocity * 0.01))
             ? lastAngle
             : state.angle.getDegrees();
-    steerMotor.set(ControlMode.Position, degreesToFalcon(angle, steerGearRatio));
+    steerMotor.set(ControlMode.Position, degreesToFalcon(angle, STEER_GEAR_RATIO));
     lastAngle = angle;
   }
 
@@ -206,7 +206,7 @@ public class SwerveModule implements Loggable {
   }
 
   private void resetToAbsolute() {
-    double absolutePosition = degreesToFalcon(getSteeringAngle().getDegrees(), steerGearRatio);
+    double absolutePosition = degreesToFalcon(getSteeringAngle().getDegrees(), STEER_GEAR_RATIO);
     steerMotor.setSelectedSensorPosition(absolutePosition);
   }
 

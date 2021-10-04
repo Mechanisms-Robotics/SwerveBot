@@ -19,4 +19,13 @@ public final class Constants {
   public static final double loopTime = 0.01; // s
   public static final int talonPrimaryPid = 0;
   public static final int falconCPR = 2048; // counts per revolution
+
+  // TODO: Change to velocity once PIDs are tuned.
+  // Currently open loop precentage
+  public static final double shooterShootSpeed = 0.70;
+  public static final double acceleratorShootSpeed = 0.70;
+  public static final double spindexerShootSpeed = 0.50;
+  public static final double spindexerIntakeSpeed = 0.15;
+  public static final double spindexerPrepSpeed = 0.15;
+  public static final double intakeSpeed = 0.25;
 }
