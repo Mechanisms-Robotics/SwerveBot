@@ -20,18 +20,19 @@ public class IntakeCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    if (!intake.isDeployed()) intake.deploy();
+    intake.deploy();
     intake.setOpenLoop(Constants.intakeSpeed);
 
     accelerator.coast();
 
-    if (!spindexer.isGateDeployed()) spindexer.deployGate();
-    if (spindexer.isRampDeployed()) spindexer.retractRamp();
+    spindexer.deployGate();
+    spindexer.retractRamp();
     spindexer.setOpenLoop(Constants.spindexerIntakeSpeed);
   }
 
   @Override
   public void end(boolean interrupted) {
+    spindexer.stop(); // TODO: Remove
     intake.stop();
     intake.retract();
   }

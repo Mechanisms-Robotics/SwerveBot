@@ -81,8 +81,8 @@ public class SwerveModule implements Loggable {
   private final CANCoder steeringEncoder;
   private final String moduleName;
 
-  private double lastAngle;
-  private double angleOffset;
+  private double lastAngle; // For debugging
+  private final double angleOffset; // This is only used to calibrate the swerve modules
 
   /**
    * Constructs a swerve module.
@@ -129,6 +129,7 @@ public class SwerveModule implements Loggable {
     steerMotor.config_kD(MOTION_MAGIC_PID_SLOT, STEERING_KD, startupCanTimeout);
     steerMotor.configAllowableClosedloopError(
         MOTION_MAGIC_PID_SLOT, STEERING_DEADBAND, startupCanTimeout);
+
     resetToAbsolute();
   }
 
@@ -205,6 +206,7 @@ public class SwerveModule implements Loggable {
     return moduleName;
   }
 
+  /** Resets the steering motor's internal encoder to the value of the absolute encoder. **/
   private void resetToAbsolute() {
     double absolutePosition = degreesToFalcon(getSteeringAngle().getDegrees(), STEER_GEAR_RATIO);
     steerMotor.setSelectedSensorPosition(absolutePosition);

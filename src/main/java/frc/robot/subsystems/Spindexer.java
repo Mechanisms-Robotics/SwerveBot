@@ -14,14 +14,13 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 
 public class Spindexer extends SubsystemBase implements Loggable {
   private static final int SPINDEXER_MOTOR_ID = 30;
   private static final int RAMP_SOLENOID_FORWARD_ID = 7; // TODO: Get id from wiring
   private static final int RAMP_SOLENOID_REVERSE_ID = 0; // TODO: Get id from wiring
-  private static final int GATE_SOLENOID_FORWARD_ID = 2; // TODO: Get id from wiring
-  private static final int GATE_SOLENOID_REVERSE_ID = 3; // TODO: Get id from wiring
+  private static final int GATE_SOLENOID_FORWARD_ID = 6; // TODO: Get id from wiring
+  private static final int GATE_SOLENOID_REVERSE_ID = 1; // TODO: Get id from wiring
 
   private static final DoubleSolenoid.Value RAMP_DEPLOYED = DoubleSolenoid.Value.kForward;
   private static final DoubleSolenoid.Value RAMP_RETRACTED = DoubleSolenoid.Value.kReverse;
@@ -90,17 +89,14 @@ public class Spindexer extends SubsystemBase implements Loggable {
     gateSolenoid.set(GATE_RETRACTED);
   }
 
-  @Log
   public boolean isRampDeployed() {
     return rampSolenoid.get() == RAMP_DEPLOYED;
   }
 
-  @Log
   public boolean isGateDeployed() {
     return gateSolenoid.get() == GATE_DEPLOYED;
   }
 
-  @Log
   public double getVelocity() {
     return falconToRPM(spindexerMotor.getSelectedSensorVelocity(), SPINDEXER_GEAR_RATIO);
   }

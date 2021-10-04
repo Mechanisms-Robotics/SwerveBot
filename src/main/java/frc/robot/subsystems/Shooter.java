@@ -11,7 +11,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 
 public class Shooter extends SubsystemBase implements Loggable {
   private static final int SHOOTER_MOTOR_ID = 50;
@@ -71,7 +70,6 @@ public class Shooter extends SubsystemBase implements Loggable {
         FEEDFORWARD.calculate(rpm));
   }
 
-  @Log
   public double getVelocity() {
     return falconToRPM(shooterMotor.getSelectedSensorVelocity(), SHOOTER_GEAR_RATIO);
   }

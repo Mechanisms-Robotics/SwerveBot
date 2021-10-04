@@ -96,11 +96,11 @@ public class Swerve extends SubsystemBase implements Loggable {
             VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
     headingStabilizationPID = new PIDController(0.005, 0.0, 0.0);
-    headingStabilizationPID.setTolerance(1.0);
+    headingStabilizationPID.setTolerance(1.0); // tolerance is in degrees
 
     // TODO: Tune
     forPID = new PIDController(0.005, 0.0, 0.0);
-    forPID.setTolerance(5.0);
+    forPID.setTolerance(5.0); // tolerance is in degrees
 
     this.register();
     this.setName("Swerve Drive");
@@ -120,18 +120,20 @@ public class Swerve extends SubsystemBase implements Loggable {
       double xVelocity, double yVelocity, double rotationVelocity, boolean fieldRelative) {
 
     // Heading stabilization loop
-    if (Math.abs(rotationVelocity) < 0.01) {
-      // If we where turning then stoped turning lock in current heading
+    final double turningVelocityThreshold = 0.01;
+    if (Math.abs(rotationVelocity) < turningVelocityThreshold) {
+      // If we were turning then stopped turning lock in current heading
       if (turning) {
         stabilizationHeading = getHeading();
         turning = false;
       } else {
-        if (forEnabled)
+        if (forEnabled) {
           rotationVelocity += forPID.calculate(getHeading().getDegrees(), forHeading.getDegrees());
-
-        rotationVelocity +=
-            headingStabilizationPID.calculate(
-                getHeading().getDegrees(), stabilizationHeading.getDegrees());
+        } else {
+          rotationVelocity +=
+              headingStabilizationPID.calculate(
+                  getHeading().getDegrees(), stabilizationHeading.getDegrees());
+        }
       }
     } else {
       turning = true;

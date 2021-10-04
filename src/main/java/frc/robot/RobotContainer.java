@@ -1,15 +1,11 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.ClimberCommand;
-import frc.robot.commands.ContinuousJogHoodCommand;
 import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.PrepShootCommand;
-import frc.robot.commands.ShootCommand;
-import frc.robot.commands.SpinupCommand;
 import frc.robot.commands.TimedSpindexerCommand;
 import frc.robot.subsystems.*;
 
@@ -28,11 +24,12 @@ public class RobotContainer {
   // The driver's controller
   private final XboxController driverController = new XboxController(0);
   private final XboxController operatorController = new XboxController(1);
-  private final Button shootTrigger = new Button(() -> driverController.getRawAxis(3) > 0.1);
-  private final Button fastShootButton = new Button(driverController::getAButton);
-  private final Button hoodJogForward = new Button(() -> driverController.getBumper(Hand.kRight));
-  private final Button hoodJogReverse = new Button(() -> driverController.getBumper(Hand.kLeft));
-  private final Button intakeButton = new Button(driverController::getBButton);
+  // private final Button shootTrigger = new Button(() -> driverController.getRawAxis(3) > 0.1);
+  // private final Button fastShootButton = new Button(driverController::getAButton);
+  // private final Button hoodJogForward = new Button(() ->
+  // driverController.getBumper(Hand.kRight));
+  // private final Button hoodJogReverse = new Button(() -> driverController.getBumper(Hand.kLeft));
+  private final Button intakeButton = new Button(() -> driverController.getRawButton(1));
 
   public RobotContainer() {
     configureButtonBindings();
@@ -40,35 +37,35 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    shootTrigger.toggleWhenPressed(
-        new SpinupCommand(shooter, accelerator, spindexer)
-            .andThen(new ShootCommand(shooter, accelerator, spindexer)));
+    /*shootTrigger.toggleWhenPressed(
+    new SpinupCommand(shooter, accelerator, spindexer)
+        .andThen(new ShootCommand(shooter, accelerator, spindexer)));*/
 
-    fastShootButton.toggleWhenPressed(
-        new PrepShootCommand(spindexer, accelerator)
-            .andThen(new ShootCommand(shooter, accelerator, spindexer)));
+    /*fastShootButton.toggleWhenPressed(
+    new PrepShootCommand(spindexer, accelerator)
+        .andThen(new ShootCommand(shooter, accelerator, spindexer)));*/
 
-    hoodJogForward.toggleWhenPressed(new ContinuousJogHoodCommand(hood, false));
-    hoodJogReverse.toggleWhenPressed(new ContinuousJogHoodCommand(hood, true));
+    // hoodJogForward.toggleWhenPressed(new ContinuousJogHoodCommand(hood, false));
+    // hoodJogReverse.toggleWhenPressed(new ContinuousJogHoodCommand(hood, true));
 
     // TODO: Don't have icky magic number
     intakeButton.toggleWhenPressed(
-        new IntakeCommand(intake, spindexer, accelerator)
-            .andThen(
-                new TimedSpindexerCommand(
-                    spindexer, accelerator, 1.0, Constants.spindexerIntakeSpeed)));
+    new IntakeCommand(intake, spindexer, accelerator)
+        .andThen(
+            new TimedSpindexerCommand(
+                spindexer, accelerator, 5.0, Constants.spindexerIntakeSpeed)));
+    // intakeButton.whenPressed(new IntakeCommand(intake, spindexer, accelerator));
+    // intakeRetractButton.whenPressed(new InstantCommand(intake::retract, intake));
   }
 
   private void configureDefaultCommands() {
     // Drive the robot relative to the field\
-    /*
-    swerve.setDefaultCommand(
+    /*swerve.setDefaultCommand(
         new DriveTeleopCommand(
             () -> driverController.getX(Hand.kLeft),
             () -> -driverController.getY(Hand.kLeft),
             () -> driverController.getX(Hand.kRight),
-            swerve));
-     */
+            swerve));*/
     // spindexer.setDefaultCommand(
     //        new RunCommand(
     //                () -> spindexer.setOpenLoop(0.15)
