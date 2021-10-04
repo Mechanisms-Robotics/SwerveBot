@@ -206,7 +206,7 @@ public class SwerveModule implements Loggable {
     return moduleName;
   }
 
-  /** Resets the steering motor's internal encoder to the value of the absolute encoder. **/
+  /** Resets the steering motor's internal encoder to the value of the absolute encoder. * */
   private void resetToAbsolute() {
     double absolutePosition = degreesToFalcon(getSteeringAngle().getDegrees(), STEER_GEAR_RATIO);
     steerMotor.setSelectedSensorPosition(absolutePosition);

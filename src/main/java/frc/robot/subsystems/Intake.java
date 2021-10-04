@@ -47,7 +47,7 @@ public class Intake extends SubsystemBase implements Loggable {
 
   private final WPI_TalonFX intakeMotor = new WPI_TalonFX(INTAKE_MOTOR_ID);
   private final DoubleSolenoid intakeSolenoid =
-  new DoubleSolenoid(INTAKE_SOLENOID_FORWARD_ID, INTAKE_SOLENOID_REVERSE_ID);
+      new DoubleSolenoid(INTAKE_SOLENOID_FORWARD_ID, INTAKE_SOLENOID_REVERSE_ID);
 
   public Intake() {
     intakeMotor.configAllSettings(INTAKE_MOTOR_CONFIG, startupCanTimeout);

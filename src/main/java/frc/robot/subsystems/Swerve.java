@@ -22,8 +22,8 @@ public class Swerve extends SubsystemBase implements Loggable {
   public static final double maxRotationalVelocity = Math.PI; // rads/s
 
   // The center of the robot is the origin point for all locations
-  private static final double driveBaseWidth = 0.44; // m
-  private static final double driveBaseLength = 0.44; // m
+  private static final double driveBaseWidth = 0.5969; // m
+  private static final double driveBaseLength = 0.5969; // m
 
   private static final Translation2d flModuleLocation =
       new Translation2d(driveBaseLength / 2.0, driveBaseWidth / 2.0);
@@ -47,10 +47,10 @@ public class Swerve extends SubsystemBase implements Loggable {
   private static final int brSteerMotorID = 17;
   private static final int brSteerEncoderID = 16;
 
-  private static final double flAngleOffset = 11.250;
-  private static final double frAngleOffset = 52.646;
-  private static final double blAngleOffset = 204.697;
-  private static final double brAngleOffset = 221.045;
+  private static final double flAngleOffset = 11.865;
+  private static final double frAngleOffset = 222.891;
+  private static final double blAngleOffset = 207.422;
+  private static final double brAngleOffset = 37.266;
 
   private static final int gyroID = 1;
 
@@ -127,13 +127,13 @@ public class Swerve extends SubsystemBase implements Loggable {
         stabilizationHeading = getHeading();
         turning = false;
       } else {
-        if (forEnabled) {
-          rotationVelocity += forPID.calculate(getHeading().getDegrees(), forHeading.getDegrees());
-        } else {
-          rotationVelocity +=
-              headingStabilizationPID.calculate(
-                  getHeading().getDegrees(), stabilizationHeading.getDegrees());
-        }
+        // if (forEnabled) {
+        //rotationVelocity += forPID.calculate(getHeading().getDegrees(), forHeading.getDegrees());
+        // } else {
+        /*rotationVelocity +=
+            headingStabilizationPID.calculate(
+                getHeading().getDegrees(), stabilizationHeading.getDegrees());*/
+        // }
       }
     } else {
       turning = true;
