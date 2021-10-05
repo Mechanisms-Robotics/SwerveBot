@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -12,6 +11,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.VecBuilder;
+import frc.robot.util.HeadingController;
 import io.github.oblarg.oblog.Loggable;
 import io.github.oblarg.oblog.annotations.Log;
 
@@ -75,14 +75,18 @@ public class Swerve extends SubsystemBase implements Loggable {
 
   private final PigeonIMU gyro = new PigeonIMU(gyroID);
 
-  private PIDController headingStabilizationPID;
-  private Rotation2d stabilizationHeading = new Rotation2d();
-  private boolean turning;
-
-  // Field Oriented Rotation
-  private boolean forEnabled = false;
-  private PIDController forPID;
-  private Rotation2d forHeading = new Rotation2d();
+  private HeadingController headingController =
+      new HeadingController(
+          0.005, // Stabilization kP
+          0.0, // Stabilization kD
+          0.0, // Lock kP
+          0.0, // Lock kI
+          0.0, // Lock kD
+          0.0, // Turn in place kP
+          0.0, // Turn in place kI
+          0.0 // Turn in place kD
+          );
+  private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
 
   /** Constructs the Swerve subsystem. */
   public Swerve() {
@@ -94,13 +98,6 @@ public class Swerve extends SubsystemBase implements Loggable {
             VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
             VecBuilder.fill(Units.degreesToRadians(0.01)),
             VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
-
-    headingStabilizationPID = new PIDController(0.005, 0.0, 0.0);
-    headingStabilizationPID.setTolerance(1.0); // tolerance is in degrees
-
-    // TODO: Tune
-    forPID = new PIDController(0.005, 0.0, 0.0);
-    forPID.setTolerance(5.0); // tolerance is in degrees
 
     this.register();
     this.setName("Swerve Drive");
@@ -114,41 +111,31 @@ public class Swerve extends SubsystemBase implements Loggable {
         frModule.getState(),
         blModule.getState(),
         brModule.getState());
+
+    headingController.update(desiredSpeeds, getHeading());
+    setSwerveStates(desiredSpeeds);
   }
 
-  public void driveVelocity(
+  public void drive(
       double xVelocity, double yVelocity, double rotationVelocity, boolean fieldRelative) {
 
-    // Heading stabilization loop
-    final double turningVelocityThreshold = 0.01;
-    if (Math.abs(rotationVelocity) < turningVelocityThreshold) {
-      // If we were turning then stopped turning lock in current heading
-      if (turning) {
-        stabilizationHeading = getHeading();
-        turning = false;
-      } else {
-        // if (forEnabled) {
-        //rotationVelocity += forPID.calculate(getHeading().getDegrees(), forHeading.getDegrees());
-        // } else {
-        /*rotationVelocity +=
-            headingStabilizationPID.calculate(
-                getHeading().getDegrees(), stabilizationHeading.getDegrees());*/
-        // }
-      }
-    } else {
-      turning = true;
-    }
-
-    // If field relative is updated
-    ChassisSpeeds speeds;
+    headingController.stabiliseHeading();
     if (fieldRelative) {
-      speeds =
+      desiredSpeeds =
           ChassisSpeeds.fromFieldRelativeSpeeds(
               xVelocity, yVelocity, rotationVelocity, getHeading());
     } else {
-      speeds = new ChassisSpeeds(xVelocity, yVelocity, rotationVelocity);
+      desiredSpeeds = new ChassisSpeeds(xVelocity, yVelocity, rotationVelocity);
     }
+  }
 
+  public void drive(double xVelocity, double yVelocity, Rotation2d rotation) {
+    headingController.lockHeading(rotation);
+    // We don't set the rotation speeds as the heading controller will take care of that.
+    desiredSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xVelocity, yVelocity, 0.0, getHeading());
+  }
+
+  private void setSwerveStates(ChassisSpeeds speeds) {
     SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
 
     SwerveDriveKinematics.normalizeWheelSpeeds(states, maxVelocity);
@@ -182,16 +169,6 @@ public class Swerve extends SubsystemBase implements Loggable {
     return states;
   }
 
-  /** Sets whether to use FOR (Field Oriented Rotation) control or not. * */
-  public void setFOREnabled(boolean isEnabled) {
-    this.forEnabled = isEnabled;
-  }
-
-  /** Updates desired heading for FOR (Field Oriented Rotation) control. * */
-  public void setFORDesiredHeading(Rotation2d desiredHeading) {
-    forHeading = desiredHeading;
-  }
-
   /** Zeros the gyro heading. */
   public void zeroHeading() {
     gyro.setYaw(0.0);
@@ -211,6 +188,10 @@ public class Swerve extends SubsystemBase implements Loggable {
     double[] ypr = new double[3];
     gyro.getYawPitchRoll(ypr);
     return Rotation2d.fromDegrees(ypr[0]);
+  }
+
+  public ChassisSpeeds getSpeeds() {
+    return kinematics.toChassisSpeeds(getModuleStates());
   }
 
   /**

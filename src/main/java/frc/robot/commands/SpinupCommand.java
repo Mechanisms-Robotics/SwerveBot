@@ -16,7 +16,7 @@ public class SpinupCommand extends CommandBase {
   public final Shooter shooter;
   public final Accelerator accelerator;
   public final Spindexer spindexer;
-  public final double spinupTime = 1.0;
+  public final double spinUpTime = 1.0;
   public final Timer timer = new Timer();
 
   public SpinupCommand(Shooter shooter, Accelerator accelerator, Spindexer spindexer) {
@@ -39,6 +39,6 @@ public class SpinupCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return timer.hasElapsed(spinupTime);
+    return timer.hasElapsed(spinUpTime);
   }
 }

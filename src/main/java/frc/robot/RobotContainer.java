@@ -62,12 +62,12 @@ public class RobotContainer {
   private void configureDefaultCommands() {
     // Drive the robot relative to the field\
     swerve.setDefaultCommand(
-    new DriveTeleopCommand(
-        () -> driverController.getX(Hand.kLeft),
-        () -> -driverController.getY(Hand.kLeft),
-        () -> -driverController.getX(Hand.kRight),
-        true,
-        swerve));
+        new DriveTeleopCommand(
+            () -> driverController.getX(Hand.kLeft),
+            () -> -driverController.getY(Hand.kLeft),
+            () -> -driverController.getX(Hand.kRight),
+            true,
+            swerve));
     // spindexer.setDefaultCommand(
     //        new RunCommand(
     //                () -> spindexer.setOpenLoop(0.15)

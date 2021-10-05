@@ -83,11 +83,11 @@ public class DriveTeleopCommand extends CommandBase {
     SmartDashboard.putNumber("Swerve vY", dy);
     SmartDashboard.putNumber("Swerve vR", dr);
 
-    dx = (Math.abs(dx) > this.dxDeadband) ? dx : 0;
-    dy = (Math.abs(dy) > this.dyDeadband) ? dy : 0;
-    dr = (Math.abs(dr) > this.drDeadband) ? dr : 0;
+    dx = (Math.abs(dx) > dxDeadband) ? dx : 0;
+    dy = (Math.abs(dy) > dyDeadband) ? dy : 0;
+    dr = (Math.abs(dr) > drDeadband) ? dr : 0;
 
-    swerve.driveVelocity(dx, dy, dr, fieldOriented);
+    swerve.drive(dx, dy, dr, fieldOriented);
   }
 
   @Override
