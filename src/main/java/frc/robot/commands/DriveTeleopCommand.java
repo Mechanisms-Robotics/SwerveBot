@@ -9,15 +9,15 @@ import java.util.function.Supplier;
 /** Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x. */
 public class DriveTeleopCommand extends CommandBase {
 
-  private static final double maxTranslationalVelocityRate = 10; // m/s per second
-  private static final double maxRotationVelocityRate = 4 * Math.PI; // rads/s per second
+  private static final double MAX_TRANSLATIONAL_VELOCITY_RATE = 10; // m/s per second
+  private static final double MAX_ROTATION_VELOCITY_RATE = 4 * Math.PI; // rads/s per second
+
+  private static final double TRANSLATION_CURVE_STRENGTH = 0.4;
+  private static final double ROTATION_CURVE_STRENGTH = 10.0; // 10.0 makes it effectively linear.
 
   private static final double DEADBAND = 0.2;
 
   private final Swerve swerve;
-
-  private final double translationCurveStrength = 0.4;
-  private final double rotationCurveStrength = 10.0; // 10.0 makes it effectively linear.
 
   private final Supplier<Double> vxSupplier;
   private final Supplier<Double> vySupplier;
@@ -51,9 +51,9 @@ public class DriveTeleopCommand extends CommandBase {
     this.swerve = swerve;
     addRequirements(this.swerve);
 
-    vxRateLimiter = new SlewRateLimiter(maxTranslationalVelocityRate);
-    vyRateLimiter = new SlewRateLimiter(maxTranslationalVelocityRate);
-    vrRateLimiter = new SlewRateLimiter(maxRotationVelocityRate);
+    vxRateLimiter = new SlewRateLimiter(MAX_TRANSLATIONAL_VELOCITY_RATE);
+    vyRateLimiter = new SlewRateLimiter(MAX_TRANSLATIONAL_VELOCITY_RATE);
+    vrRateLimiter = new SlewRateLimiter(MAX_ROTATION_VELOCITY_RATE);
   }
 
   /**
@@ -82,9 +82,9 @@ public class DriveTeleopCommand extends CommandBase {
     SmartDashboard.putNumber("Swerve vY", dy);
     SmartDashboard.putNumber("Swerve vR", dr);
 
-    dx = applyControlCurve(Math.abs(dx) > DEADBAND ? dx : 0, translationCurveStrength);
-    dy = applyControlCurve(Math.abs(dy) > DEADBAND ? dy : 0, translationCurveStrength);
-    dr = applyControlCurve(Math.abs(dr) > DEADBAND ? dr : 0, rotationCurveStrength);
+    dx = applyControlCurve(Math.abs(dx) > DEADBAND ? dx : 0, TRANSLATION_CURVE_STRENGTH);
+    dy = applyControlCurve(Math.abs(dy) > DEADBAND ? dy : 0, TRANSLATION_CURVE_STRENGTH);
+    dr = applyControlCurve(Math.abs(dr) > DEADBAND ? dr : 0, ROTATION_CURVE_STRENGTH);
 
     swerve.drive(dx, dy, dr, fieldOriented);
   }
