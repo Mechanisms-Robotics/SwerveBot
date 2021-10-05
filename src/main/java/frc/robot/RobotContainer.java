@@ -65,8 +65,8 @@ public class RobotContainer {
     new DriveTeleopCommand(
         () -> driverController.getX(Hand.kLeft),
         () -> -driverController.getY(Hand.kLeft),
-        () -> driverController.getX(Hand.kRight),
-        false,
+        () -> -driverController.getX(Hand.kRight),
+        true,
         swerve));
     // spindexer.setDefaultCommand(
     //        new RunCommand(

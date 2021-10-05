@@ -34,7 +34,7 @@ public class SwerveModule implements Loggable {
   private static final TalonFXConfiguration STEERING_MOTOR_CONFIG = new TalonFXConfiguration();
   private static final CANCoderConfiguration CONFIGURATION = new CANCoderConfiguration();
 
-  private static final double STEERING_KP = 0.6;
+  private static final double STEERING_KP = 0.1;
   private static final double STEERING_KI = 0.0;
   private static final double STEERING_KD = 3.0;
   private static final double STEERING_DEADBAND = 75; // ticks
@@ -197,6 +197,8 @@ public class SwerveModule implements Loggable {
         (Math.abs(state.speedMetersPerSecond) <= (Swerve.maxVelocity * 0.01))
             ? lastAngle
             : state.angle.getDegrees();
+    System.out.println(moduleName + "Input: " + state.angle.toString());
+    System.out.println(moduleName + " Output: " + angle);
     steerMotor.set(ControlMode.Position, degreesToFalcon(angle, STEER_GEAR_RATIO));
     lastAngle = angle;
   }

@@ -26,13 +26,13 @@ public class Swerve extends SubsystemBase implements Loggable {
   private static final double driveBaseLength = 0.5969; // m
 
   private static final Translation2d flModuleLocation =
-      new Translation2d(driveBaseLength / 2.0, driveBaseWidth / 2.0);
-  private static final Translation2d frModuleLocation =
-      new Translation2d(driveBaseLength / 2.0, -driveBaseWidth / 2.0);
-  private static final Translation2d blModuleLocation =
       new Translation2d(-driveBaseLength / 2.0, driveBaseWidth / 2.0);
-  private static final Translation2d brModuleLocation =
+  private static final Translation2d frModuleLocation =
+      new Translation2d(driveBaseLength / 2.0, driveBaseWidth / 2.0);
+  private static final Translation2d blModuleLocation =
       new Translation2d(-driveBaseLength / 2.0, -driveBaseWidth / 2.0);
+  private static final Translation2d brModuleLocation =
+      new Translation2d(driveBaseLength / 2.0, -driveBaseWidth / 2.0);
 
   private static final int flWheelMotorID = 12;
   private static final int flSteerMotorID = 13;
@@ -47,10 +47,10 @@ public class Swerve extends SubsystemBase implements Loggable {
   private static final int brSteerMotorID = 17;
   private static final int brSteerEncoderID = 16;
 
-  private static final double flAngleOffset = 11.865;
-  private static final double frAngleOffset = 222.891;
-  private static final double blAngleOffset = 207.422;
-  private static final double brAngleOffset = 37.266;
+  private static final double flAngleOffset = 326.0742;
+  private static final double frAngleOffset = 62.1414;
+  private static final double blAngleOffset = 174.9847;
+  private static final double brAngleOffset = 164.6987;
 
   private static final int gyroID = 1;
 
