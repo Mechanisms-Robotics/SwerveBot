@@ -13,7 +13,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 
 public class Accelerator extends SubsystemBase implements Loggable {
   private static final int ACCELERATOR_MOTOR_ID = 40;
@@ -62,7 +61,6 @@ public class Accelerator extends SubsystemBase implements Loggable {
    *
    * @return Velocity in RPM
    */
-  @Log
   public double getVelocity() {
     return falconToRPM(acceleratorMotor.getSelectedSensorVelocity(), ACCELERATOR_GEAR_RATIO);
   }

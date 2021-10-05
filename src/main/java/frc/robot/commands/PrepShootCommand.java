@@ -23,8 +23,8 @@ public class PrepShootCommand extends CommandBase {
   public void initialize() {
     accelerator.coast();
 
-    if (spindexer.isGateDeployed()) spindexer.retractGate();
-    if (!spindexer.isRampDeployed()) spindexer.deployRamp();
+    spindexer.retractGate();
+    spindexer.deployRamp();
     spindexer.setOpenLoop(Constants.spindexerPrepSpeed);
   }
 

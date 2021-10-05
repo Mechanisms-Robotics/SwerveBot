@@ -22,17 +22,17 @@ public class Swerve extends SubsystemBase implements Loggable {
   public static final double maxRotationalVelocity = Math.PI; // rads/s
 
   // The center of the robot is the origin point for all locations
-  private static final double driveBaseWidth = 0.44; // m
-  private static final double driveBaseLength = 0.44; // m
+  private static final double driveBaseWidth = 0.5969; // m
+  private static final double driveBaseLength = 0.5969; // m
 
   private static final Translation2d flModuleLocation =
-      new Translation2d(driveBaseLength / 2.0, driveBaseWidth / 2.0);
-  private static final Translation2d frModuleLocation =
-      new Translation2d(driveBaseLength / 2.0, -driveBaseWidth / 2.0);
-  private static final Translation2d blModuleLocation =
       new Translation2d(-driveBaseLength / 2.0, driveBaseWidth / 2.0);
-  private static final Translation2d brModuleLocation =
+  private static final Translation2d frModuleLocation =
+      new Translation2d(driveBaseLength / 2.0, driveBaseWidth / 2.0);
+  private static final Translation2d blModuleLocation =
       new Translation2d(-driveBaseLength / 2.0, -driveBaseWidth / 2.0);
+  private static final Translation2d brModuleLocation =
+      new Translation2d(driveBaseLength / 2.0, -driveBaseWidth / 2.0);
 
   private static final int flWheelMotorID = 12;
   private static final int flSteerMotorID = 13;
@@ -47,10 +47,10 @@ public class Swerve extends SubsystemBase implements Loggable {
   private static final int brSteerMotorID = 17;
   private static final int brSteerEncoderID = 16;
 
-  private static final double flAngleOffset = 11.250;
-  private static final double frAngleOffset = 52.646;
-  private static final double blAngleOffset = 204.697;
-  private static final double brAngleOffset = 221.045;
+  private static final double flAngleOffset = 326.0742;
+  private static final double frAngleOffset = 62.1414;
+  private static final double blAngleOffset = 174.9847;
+  private static final double brAngleOffset = 164.6987;
 
   private static final int gyroID = 1;
 
@@ -96,11 +96,11 @@ public class Swerve extends SubsystemBase implements Loggable {
             VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
     headingStabilizationPID = new PIDController(0.005, 0.0, 0.0);
-    headingStabilizationPID.setTolerance(1.0);
+    headingStabilizationPID.setTolerance(1.0); // tolerance is in degrees
 
     // TODO: Tune
     forPID = new PIDController(0.005, 0.0, 0.0);
-    forPID.setTolerance(5.0);
+    forPID.setTolerance(5.0); // tolerance is in degrees
 
     this.register();
     this.setName("Swerve Drive");
@@ -120,18 +120,20 @@ public class Swerve extends SubsystemBase implements Loggable {
       double xVelocity, double yVelocity, double rotationVelocity, boolean fieldRelative) {
 
     // Heading stabilization loop
-    if (Math.abs(rotationVelocity) < 0.01) {
-      // If we where turning then stoped turning lock in current heading
+    final double turningVelocityThreshold = 0.01;
+    if (Math.abs(rotationVelocity) < turningVelocityThreshold) {
+      // If we were turning then stopped turning lock in current heading
       if (turning) {
         stabilizationHeading = getHeading();
         turning = false;
       } else {
-        if (forEnabled)
-          rotationVelocity += forPID.calculate(getHeading().getDegrees(), forHeading.getDegrees());
-
-        rotationVelocity +=
+        // if (forEnabled) {
+        //rotationVelocity += forPID.calculate(getHeading().getDegrees(), forHeading.getDegrees());
+        // } else {
+        /*rotationVelocity +=
             headingStabilizationPID.calculate(
-                getHeading().getDegrees(), stabilizationHeading.getDegrees());
+                getHeading().getDegrees(), stabilizationHeading.getDegrees());*/
+        // }
       }
     } else {
       turning = true;

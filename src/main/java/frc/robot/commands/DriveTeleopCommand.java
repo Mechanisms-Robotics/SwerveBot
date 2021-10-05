@@ -11,12 +11,12 @@ public class DriveTeleopCommand extends CommandBase {
 
   private static final double maxTranslationalVelocityRate = 4; // m/s per second
   private static final double maxRotationVelocityRate = 2 * Math.PI; // rads/s per second
-  private static final double maxTranslationalVelocity = Swerve.maxVelocity * 0.90;
+  private static final double maxTranslationalVelocity = Swerve.maxVelocity;
   private static final double maxRotationalVelocity = Swerve.maxRotationalVelocity;
 
-  private static final double dxDeadband = 0.075;
-  private static final double dyDeadband = 0.075;
-  private static final double drDeadband = 0.075;
+  private static final double dxDeadband = 0.075; // Joystick percentage
+  private static final double dyDeadband = 0.075; // Joystick percentage
+  private static final double drDeadband = 0.075; // Joystick percentage
 
   private final Swerve swerve;
 

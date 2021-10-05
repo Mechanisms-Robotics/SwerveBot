@@ -15,13 +15,12 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 
 public class Intake extends SubsystemBase implements Loggable {
 
   private static final int INTAKE_MOTOR_ID = 20;
-  private static final int INTAKE_SOLENOID_FORWARD_ID = 0; // TODO: Get id from wiring
-  private static final int INTAKE_SOLENOID_REVERSE_ID = 1; // TODO: Get id from wireing
+  private static final int INTAKE_SOLENOID_FORWARD_ID = 5;
+  private static final int INTAKE_SOLENOID_REVERSE_ID = 2;
   private static final DoubleSolenoid.Value INTAKE_DEPLOYED = DoubleSolenoid.Value.kForward;
   private static final DoubleSolenoid.Value INTAKE_RETRACTED = DoubleSolenoid.Value.kReverse;
   private static final double INTAKE_GEAR_RATIO = 1.0;
@@ -67,12 +66,7 @@ public class Intake extends SubsystemBase implements Loggable {
   }
 
   public void setVelocity(double rpm) {
-    if (isDeployed()) {
-      intakeMotor.set(ControlMode.Velocity, RPMToFalcon(rpm, INTAKE_GEAR_RATIO));
-    } else {
-      DriverStation.reportWarning("Intake commanded to run while retracted. Ignoring Input", false);
-      stop();
-    }
+    intakeMotor.set(ControlMode.Velocity, RPMToFalcon(rpm, INTAKE_GEAR_RATIO));
   }
 
   public void deploy() {
@@ -84,12 +78,10 @@ public class Intake extends SubsystemBase implements Loggable {
     intakeSolenoid.set(INTAKE_RETRACTED);
   }
 
-  @Log
   public boolean isDeployed() {
     return intakeSolenoid.get() == INTAKE_DEPLOYED;
   }
 
-  @Log
   public double getVelocity() {
     return falconToRPM(intakeMotor.getSelectedSensorVelocity(), INTAKE_GEAR_RATIO);
   }

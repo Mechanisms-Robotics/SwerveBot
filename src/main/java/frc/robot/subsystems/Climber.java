@@ -11,7 +11,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
-import io.github.oblarg.oblog.annotations.Log;
 
 public class Climber extends SubsystemBase implements Loggable {
   private static final int CLIMBER_MOTOR_ID = 60;
@@ -42,7 +41,6 @@ public class Climber extends SubsystemBase implements Loggable {
     climberMotor.set(ControlMode.PercentOutput, percentOutput);
   }
 
-  @Log
   public double getVelocity() {
     return falconToRPM(climberMotor.getSelectedSensorVelocity(), CLIMBER_GEAR_RATIO);
   }
