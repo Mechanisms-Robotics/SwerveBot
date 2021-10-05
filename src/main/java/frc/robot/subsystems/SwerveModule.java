@@ -197,8 +197,6 @@ public class SwerveModule implements Loggable {
         (Math.abs(state.speedMetersPerSecond) <= (Swerve.maxVelocity * 0.01))
             ? lastAngle
             : state.angle.getDegrees();
-    System.out.println(moduleName + "Input: " + state.angle.toString());
-    System.out.println(moduleName + " Output: " + angle);
     steerMotor.set(ControlMode.Position, degreesToFalcon(angle, STEER_GEAR_RATIO));
     lastAngle = angle;
   }
