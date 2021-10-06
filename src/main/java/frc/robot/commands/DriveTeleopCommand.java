@@ -12,7 +12,7 @@ public class DriveTeleopCommand extends CommandBase {
   private static final double MAX_TRANSLATIONAL_VELOCITY_RATE = 10; // m/s per second
   private static final double MAX_ROTATION_VELOCITY_RATE = 4 * Math.PI; // rads/s per second
 
-  private static final double TRANSLATION_CURVE_STRENGTH = 0.4;
+  private static final double TRANSLATION_CURVE_STRENGTH = 2;
   private static final double ROTATION_CURVE_STRENGTH = 10.0; // 10.0 makes it effectively linear.
 
   private static final double DEADBAND = 0.2;
@@ -123,7 +123,7 @@ public class DriveTeleopCommand extends CommandBase {
     // DEADBAND to 0.
     final double absControl = Math.abs(controlValue);
     final double continuousControl = (absControl - DEADBAND) * (1.0 / (1.0 - DEADBAND));
-    return Math.signum(continuousControl)
+    return Math.signum(controlValue)
         * ((curveStrength * continuousControl) / (curveStrength - continuousControl + 1));
   }
 }
