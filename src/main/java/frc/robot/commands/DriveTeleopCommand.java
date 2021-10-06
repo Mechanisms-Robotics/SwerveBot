@@ -75,16 +75,21 @@ public class DriveTeleopCommand extends CommandBase {
   @Override
   public void execute() {
     // Get driver input
-    double dx = vxRateLimiter.calculate(vxSupplier.get() * Swerve.maxVelocity);
-    double dy = vyRateLimiter.calculate(vySupplier.get() * Swerve.maxVelocity);
-    double dr = vrRateLimiter.calculate(vrSupplier.get() * Swerve.maxRotationalVelocity);
+    double dx = vxSupplier.get();
+    double dy = vySupplier.get();
+    double dr = vrSupplier.get();
+    dx = applyControlCurve(Math.abs(dx) > DEADBAND ? dx : 0, TRANSLATION_CURVE_STRENGTH);
+    dy = applyControlCurve(Math.abs(dy) > DEADBAND ? dy : 0, TRANSLATION_CURVE_STRENGTH);
+    dr = applyControlCurve(Math.abs(dr) > DEADBAND ? dr : 0, ROTATION_CURVE_STRENGTH);
+    dx = vxRateLimiter.calculate(dx * Swerve.maxVelocity);
+    dy = vyRateLimiter.calculate(dy * Swerve.maxVelocity);
+    dr = vrRateLimiter.calculate(dr * Swerve.maxRotationalVelocity);
+
     SmartDashboard.putNumber("Swerve vX", dx);
     SmartDashboard.putNumber("Swerve vY", dy);
     SmartDashboard.putNumber("Swerve vR", dr);
 
-    dx = applyControlCurve(Math.abs(dx) > DEADBAND ? dx : 0, TRANSLATION_CURVE_STRENGTH);
-    dy = applyControlCurve(Math.abs(dy) > DEADBAND ? dy : 0, TRANSLATION_CURVE_STRENGTH);
-    dr = applyControlCurve(Math.abs(dr) > DEADBAND ? dr : 0, ROTATION_CURVE_STRENGTH);
+
 
     swerve.drive(dx, dy, dr, fieldOriented);
   }
