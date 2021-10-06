@@ -3,8 +3,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
-import frc.robot.commands.ClimberCommand;
 import frc.robot.commands.DriveTeleopCommand;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.TimedSpindexerCommand;
@@ -32,6 +32,9 @@ public class RobotContainer {
   // private final Button hoodJogReverse = new Button(() -> driverController.getBumper(Hand.kLeft));
   private final Button intakeButton = new Button(() -> driverController.getRawButton(1));
 
+  private final Button climbUpButton = new Button(() -> driverController.getPOV() == 0);
+  private final Button climbDownButton = new Button(() -> driverController.getPOV() == 180);
+
   public RobotContainer() {
     configureButtonBindings();
     configureDefaultCommands();
@@ -55,6 +58,10 @@ public class RobotContainer {
             .andThen(
                 new TimedSpindexerCommand(
                     spindexer, accelerator, 5.0, Constants.spindexerIntakeSpeed)));
+    climbUpButton.whenHeld(
+        new StartEndCommand(() -> climber.setOpenLoop(0.25), climber::stop, climber));
+    climbDownButton.whenHeld(
+        new StartEndCommand(() -> climber.setOpenLoop(-0.25), climber::stop, climber));
     // intakeButton.whenPressed(new IntakeCommand(intake, spindexer, accelerator));
     // intakeRetractButton.whenPressed(new InstantCommand(intake::retract, intake));
   }
@@ -68,12 +75,6 @@ public class RobotContainer {
             () -> -driverController.getX(Hand.kRight),
             true,
             swerve));
-    // spindexer.setDefaultCommand(
-    //        new RunCommand(
-    //                () -> spindexer.setOpenLoop(0.15)
-    //        )
-    // );
-    climber.setDefaultCommand(new ClimberCommand(() -> operatorController.getRawAxis(5), climber));
   }
 
   public Command getAutonomousCommand() {
