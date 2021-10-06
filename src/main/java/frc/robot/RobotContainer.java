@@ -3,18 +3,17 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
-import frc.robot.commands.ClimberCommand;
-import frc.robot.commands.DriveTeleopCommand;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.TimedSpindexerCommand;
+import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
 /** The container for the robot. Contains subsystems, OI devices, and commands. */
 public class RobotContainer {
 
   // Subsystems
-  private final Swerve swerve = new Swerve();
+  public final Swerve swerve = new Swerve();
   private final Shooter shooter = new Shooter();
   private final Hood hood = new Hood();
   private final Accelerator accelerator = new Accelerator();
@@ -25,12 +24,15 @@ public class RobotContainer {
   // The driver's controller
   private final XboxController driverController = new XboxController(0);
   private final XboxController operatorController = new XboxController(1);
-  // private final Button shootTrigger = new Button(() -> driverController.getRawAxis(3) > 0.1);
-  // private final Button fastShootButton = new Button(driverController::getAButton);
-  // private final Button hoodJogForward = new Button(() ->
-  // driverController.getBumper(Hand.kRight));
-  // private final Button hoodJogReverse = new Button(() -> driverController.getBumper(Hand.kLeft));
+  private final Button shootTrigger = new Button(() -> driverController.getRawAxis(3) > 0.1);
+  private final Button fastShootButton = new Button(() -> driverController.getRawButton(2));
+  private final Button justShootButton = new Button(() -> driverController.getRawButton(3));
+  private final Button hoodJogForward = new Button(() -> driverController.getBumper(Hand.kRight));
+  private final Button hoodJogReverse = new Button(() -> driverController.getBumper(Hand.kLeft));
   private final Button intakeButton = new Button(() -> driverController.getRawButton(1));
+
+  private final Button climbUpButton = new Button(() -> driverController.getPOV() == 0);
+  private final Button climbDownButton = new Button(() -> driverController.getPOV() == 180);
 
   public RobotContainer() {
     configureButtonBindings();
@@ -38,16 +40,15 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    /*shootTrigger.toggleWhenPressed(
+    shootTrigger.toggleWhenPressed(
     new SpinupCommand(shooter, accelerator, spindexer)
-        .andThen(new ShootCommand(shooter, accelerator, spindexer)));*/
+        .andThen(new ShootCommand(shooter, accelerator, spindexer)));
 
-    /*fastShootButton.toggleWhenPressed(
-    new PrepShootCommand(spindexer, accelerator)
-        .andThen(new ShootCommand(shooter, accelerator, spindexer)));*/
+    fastShootButton.whenPressed(new PrepShootCommand(spindexer, accelerator));
+    justShootButton.toggleWhenPressed(new SequentialCommandGroup(new SpinupShooterCommand(shooter, accelerator), new ShootCommand(shooter, accelerator, spindexer)));
 
-    // hoodJogForward.toggleWhenPressed(new ContinuousJogHoodCommand(hood, false));
-    // hoodJogReverse.toggleWhenPressed(new ContinuousJogHoodCommand(hood, true));
+    hoodJogForward.toggleWhenPressed(new ContinuousJogHoodCommand(hood, false));
+    hoodJogReverse.toggleWhenPressed(new ContinuousJogHoodCommand(hood, true));
 
     // TODO: Don't have icky magic number
     intakeButton.toggleWhenPressed(
@@ -55,6 +56,10 @@ public class RobotContainer {
             .andThen(
                 new TimedSpindexerCommand(
                     spindexer, accelerator, 5.0, Constants.spindexerIntakeSpeed)));
+    climbUpButton.whenHeld(
+        new StartEndCommand(() -> climber.setOpenLoop(0.25), climber::stop, climber));
+    climbDownButton.whenHeld(
+        new StartEndCommand(() -> climber.setOpenLoop(-0.25), climber::stop, climber));
     // intakeButton.whenPressed(new IntakeCommand(intake, spindexer, accelerator));
     // intakeRetractButton.whenPressed(new InstantCommand(intake::retract, intake));
   }
@@ -68,12 +73,6 @@ public class RobotContainer {
             () -> -driverController.getX(Hand.kRight),
             true,
             swerve));
-    // spindexer.setDefaultCommand(
-    //        new RunCommand(
-    //                () -> spindexer.setOpenLoop(0.15)
-    //        )
-    // );
-    climber.setDefaultCommand(new ClimberCommand(() -> operatorController.getRawAxis(5), climber));
   }
 
   public Command getAutonomousCommand() {

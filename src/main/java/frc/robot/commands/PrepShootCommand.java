@@ -21,11 +21,12 @@ public class PrepShootCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    accelerator.coast();
+    accelerator.setOpenLoop(-0.1);
 
     spindexer.retractGate();
     spindexer.deployRamp();
     spindexer.setOpenLoop(Constants.spindexerPrepSpeed);
+    prepTimer.start();
   }
 
   @Override
@@ -35,7 +36,10 @@ public class PrepShootCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
+    prepTimer.stop();
+    prepTimer.reset();
     spindexer.stop();
     spindexer.retractRamp();
+    accelerator.stop();
   }
 }

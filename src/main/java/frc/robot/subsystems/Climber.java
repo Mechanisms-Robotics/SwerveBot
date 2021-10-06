@@ -26,6 +26,9 @@ public class Climber extends SubsystemBase implements Loggable {
     climberCurrentLimit.triggerThresholdTime = 0.5; // sec
     climberCurrentLimit.enable = true;
     CLIMBER_MOTOR_CONFIG.supplyCurrLimit = climberCurrentLimit;
+
+    CLIMBER_MOTOR_CONFIG.reverseSoftLimitEnable = true;
+    CLIMBER_MOTOR_CONFIG.reverseSoftLimitThreshold = 0;
   }
 
   private final WPI_TalonFX climberMotor = new WPI_TalonFX(CLIMBER_MOTOR_ID);

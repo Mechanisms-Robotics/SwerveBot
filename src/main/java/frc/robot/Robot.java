@@ -37,6 +37,8 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
     Logger.configureLoggingAndConfig(robotContainer, false);
+
+    robotContainer.swerve.zeroHeading();
   }
 
   /**

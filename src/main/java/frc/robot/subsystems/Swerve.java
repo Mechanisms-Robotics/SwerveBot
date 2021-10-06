@@ -120,6 +120,7 @@ public class Swerve extends SubsystemBase implements Loggable {
       double xVelocity, double yVelocity, double rotationVelocity, boolean fieldRelative) {
 
     headingController.stabiliseHeading();
+
     if (fieldRelative) {
       desiredSpeeds =
           ChassisSpeeds.fromFieldRelativeSpeeds(

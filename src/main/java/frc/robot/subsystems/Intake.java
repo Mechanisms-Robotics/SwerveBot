@@ -57,12 +57,7 @@ public class Intake extends SubsystemBase implements Loggable {
   }
 
   public void setOpenLoop(double percentOutput) {
-    if (isDeployed()) {
-      intakeMotor.set(ControlMode.PercentOutput, percentOutput);
-    } else {
-      DriverStation.reportWarning("Intake commanded to run while retracted. Ignoring Input", false);
-      stop();
-    }
+    intakeMotor.set(ControlMode.PercentOutput, percentOutput);
   }
 
   public void setVelocity(double rpm) {
