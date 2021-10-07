@@ -1,13 +1,13 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.util.PS4Controller;
+import frc.robot.util.PS4Controller.Direction;
 
 /** The container for the robot. Contains subsystems, OI devices, and commands. */
 public class RobotContainer {
@@ -22,17 +22,20 @@ public class RobotContainer {
   private final Intake intake = new Intake();
 
   // The driver's controller
-  private final XboxController driverController = new XboxController(0);
-  private final XboxController operatorController = new XboxController(1);
-  private final Button shootTrigger = new Button(() -> driverController.getRawAxis(3) > 0.1);
-  private final Button fastShootButton = new Button(() -> driverController.getRawButton(2));
-  private final Button justShootButton = new Button(() -> driverController.getRawButton(3));
-  private final Button hoodJogForward = new Button(() -> driverController.getBumper(Hand.kRight));
-  private final Button hoodJogReverse = new Button(() -> driverController.getBumper(Hand.kLeft));
-  private final Button intakeButton = new Button(() -> driverController.getRawButton(1));
+  private final PS4Controller driverController = new PS4Controller(0);
+  private final PS4Controller operatorController = new PS4Controller(1);
 
-  private final Button climbUpButton = new Button(() -> driverController.getPOV() == 0);
-  private final Button climbDownButton = new Button(() -> driverController.getPOV() == 180);
+  // Every button for controlling the robot.
+  private final Button shootTrigger = new Button(driverController::getRightTriggerButton);
+  private final Button prepShootButton = new Button(driverController::getCircleButton);
+  private final Button justShootButton = new Button(driverController::getSquareButton);
+  private final Button hoodJogForward = new Button(driverController::getRightBumperButton);
+  private final Button hoodJogReverse = new Button(driverController::getLeftBumperButton);
+  private final Button intakeButton = new Button(driverController::getXButton);
+
+  private final Button climbUpButton = new Button(() -> driverController.getPOV() == Direction.Up);
+  private final Button climbDownButton =
+      new Button(() -> driverController.getPOV() == Direction.Down);
 
   public RobotContainer() {
     configureButtonBindings();
@@ -40,15 +43,18 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    shootTrigger.toggleWhenPressed(
-    new SpinupCommand(shooter, accelerator, spindexer)
-        .andThen(new ShootCommand(shooter, accelerator, spindexer)));
+    shootTrigger.whenHeld(
+        new SpinupCommand(shooter, accelerator, spindexer)
+            .andThen(new ShootCommand(shooter, accelerator, spindexer)));
 
-    fastShootButton.whenPressed(new PrepShootCommand(spindexer, accelerator));
-    justShootButton.toggleWhenPressed(new SequentialCommandGroup(new SpinupShooterCommand(shooter, accelerator), new ShootCommand(shooter, accelerator, spindexer)));
+    prepShootButton.whenPressed(new PrepShootCommand(spindexer, accelerator));
+    justShootButton.toggleWhenPressed(
+        new SequentialCommandGroup(
+            new SpinupShooterCommand(shooter, accelerator),
+            new ShootCommand(shooter, accelerator, spindexer)));
 
-    hoodJogForward.toggleWhenPressed(new ContinuousJogHoodCommand(hood, false));
-    hoodJogReverse.toggleWhenPressed(new ContinuousJogHoodCommand(hood, true));
+    hoodJogForward.whenHeld(new ContinuousJogHoodCommand(hood, false));
+    hoodJogReverse.whenHeld(new ContinuousJogHoodCommand(hood, true));
 
     // TODO: Don't have icky magic number
     intakeButton.toggleWhenPressed(
@@ -68,9 +74,9 @@ public class RobotContainer {
     // Drive the robot relative to the field\
     swerve.setDefaultCommand(
         new DriveTeleopCommand(
-            () -> driverController.getX(Hand.kLeft),
-            () -> -driverController.getY(Hand.kLeft),
-            () -> -driverController.getX(Hand.kRight),
+            driverController::getLeftJoystickX,
+            driverController::getLeftJoystickY,
+            () -> -driverController.getRightJoystickX(),
             true,
             swerve));
   }
