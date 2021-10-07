@@ -14,11 +14,11 @@ public class RobotContainer {
 
   // Subsystems
   public final Swerve swerve = new Swerve();
-  private final Shooter shooter = new Shooter();
-  private final Hood hood = new Hood();
+  //private final Shooter shooter = new Shooter();
+  //private final Hood hood = new Hood();
   private final Accelerator accelerator = new Accelerator();
   private final Spindexer spindexer = new Spindexer();
-  private final Climber climber = new Climber();
+  //private final Climber climber = new Climber();
   private final Intake intake = new Intake();
 
   // The driver's controller
@@ -26,6 +26,7 @@ public class RobotContainer {
   private final PS4Controller operatorController = new PS4Controller(1);
 
   // Every button for controlling the robot.
+  private final Button spinupTrigger = new Button(driverController::getLeftTriggerButton);
   private final Button shootTrigger = new Button(driverController::getRightTriggerButton);
   private final Button prepShootButton = new Button(driverController::getCircleButton);
   private final Button justShootButton = new Button(driverController::getSquareButton);
@@ -43,9 +44,9 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    shootTrigger.whenHeld(
-        new SpinupCommand(shooter, accelerator, spindexer)
-            .andThen(new ShootCommand(shooter, accelerator, spindexer)));
+    /*
+    spinupTrigger.whenPressed(new SpinupCommand(shooter, accelerator, spindexer));
+    shootTrigger.whenHeld(new ShootCommand(shooter, accelerator, spindexer));
 
     prepShootButton.whenPressed(new PrepShootCommand(spindexer, accelerator));
     justShootButton.toggleWhenPressed(
@@ -57,16 +58,16 @@ public class RobotContainer {
     hoodJogReverse.whenHeld(new ContinuousJogHoodCommand(hood, true));
 
     // TODO: Don't have icky magic number
-    intakeButton.toggleWhenPressed(
+    */intakeButton.toggleWhenPressed(
         new IntakeCommand(intake, spindexer, accelerator)
             .andThen(
                 new TimedSpindexerCommand(
                     spindexer, accelerator, 5.0, Constants.spindexerIntakeSpeed)));
-    climbUpButton.whenHeld(
-        new StartEndCommand(() -> climber.setOpenLoop(0.25), climber::stop, climber));
-    climbDownButton.whenHeld(
-        new StartEndCommand(() -> climber.setOpenLoop(-0.25), climber::stop, climber));
-    // intakeButton.whenPressed(new IntakeCommand(intake, spindexer, accelerator));
+    ///climbUpButton.whenHeld(
+    //    new StartEndCommand(() -> climber.setOpenLoop(0.25), climber::stop, climber));
+    //climbDownButton.whenHeld(
+    //    new StartEndCommand(() -> climber.setOpenLoop(-0.25), climber::stop, climber));
+    //intakeButton.whenPressed(new IntakeCommand(intake, spindexer, accelerator));
     // intakeRetractButton.whenPressed(new InstantCommand(intake::retract, intake));
   }
 

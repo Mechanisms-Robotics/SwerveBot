@@ -39,7 +39,7 @@ public class SwerveModule implements Loggable {
   private static final double STEERING_KD = 3.0;
   private static final double STEERING_DEADBAND = 75; // ticks
 
-  private static final double WHEEL_KP = 0.01;
+  private static final double WHEEL_KP = 0.012; // 0.01
   private static final double WHEEL_KI = 0.0;
   private static final double WHEEL_KD = 0.0;
   private static final double WHEEL_KF = 0.05;

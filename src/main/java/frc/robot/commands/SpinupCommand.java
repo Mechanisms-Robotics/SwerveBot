@@ -11,7 +11,7 @@ import frc.robot.subsystems.Spindexer;
 
 public class SpinupCommand extends CommandBase {
 
-  public final double SPINDEXER_EXTRA_SPIN_UP_SPEED = 0.10;
+  public final double SPINDEXER_EXTRA_SPIN_UP_SPEED = -0.10;
 
   public final Shooter shooter;
   public final Accelerator accelerator;
@@ -40,5 +40,12 @@ public class SpinupCommand extends CommandBase {
   @Override
   public boolean isFinished() {
     return timer.hasElapsed(spinUpTime);
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    timer.stop();
+    spindexer.stop();
+    shooter.stop();
   }
 }

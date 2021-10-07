@@ -1,9 +1,13 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.SlewRateLimiter;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
+import jdk.jshell.execution.Util;
+
 import java.util.function.Supplier;
 
 /** Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x. */
@@ -12,10 +16,11 @@ public class DriveTeleopCommand extends CommandBase {
   private static final double MAX_TRANSLATIONAL_VELOCITY_RATE = 10; // m/s per second
   private static final double MAX_ROTATION_VELOCITY_RATE = 4 * Math.PI; // rads/s per second
 
-  private static final double TRANSLATION_CURVE_STRENGTH = 2;
+  private static final double TRANSLATION_CURVE_STRENGTH = 10000.0;
   private static final double ROTATION_CURVE_STRENGTH = 10.0; // 10.0 makes it effectively linear.
 
-  private static final double DEADBAND = 0.2;
+
+  private static final double DEADBAND = 0.15;
 
   private final Swerve swerve;
 
@@ -78,18 +83,22 @@ public class DriveTeleopCommand extends CommandBase {
     double dx = vxSupplier.get();
     double dy = vySupplier.get();
     double dr = vrSupplier.get();
-    dx = applyControlCurve(Math.abs(dx) > DEADBAND ? dx : 0, TRANSLATION_CURVE_STRENGTH);
-    dy = applyControlCurve(Math.abs(dy) > DEADBAND ? dy : 0, TRANSLATION_CURVE_STRENGTH);
-    dr = applyControlCurve(Math.abs(dr) > DEADBAND ? dr : 0, ROTATION_CURVE_STRENGTH);
-    dx = vxRateLimiter.calculate(dx * Swerve.maxVelocity);
-    dy = vyRateLimiter.calculate(dy * Swerve.maxVelocity);
+    dx = Math.abs(dx) > DEADBAND ? dx : 0;
+    dy = Math.abs(dy) > DEADBAND ? dy : 0;
+    dr = Math.abs(dr) > DEADBAND ? dr : 0;
+    Translation2d translation = new Translation2d(dx, dy);
+    double mag = translation.getNorm();
+    final double scale = 1.2;
+    mag = Math.pow(mag, scale);
+    final Rotation2d rotation = new Rotation2d(translation.getX(), translation.getY());
+    translation = new Translation2d(rotation.getCos() * mag, rotation.getSin() * mag);
+    dx = vxRateLimiter.calculate(translation.getX() * Swerve.maxVelocity);
+    dy = vyRateLimiter.calculate(translation.getY() * Swerve.maxVelocity);
     dr = vrRateLimiter.calculate(dr * Swerve.maxRotationalVelocity);
 
     SmartDashboard.putNumber("Swerve vX", dx);
     SmartDashboard.putNumber("Swerve vY", dy);
     SmartDashboard.putNumber("Swerve vR", dr);
-
-
 
     swerve.drive(dx, dy, dr, fieldOriented);
   }
