@@ -115,11 +115,9 @@ public class DriveTeleopCommand extends CommandBase {
     double dx = vxSupplier.get();
     double dy = vySupplier.get();
     double drx = vrxSupplier.get();
-    double dry = vrySupplier.get();
     dx = Math.abs(dx) > DEADBAND ? dx : 0;
     dy = Math.abs(dy) > DEADBAND ? dy : 0;
     drx = Math.abs(drx) > DEADBAND ? drx : 0;
-    dry = Math.abs(dry) > DEADBAND ? dry : 0;
     Translation2d translation = new Translation2d(dx, dy);
     double mag = translation.getNorm();
     final double scale = 1.2;
@@ -129,28 +127,19 @@ public class DriveTeleopCommand extends CommandBase {
     dx = vxRateLimiter.calculate(translation.getX() * Swerve.maxVelocity);
     dy = vyRateLimiter.calculate(translation.getY() * Swerve.maxVelocity);
     drx = vrRateLimiter.calculate(drx * Swerve.maxRotationalVelocity);
-    dry = vrRateLimiter.calculate(dry * Swerve.maxRotationalVelocity);
-
     SmartDashboard.putNumber("Swerve vX", dx);
     SmartDashboard.putNumber("Swerve vY", dy);
     SmartDashboard.putNumber("Swerve vrX", drx);
-    SmartDashboard.putNumber("Swerve vrY", dry);
 
     if (forEnabled) {
-      swerve.drive(dx, dy, convertJoystickToAngle(drx, dry));
+      double dry = vrySupplier.get();
+      dry = Math.abs(dry) > DEADBAND ? dry : 0;
+      dry = vrRateLimiter.calculate(dry * Swerve.maxRotationalVelocity);
+      SmartDashboard.putNumber("Swerve vrY", dry);
+      swerve.drive(dx, dy, new Rotation2d(drx, dry));
     } else {
       swerve.drive(dx, dy, drx, fieldOriented);
     }
-  }
-
-  private Rotation2d convertJoystickToAngle(double drx, double dry) {
-    Translation2d joystickVec = new Translation2d(drx, dry);
-    Translation2d forwardVec = new Translation2d(0.0, 1.0);
-    double dotProduct =
-        (joystickVec.getX() * forwardVec.getX()) + (joystickVec.getY() * forwardVec.getY());
-    double magProduct = joystickVec.getNorm() * forwardVec.getNorm();
-    double angle = Math.toDegrees(Math.acos(dotProduct / magProduct));
-    return Rotation2d.fromDegrees(angle);
   }
 
   @Override
