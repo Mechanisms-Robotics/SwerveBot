@@ -6,8 +6,6 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
-import jdk.jshell.execution.Util;
-
 import java.util.function.Supplier;
 
 /** Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x. */
@@ -18,7 +16,6 @@ public class DriveTeleopCommand extends CommandBase {
 
   private static final double TRANSLATION_CURVE_STRENGTH = 10000.0;
   private static final double ROTATION_CURVE_STRENGTH = 10.0; // 10.0 makes it effectively linear.
-
 
   private static final double DEADBAND = 0.15;
 
