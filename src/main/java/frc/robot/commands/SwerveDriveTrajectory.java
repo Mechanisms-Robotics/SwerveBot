@@ -10,36 +10,27 @@ import frc.robot.subsystems.Swerve;
 
 public class SwerveDriveTrajectory extends SwerveControllerCommand {
 
-  private final static PIDController xController = new PIDController(
-          0.0,
-          0.0,
-          0.0,
-          Constants.loopTime
-  );
-  private final static PIDController yController = new PIDController(
-          0.0,
-          0.0,
-          0.0,
-          Constants.loopTime
-  );
-  private final static ProfiledPIDController thetaController = new ProfiledPIDController(
+  private static final PIDController xController =
+      new PIDController(0.0, 0.0, 0.0, Constants.loopTime);
+  private static final PIDController yController =
+      new PIDController(0.0, 0.0, 0.0, Constants.loopTime);
+  private static final ProfiledPIDController thetaController =
+      new ProfiledPIDController(
           0.0,
           0.0,
           0.0,
           new TrapezoidProfile.Constraints(4 * Math.PI, 8 * Math.PI),
-          Constants.loopTime
-  );
+          Constants.loopTime);
 
   public SwerveDriveTrajectory(Trajectory trajectory, Swerve swerve) {
     super(
-            trajectory,
-            swerve::getPose,
-            swerve.getKinematics(),
-            xController,
-            yController,
-            thetaController,
-            swerve::setModuleStates,
-            swerve
-    );
+        trajectory,
+        swerve::getPose,
+        swerve.getKinematics(),
+        xController,
+        yController,
+        thetaController,
+        swerve::setModuleStates,
+        swerve);
   }
 }

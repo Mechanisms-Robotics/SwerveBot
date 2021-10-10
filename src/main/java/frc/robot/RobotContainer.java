@@ -1,17 +1,17 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.PS4Controller;
 import frc.robot.util.PS4Controller.Direction;
+import org.photonvision.PhotonCamera;
 
 /** The container for the robot. Contains subsystems, OI devices, and commands. */
 public class RobotContainer {
+
+  private static final boolean TUNING_MODE = true;
 
   // Subsystems
   public final Swerve swerve = new Swerve();
@@ -21,6 +21,7 @@ public class RobotContainer {
   private final Spindexer spindexer = new Spindexer();
   private final Climber climber = new Climber();
   private final Intake intake = new Intake();
+  private final PhotonCamera camera = new PhotonCamera("limelight");
 
   // The driver's controller
   private final PS4Controller driverController = new PS4Controller(0);
@@ -49,6 +50,9 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
     configureDefaultCommands();
+    if (TUNING_MODE) {
+      CommandScheduler.getInstance().schedule(new TuneHood(hood, camera));
+    }
   }
 
   private void configureButtonBindings() {

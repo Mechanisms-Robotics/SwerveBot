@@ -10,18 +10,19 @@ import org.photonvision.PhotonUtils;
 import org.photonvision.common.hardware.VisionLEDMode;
 
 public class AimHoodCommand extends CommandBase {
-  private final static int PIPELINE_INDEX = 0;
+  private static final int PIPELINE_INDEX = 0;
 
   // TODO: Measure
-  private final static double TARGET_HEIGHT = 2; // Meters
-  private final static double CAMERA_HEIGHT = 0.5; // Meters
-  private final static double CAMERA_PITCH = 0.0; // Radians
+  public static final double TARGET_HEIGHT = 2; // Meters
+  public static final double CAMERA_HEIGHT = 0.5; // Meters
+  public static final double CAMERA_PITCH = 0.0; // Radians
 
-  private final static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> RANGE_TO_HOOD_MAP = new InterpolatingTreeMap<>();
+  private static final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble>
+      RANGE_TO_HOOD_MAP = new InterpolatingTreeMap<>();
+
   static {
     // TODO Add hood range points here
   }
-
 
   private Hood hood;
   private PhotonCamera camera;
@@ -34,29 +35,17 @@ public class AimHoodCommand extends CommandBase {
   }
 
   @Override
-  public void initialize() {
-    camera.setLED(VisionLEDMode.kOn);
-    camera.setPipelineIndex(PIPELINE_INDEX);
-  }
-
-  @Override
   public void execute() {
     var cameraResults = camera.getLatestResult();
     if (cameraResults.hasTargets()) {
-      var range = PhotonUtils.calculateDistanceToTargetMeters(
+      var range =
+          PhotonUtils.calculateDistanceToTargetMeters(
               CAMERA_HEIGHT,
               TARGET_HEIGHT,
               CAMERA_PITCH,
-              Units.degreesToRadians(cameraResults.getBestTarget().getPitch())
-      );
+              Units.degreesToRadians(cameraResults.getBestTarget().getPitch()));
       targetHoodPosition = RANGE_TO_HOOD_MAP.get(range).value;
     }
     hood.setHoodRawPosition(targetHoodPosition);
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-    camera.setLED(VisionLEDMode.kOff);
-    hood.setHoodRawPosition(0.0);
   }
 }

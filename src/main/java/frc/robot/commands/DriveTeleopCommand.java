@@ -11,25 +11,25 @@ import java.util.function.Supplier;
 /** Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x. */
 public class DriveTeleopCommand extends CommandBase {
 
-  private static final double MAX_TRANSLATIONAL_VELOCITY_RATE = 10; // m/s per second
-  private static final double MAX_ROTATION_VELOCITY_RATE = 4 * Math.PI; // rads/s per second
+  protected static final double MAX_TRANSLATIONAL_VELOCITY_RATE = 10; // m/s per second
+  protected static final double MAX_ROTATION_VELOCITY_RATE = 4 * Math.PI; // rads/s per second
 
-  private static final double TRANSLATION_CURVE_STRENGTH = 10000.0;
-  private static final double ROTATION_CURVE_STRENGTH = 10.0; // 10.0 makes it effectively linear.
+  protected static final double TRANSLATION_CURVE_STRENGTH = 10000.0;
+  protected static final double ROTATION_CURVE_STRENGTH = 10.0; // 10.0 makes it effectively linear.
 
-  private static final double DEADBAND = 0.15;
+  protected static final double DEADBAND = 0.15;
 
-  private final Swerve swerve;
+  protected final Swerve swerve;
 
-  private final Supplier<Double> vxSupplier;
-  private final Supplier<Double> vySupplier;
-  private final Supplier<Double> vrxSupplier;
-  private final Supplier<Double> vrySupplier;
-  private final SlewRateLimiter vxRateLimiter;
-  private final SlewRateLimiter vyRateLimiter;
-  private final SlewRateLimiter vrRateLimiter;
-  private final boolean fieldOriented;
-  private final boolean forEnabled; // Field Oriented Rotation
+  protected final Supplier<Double> vxSupplier;
+  protected final Supplier<Double> vySupplier;
+  protected final Supplier<Double> vrxSupplier;
+  protected final Supplier<Double> vrySupplier;
+  protected final SlewRateLimiter vxRateLimiter;
+  protected final SlewRateLimiter vyRateLimiter;
+  protected final SlewRateLimiter vrRateLimiter;
+  protected final boolean fieldOriented;
+  protected final boolean forEnabled; // Field Oriented Rotation
 
   /**
    * Constructs the DriveTeleopCommand.

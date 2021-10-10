@@ -9,6 +9,7 @@ public class Hood extends SubsystemBase {
   private static final double HOOD_STEP_AMOUNT = 0.01;
 
   private final Servo hoodServo = new Servo(HOOD_SERVO_PWM_PORT);
+  private double currentPos = 0.0;
 
   public Hood() {
     hoodServo.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
@@ -20,6 +21,7 @@ public class Hood extends SubsystemBase {
     // Set speed is the speed of the pwm pulse not the speed of the servo
     // PWM speed commands the servo position.
     hoodServo.setSpeed(rawPosition);
+    currentPos = rawPosition;
   }
 
   public void increaseHood() {
@@ -32,5 +34,9 @@ public class Hood extends SubsystemBase {
     double currentPos = hoodServo.getSpeed();
     double wantedPos = currentPos - HOOD_STEP_AMOUNT;
     setHoodRawPosition(wantedPos);
+  }
+
+  public double getCurrentPos() {
+    return currentPos;
   }
 }
