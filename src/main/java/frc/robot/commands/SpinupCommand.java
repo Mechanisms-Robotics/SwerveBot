@@ -45,7 +45,5 @@ public class SpinupCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     timer.stop();
-    spindexer.stop();
-    shooter.stop();
   }
 }

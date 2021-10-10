@@ -1,6 +1,9 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -12,11 +15,11 @@ public class RobotContainer {
 
   // Subsystems
   public final Swerve swerve = new Swerve();
-  // private final Shooter shooter = new Shooter();
-  // private final Hood hood = new Hood();
+  private final Shooter shooter = new Shooter();
+  private final Hood hood = new Hood();
   private final Accelerator accelerator = new Accelerator();
   private final Spindexer spindexer = new Spindexer();
-  // private final Climber climber = new Climber();
+  private final Climber climber = new Climber();
   private final Intake intake = new Intake();
 
   // The driver's controller
@@ -31,6 +34,7 @@ public class RobotContainer {
   private final Button hoodJogForward = new Button(driverController::getRightBumperButton);
   private final Button hoodJogReverse = new Button(driverController::getLeftBumperButton);
   private final Button intakeButton = new Button(driverController::getXButton);
+  private final Button gyroResetButton = new Button(driverController::getShareButton);
 
   private final Button climbUpButton = new Button(() -> driverController.getPOV() == Direction.Up);
   private final Button climbDownButton =
@@ -42,7 +46,6 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    /*
     spinupTrigger.whenPressed(new SpinupCommand(shooter, accelerator, spindexer));
     shootTrigger.whenHeld(new ShootCommand(shooter, accelerator, spindexer));
 
@@ -56,17 +59,17 @@ public class RobotContainer {
     hoodJogReverse.whenHeld(new ContinuousJogHoodCommand(hood, true));
 
     // TODO: Don't have icky magic number
-    */ intakeButton.toggleWhenPressed(
+    intakeButton.toggleWhenPressed(
         new IntakeCommand(intake, spindexer, accelerator)
             .andThen(
                 new TimedSpindexerCommand(
                     spindexer, accelerator, 5.0, Constants.spindexerIntakeSpeed)));
-    /// climbUpButton.whenHeld(
-    //    new StartEndCommand(() -> climber.setOpenLoop(0.25), climber::stop, climber));
-    // climbDownButton.whenHeld(
-    //    new StartEndCommand(() -> climber.setOpenLoop(-0.25), climber::stop, climber));
-    // intakeButton.whenPressed(new IntakeCommand(intake, spindexer, accelerator));
-    // intakeRetractButton.whenPressed(new InstantCommand(intake::retract, intake));
+    climbUpButton.whenHeld(
+        new StartEndCommand(() -> climber.setOpenLoop(0.75), climber::stop, climber));
+    climbDownButton.whenHeld(
+        new StartEndCommand(() -> climber.setOpenLoop(-0.75), climber::stop, climber));
+
+    gyroResetButton.whenPressed(new InstantCommand(swerve::zeroHeading));
   }
 
   private void configureDefaultCommands() {
