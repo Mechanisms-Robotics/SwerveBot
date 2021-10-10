@@ -3,14 +3,18 @@ package frc.robot.util;
 import static frc.robot.Constants.loopTime;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import frc.robot.subsystems.Swerve;
 
 public class HeadingController {
 
   private static final double STABILISATION_DEADBAND = 1.0; // Degrees
-  private static final double LOCK_DEADBAND = 1.0; // Degrees
+  private static final double LOCK_DEADBAND = 2.0; // Degrees
+
+  private static final TrapezoidProfile.Constraints PROFILED_PID_CONSTRAINTS = new TrapezoidProfile.Constraints();
 
   private final PIDController stabilisationController;
   private final PIDController lockController;
@@ -42,6 +46,10 @@ public class HeadingController {
         new PIDController(
             stableP, 0.0, // We don't use I for the imprecise controllers
             stableD, loopTime);
+
+    PROFILED_PID_CONSTRAINTS.maxAcceleration = 4 * Math.PI; // radians
+    PROFILED_PID_CONSTRAINTS.maxVelocity = 4 * Math.PI; // radians
+
     lockController = new PIDController(lockP, lockI, lockD, loopTime);
     inPlaceController = new PIDController(inPlaceP, inPlaceI, inPlaceD, loopTime);
 
@@ -57,8 +65,6 @@ public class HeadingController {
     state = ControllState.LOCK;
     lockController.setSetpoint(heading.getRadians());
     inPlaceController.setSetpoint(heading.getRadians());
-    lockController.reset();
-    inPlaceController.reset();
   }
 
   /** Have the heading controller stabilise the current heading. */
@@ -97,12 +103,11 @@ public class HeadingController {
    * @return A double to add to the rotation velocity to PID to a heading.
    */
   private double updateLock(ChassisSpeeds desiredSpeeds, Rotation2d heading) {
-    final double inPlaceTurnZone = Swerve.maxRotationalVelocity * 0.05;
+    final double inPlaceTurnZone = Swerve.maxRotationalVelocity * 0.025;
     if (Math.hypot(desiredSpeeds.vxMetersPerSecond, desiredSpeeds.vyMetersPerSecond)
         < inPlaceTurnZone) {
       if (!inPlace) {
         inPlace = true;
-        inPlaceController.reset();
       }
       return inPlaceController.calculate(heading.getRadians());
     } else {

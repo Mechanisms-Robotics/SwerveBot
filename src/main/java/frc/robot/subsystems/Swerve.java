@@ -47,10 +47,10 @@ public class Swerve extends SubsystemBase implements Loggable {
   private static final int brSteerMotorID = 17;
   private static final int brSteerEncoderID = 16;
 
-  private static final double flAngleOffset = 326.0742;
-  private static final double frAngleOffset = 62.1414;
-  private static final double blAngleOffset = 174.9847;
-  private static final double brAngleOffset = 164.6987;
+  private static final double flAngleOffset = -33.0551;
+  private static final double frAngleOffset = 64.9154;
+  private static final double blAngleOffset = 173.8311;
+  private static final double brAngleOffset = -195.0347;
 
   private static final int gyroID = 1;
 
@@ -73,16 +73,16 @@ public class Swerve extends SubsystemBase implements Loggable {
       new SwerveModule(
           "Back Right", brWheelMotorID, brSteerMotorID, brSteerEncoderID, brAngleOffset);
 
-  private final PigeonIMU gyro = new PigeonIMU(gyroID);
+  public final PigeonIMU gyro = new PigeonIMU(gyroID);
 
   private HeadingController headingController =
       new HeadingController(
           0.005, // Stabilization kP
           0.0, // Stabilization kD
-          0.0, // Lock kP
+          1.75, // Lock kP
           0.0, // Lock kI
           0.0, // Lock kD
-          0.0, // Turn in place kP
+          2.0, // Turn in place kP
           0.0, // Turn in place kI
           0.0 // Turn in place kD
           );

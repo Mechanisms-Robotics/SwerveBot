@@ -23,11 +23,44 @@ public class DriveTeleopCommand extends CommandBase {
 
   private final Supplier<Double> vxSupplier;
   private final Supplier<Double> vySupplier;
-  private final Supplier<Double> vrSupplier;
+  private final Supplier<Double> vrxSupplier;
+  private final Supplier<Double> vrySupplier;
   private final SlewRateLimiter vxRateLimiter;
   private final SlewRateLimiter vyRateLimiter;
   private final SlewRateLimiter vrRateLimiter;
   private final boolean fieldOriented;
+  private final boolean forEnabled; // Field Oriented Rotation
+
+  /**
+   * Constructs the DriveTeleopCommand.
+   *
+   * @param driverX Left joystick x, which acts as desired x translation of the swerve drive
+   * @param driverY Left joystick y, which acts as desired y translation of the swerve drive
+   * @param driverRotationX The X component of the rotation vector.
+   * @param driverRotationY The Y component of the rotation vector.
+   * @param swerve Instance of Swerve
+   */
+  public DriveTeleopCommand(
+      Supplier<Double> driverX,
+      Supplier<Double> driverY,
+      Supplier<Double> driverRotationX,
+      Supplier<Double> driverRotationY,
+      Swerve swerve) {
+    vxSupplier = driverX;
+    vySupplier = driverY;
+    vrxSupplier = driverRotationX;
+    vrySupplier = driverRotationY;
+
+    this.fieldOriented = true;
+    this.forEnabled = true;
+
+    this.swerve = swerve;
+    addRequirements(this.swerve);
+
+    vxRateLimiter = new SlewRateLimiter(MAX_TRANSLATIONAL_VELOCITY_RATE);
+    vyRateLimiter = new SlewRateLimiter(MAX_TRANSLATIONAL_VELOCITY_RATE);
+    vrRateLimiter = new SlewRateLimiter(MAX_ROTATION_VELOCITY_RATE);
+  }
 
   /**
    * Constructs the DriveTeleopCommand.
@@ -46,9 +79,11 @@ public class DriveTeleopCommand extends CommandBase {
       Swerve swerve) {
     vxSupplier = driverX;
     vySupplier = driverY;
-    vrSupplier = driverRotation;
+    vrxSupplier = driverRotation;
+    vrySupplier = null;
 
     this.fieldOriented = fieldOriented;
+    this.forEnabled = false;
 
     this.swerve = swerve;
     addRequirements(this.swerve);
@@ -79,25 +114,47 @@ public class DriveTeleopCommand extends CommandBase {
     // Get driver input
     double dx = vxSupplier.get();
     double dy = vySupplier.get();
-    double dr = vrSupplier.get();
+    double drx = vrxSupplier.get();
     dx = Math.abs(dx) > DEADBAND ? dx : 0;
     dy = Math.abs(dy) > DEADBAND ? dy : 0;
-    dr = Math.abs(dr) > DEADBAND ? dr : 0;
+    drx = Math.abs(drx) > DEADBAND ? drx : 0;
     Translation2d translation = new Translation2d(dx, dy);
     double mag = translation.getNorm();
-    final double scale = 1.2;
+    final double scale = 1.35;
     mag = Math.pow(mag, scale);
     final Rotation2d rotation = new Rotation2d(translation.getX(), translation.getY());
     translation = new Translation2d(rotation.getCos() * mag, rotation.getSin() * mag);
     dx = vxRateLimiter.calculate(translation.getX() * Swerve.maxVelocity);
     dy = vyRateLimiter.calculate(translation.getY() * Swerve.maxVelocity);
-    dr = vrRateLimiter.calculate(dr * Swerve.maxRotationalVelocity);
-
+    if (!forEnabled)
+      drx = vrRateLimiter.calculate(drx * Swerve.maxRotationalVelocity);
     SmartDashboard.putNumber("Swerve vX", dx);
     SmartDashboard.putNumber("Swerve vY", dy);
-    SmartDashboard.putNumber("Swerve vR", dr);
+    SmartDashboard.putNumber("Swerve vrX", drx);
 
-    swerve.drive(dx, dy, dr, fieldOriented);
+    if (forEnabled) {
+      double dry = vrySupplier.get();
+      dry = Math.abs(dry) > DEADBAND ? dry : 0;
+      SmartDashboard.putNumber("Swerve vrY", dry);
+      Rotation2d rot = new Rotation2d(drx, dry);
+      if (drx == 0 && dry == 0)
+        rot = Rotation2d.fromDegrees(90.0);
+      rot = rot.rotateBy(Rotation2d.fromDegrees(90));
+      System.out.println(rot);
+      swerve.drive(dx, dy, rot);
+    } else {
+      swerve.drive(dx, dy, drx, fieldOriented);
+    }
+  }
+
+  private Rotation2d convertJoystickToAngle(double drx, double dry) {
+    Translation2d joystickVec = new Translation2d(drx, dry);
+    Translation2d forwardVec = new Translation2d(0.0, 1.0);
+    double dotProduct =
+            (joystickVec.getX() * forwardVec.getX()) + (joystickVec.getY() * forwardVec.getY());
+    double magProduct = joystickVec.getNorm() * forwardVec.getNorm();
+    double angle = Math.toDegrees(Math.acos(dotProduct / magProduct));
+    return Rotation2d.fromDegrees(angle);
   }
 
   @Override

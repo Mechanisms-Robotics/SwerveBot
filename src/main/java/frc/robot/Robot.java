@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,7 +39,7 @@ public class Robot extends TimedRobot {
     robotContainer = new RobotContainer();
     Logger.configureLoggingAndConfig(robotContainer, false);
 
-    robotContainer.swerve.zeroHeading();
+    //robotContainer.swerve.zeroHeading();
   }
 
   /**
@@ -103,6 +104,7 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+    robotContainer.swerve.gyro.enterCalibrationMode(PigeonIMU.CalibrationMode.Temperature);
   }
 
   /** This function is called periodically during test mode. */
