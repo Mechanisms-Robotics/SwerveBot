@@ -3,7 +3,6 @@ package frc.robot.util;
 import static frc.robot.Constants.loopTime;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -14,7 +13,8 @@ public class HeadingController {
   private static final double STABILISATION_DEADBAND = 1.0; // Degrees
   private static final double LOCK_DEADBAND = 2.0; // Degrees
 
-  private static final TrapezoidProfile.Constraints PROFILED_PID_CONSTRAINTS = new TrapezoidProfile.Constraints();
+  private static final TrapezoidProfile.Constraints PROFILED_PID_CONSTRAINTS =
+      new TrapezoidProfile.Constraints();
 
   private final PIDController stabilisationController;
   private final PIDController lockController;

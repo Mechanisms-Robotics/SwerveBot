@@ -24,21 +24,27 @@ public class RobotContainer {
 
   // The driver's controller
   private final PS4Controller driverController = new PS4Controller(0);
-  private final PS4Controller operatorController = new PS4Controller(1);
+  private final PS4Controller secondaryDriverController = new PS4Controller(1);
 
-  // Every button for controlling the robot.
-  private final Button spinupTrigger = new Button(driverController::getLeftTriggerButton);
-  private final Button shootTrigger = new Button(driverController::getRightTriggerButton);
-  private final Button prepShootButton = new Button(driverController::getCircleButton);
-  private final Button justShootButton = new Button(driverController::getSquareButton);
-  private final Button hoodJogForward = new Button(driverController::getRightBumperButton);
-  private final Button hoodJogReverse = new Button(driverController::getLeftBumperButton);
-  private final Button intakeButton = new Button(driverController::getXButton);
-  private final Button gyroResetButton = new Button(driverController::getShareButton);
-
+  // Primary Driver Buttons
+  private final Button intakeButton = new Button(driverController::getLeftTriggerButton);
+  private final Button aimButton = new Button(driverController::getRightBumperButton);
+  private final Button shootButton = new Button(driverController::getRightTriggerButton);
   private final Button climbUpButton = new Button(() -> driverController.getPOV() == Direction.Up);
   private final Button climbDownButton =
       new Button(() -> driverController.getPOV() == Direction.Down);
+  private final Button gyroResetButton = new Button(driverController::getShareButton);
+
+  // Secondary Driver Buttons
+  private final Button unjamButton = new Button(secondaryDriverController::getXButton);
+
+  // Temporary Buttons
+  private final Button hoodJogForward =
+      new Button(() -> driverController.getPOV() == Direction.Right);
+  private final Button hoodJogReverse =
+      new Button(() -> driverController.getPOV() == Direction.Left);
+  private final Button prepShootButton = new Button(driverController::getCircleButton);
+  private final Button justShootButton = new Button(driverController::getSquareButton);
 
   public RobotContainer() {
     configureButtonBindings();
@@ -46,30 +52,29 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-    spinupTrigger.whenPressed(new SpinupCommand(shooter, accelerator, spindexer));
-    shootTrigger.whenHeld(new ShootCommand(shooter, accelerator, spindexer));
+    // Driver Button Bindings
+    intakeButton.toggleWhenPressed(new IntakeCommand(intake, spindexer, accelerator));
+    aimButton.whenPressed(new SpinupCommand(shooter, accelerator, spindexer));
+    shootButton.whenHeld(new ShootCommand(shooter, accelerator, spindexer));
 
-    prepShootButton.whenPressed(new PrepShootCommand(spindexer, accelerator));
-    justShootButton.toggleWhenPressed(
-        new SequentialCommandGroup(
-            new SpinupShooterCommand(shooter, accelerator),
-            new ShootCommand(shooter, accelerator, spindexer)));
-
-    hoodJogForward.whenHeld(new ContinuousJogHoodCommand(hood, false));
-    hoodJogReverse.whenHeld(new ContinuousJogHoodCommand(hood, true));
-
-    // TODO: Don't have icky magic number
-    intakeButton.toggleWhenPressed(
-        new IntakeCommand(intake, spindexer, accelerator)
-            .andThen(
-                new TimedSpindexerCommand(
-                    spindexer, accelerator, 5.0, Constants.spindexerIntakeSpeed)));
     climbUpButton.whenHeld(
         new StartEndCommand(() -> climber.setOpenLoop(0.75), climber::stop, climber));
     climbDownButton.whenHeld(
         new StartEndCommand(() -> climber.setOpenLoop(-0.75), climber::stop, climber));
 
     gyroResetButton.whenPressed(new InstantCommand(swerve::zeroHeading));
+
+    // Secondary Driver Button Bindings
+    unjamButton.whenHeld(new UnjamCommand(spindexer));
+
+    // Temporary Button Bindings
+    hoodJogForward.whenHeld(new ContinuousJogHoodCommand(hood, false));
+    hoodJogReverse.whenHeld(new ContinuousJogHoodCommand(hood, true));
+    prepShootButton.whenPressed(new PrepShootCommand(spindexer, accelerator));
+    justShootButton.toggleWhenPressed(
+        new SequentialCommandGroup(
+            new SpinupShooterCommand(shooter, accelerator),
+            new ShootCommand(shooter, accelerator, spindexer)));
   }
 
   private void configureDefaultCommands() {
@@ -81,6 +86,9 @@ public class RobotContainer {
             () -> -driverController.getRightJoystickX(),
             true,
             swerve));
+
+    climber.setDefaultCommand(
+        new ClimberCommand(secondaryDriverController::getRightJoystickY, climber));
   }
 
   public Command getAutonomousCommand() {

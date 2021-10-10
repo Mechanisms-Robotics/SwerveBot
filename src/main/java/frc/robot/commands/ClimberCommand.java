@@ -10,7 +10,7 @@ public class ClimberCommand extends CommandBase {
 
   private final Climber climber;
 
-  private static final double CLIMBER_MAX_SPEED = 0.1; // percent
+  private static final double CLIMBER_MAX_SPEED = 0.25; // percent
 
   public ClimberCommand(Supplier<Double> climberJoystick, Climber climber) {
     this.climberJoystick = climberJoystick;

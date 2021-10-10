@@ -126,8 +126,7 @@ public class DriveTeleopCommand extends CommandBase {
     translation = new Translation2d(rotation.getCos() * mag, rotation.getSin() * mag);
     dx = vxRateLimiter.calculate(translation.getX() * Swerve.maxVelocity);
     dy = vyRateLimiter.calculate(translation.getY() * Swerve.maxVelocity);
-    if (!forEnabled)
-      drx = vrRateLimiter.calculate(drx * Swerve.maxRotationalVelocity);
+    if (!forEnabled) drx = vrRateLimiter.calculate(drx * Swerve.maxRotationalVelocity);
     SmartDashboard.putNumber("Swerve vX", dx);
     SmartDashboard.putNumber("Swerve vY", dy);
     SmartDashboard.putNumber("Swerve vrX", drx);
@@ -137,8 +136,7 @@ public class DriveTeleopCommand extends CommandBase {
       dry = Math.abs(dry) > DEADBAND ? dry : 0;
       SmartDashboard.putNumber("Swerve vrY", dry);
       Rotation2d rot = new Rotation2d(drx, dry);
-      if (drx == 0 && dry == 0)
-        rot = Rotation2d.fromDegrees(90.0);
+      if (drx == 0 && dry == 0) rot = Rotation2d.fromDegrees(90.0);
       rot = rot.rotateBy(Rotation2d.fromDegrees(90));
       System.out.println(rot);
       swerve.drive(dx, dy, rot);
@@ -151,7 +149,7 @@ public class DriveTeleopCommand extends CommandBase {
     Translation2d joystickVec = new Translation2d(drx, dry);
     Translation2d forwardVec = new Translation2d(0.0, 1.0);
     double dotProduct =
-            (joystickVec.getX() * forwardVec.getX()) + (joystickVec.getY() * forwardVec.getY());
+        (joystickVec.getX() * forwardVec.getX()) + (joystickVec.getY() * forwardVec.getY());
     double magProduct = joystickVec.getNorm() * forwardVec.getNorm();
     double angle = Math.toDegrees(Math.acos(dotProduct / magProduct));
     return Rotation2d.fromDegrees(angle);
