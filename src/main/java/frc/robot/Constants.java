@@ -25,7 +25,7 @@ public final class Constants {
   public static final double shooterShootSpeed = 0.70;
   public static final double acceleratorShootSpeed = 0.70;
   public static final double spindexerShootSpeed = 0.75;
-  public static final double spindexerIntakeSpeed = 0.15;
+  public static final double spindexerIntakeSpeed = 0.25;
   public static final double spindexerPrepSpeed = 0.15;
   public static final double intakeSpeed = 0.5;
 }

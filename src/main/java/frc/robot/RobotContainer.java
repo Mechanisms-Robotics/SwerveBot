@@ -11,7 +11,7 @@ import org.photonvision.PhotonCamera;
 /** The container for the robot. Contains subsystems, OI devices, and commands. */
 public class RobotContainer {
 
-  private static final boolean TUNING_MODE = true;
+  private static final boolean TUNING_MODE = false;
 
   // Subsystems
   public final Swerve swerve = new Swerve();
@@ -51,14 +51,15 @@ public class RobotContainer {
     configureButtonBindings();
     configureDefaultCommands();
     if (TUNING_MODE) {
-      CommandScheduler.getInstance().schedule(new TuneHood(hood, camera));
+      CommandScheduler.getInstance().schedule(new PerpetualCommand(new TuneHood(hood, camera)));
     }
   }
 
   private void configureButtonBindings() {
     // Driver Button Bindings
     intakeButton.toggleWhenPressed(new IntakeCommand(intake, spindexer, accelerator));
-    aimButton.whenPressed(new SpinupCommand(shooter, accelerator, spindexer));
+    aimButton.toggleWhenPressed(new ParallelCommandGroup(new SpinupCommand(shooter, accelerator, spindexer),
+            new AimHoodCommand(camera, hood)));
     shootButton.whenHeld(new ShootCommand(shooter, accelerator, spindexer));
 
     climbUpButton.whenHeld(
