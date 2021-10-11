@@ -46,6 +46,9 @@ public class SwerveModule implements Loggable {
     // Configure wheel motor current limiting
     WHEEL_MOTOR_CONFIG.voltageCompSaturation = 12.0; // Volts
 
+    WHEEL_MOTOR_CONFIG.velocityMeasurementPeriod = VelocityMeasPeriod.Period_5Ms;
+    WHEEL_MOTOR_CONFIG.velocityMeasurementWindow = 8;
+
     // Configure steering motor current limiting
     var steeringMotorCurrentLimit = new SupplyCurrentLimitConfiguration();
     steeringMotorCurrentLimit.enable = true;
@@ -56,10 +59,6 @@ public class SwerveModule implements Loggable {
 
     STEERING_MOTOR_CONFIG.voltageCompSaturation = 8.0; // Volts
 
-    CONFIGURATION.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
-    CONFIGURATION.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
-    CONFIGURATION.sensorTimeBase = SensorTimeBase.PerSecond;
-
     var steeringPID = new SlotConfiguration();
     steeringPID.kP = 0.1;
     steeringPID.kI = 0.0;
@@ -67,12 +66,12 @@ public class SwerveModule implements Loggable {
     steeringPID.allowableClosedloopError = 100; // ticks
     STEERING_MOTOR_CONFIG.slot1 = steeringPID;
 
-    var wheelPID = new SlotConfiguration();
-    wheelPID.kP = 0.012;
-    wheelPID.kI = 0.0;
-    wheelPID.kD = 0.0;
-    wheelPID.kF = 0.05;
-    WHEEL_MOTOR_CONFIG.slot0 = wheelPID;
+    STEERING_MOTOR_CONFIG.velocityMeasurementPeriod = VelocityMeasPeriod.Period_5Ms;
+    STEERING_MOTOR_CONFIG.velocityMeasurementWindow = 8;
+
+    CONFIGURATION.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+    CONFIGURATION.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
+    CONFIGURATION.sensorTimeBase = SensorTimeBase.PerSecond;
   }
 
   private final WPI_TalonFX wheelMotor;
@@ -102,7 +101,7 @@ public class SwerveModule implements Loggable {
     wheelMotor.configAllSettings(WHEEL_MOTOR_CONFIG, startupCanTimeout);
     wheelMotor.setInverted(TalonFXInvertType.CounterClockwise);
     wheelMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, startupCanTimeout);
-
+    wheelMotor.selectProfileSlot(VELOCITY_PID_SLOT, 0);
     wheelMotor.setNeutralMode(NeutralMode.Brake);
 
     // Setup steering encoder

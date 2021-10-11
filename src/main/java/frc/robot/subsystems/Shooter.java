@@ -41,6 +41,9 @@ public class Shooter extends SubsystemBase implements Loggable {
     velocityLoopConfig.kI = 0.0;
     velocityLoopConfig.kD = 0.0;
     SHOOTER_MOTOR_CONFIG.slot0 = velocityLoopConfig;
+
+    SHOOTER_MOTOR_CONFIG.velocityMeasurementPeriod = VelocityMeasPeriod.Period_1Ms;
+    SHOOTER_MOTOR_CONFIG.velocityMeasurementWindow = 1;
   }
 
   private final WPI_TalonFX shooterMotor = new WPI_TalonFX(SHOOTER_MOTOR_ID);
