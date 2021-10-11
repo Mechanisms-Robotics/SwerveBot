@@ -1,18 +1,16 @@
 package frc.robot.commands;
 
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.PerpetualCommand;
 import frc.robot.subsystems.Hood;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.common.hardware.VisionLEDMode;
 
-public class TuneHood extends CommandBase{
+public class TuneHood extends CommandBase {
 
   private final Hood hood;
   private final PhotonCamera camera;
@@ -23,7 +21,8 @@ public class TuneHood extends CommandBase{
     this.camera = camera;
     this.hood = hood;
 
-    this.photonNetworkTable = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable("limelight");
+    this.photonNetworkTable =
+        NetworkTableInstance.getDefault().getTable("photonvision").getSubTable("limelight");
   }
 
   @Override

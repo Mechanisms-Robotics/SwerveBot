@@ -9,7 +9,6 @@ import frc.robot.util.InterpolatingDouble;
 import frc.robot.util.InterpolatingTreeMap;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
-import org.photonvision.common.hardware.VisionLEDMode;
 
 public class AimHoodCommand extends CommandBase {
   private static final int PIPELINE_INDEX = 0;
@@ -28,7 +27,7 @@ public class AimHoodCommand extends CommandBase {
     RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(1.4), new InterpolatingDouble(-0.609));
     RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(1.63), new InterpolatingDouble(-0.4));
     RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(1.896), new InterpolatingDouble(-0.16));
-}
+  }
 
   private Hood hood;
   private PhotonCamera camera;
@@ -40,7 +39,8 @@ public class AimHoodCommand extends CommandBase {
     this.hood = hood;
     this.camera = camera;
 
-    this.photonNetworkTable = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable("limelight");
+    this.photonNetworkTable =
+        NetworkTableInstance.getDefault().getTable("photonvision").getSubTable("limelight");
 
     addRequirements(hood);
   }
@@ -52,10 +52,7 @@ public class AimHoodCommand extends CommandBase {
       double pitch = photonNetworkTable.getEntry("targetPitch").getDouble(0.0);
       var range =
           PhotonUtils.calculateDistanceToTargetMeters(
-              CAMERA_HEIGHT,
-              TARGET_HEIGHT,
-              CAMERA_PITCH,
-              Units.degreesToRadians(pitch));
+              CAMERA_HEIGHT, TARGET_HEIGHT, CAMERA_PITCH, Units.degreesToRadians(pitch));
       targetHoodPosition = RANGE_TO_HOOD_MAP.getInterpolated(new InterpolatingDouble(range)).value;
     }
     hood.setHoodRawPosition(targetHoodPosition);

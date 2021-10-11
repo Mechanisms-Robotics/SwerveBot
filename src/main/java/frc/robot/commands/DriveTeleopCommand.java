@@ -3,10 +3,8 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
-
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -19,7 +17,7 @@ public class DriveTeleopCommand extends CommandBase {
   protected static final double TRANSLATION_CURVE_STRENGTH = 10000.0;
   protected static final double ROTATION_CURVE_STRENGTH = 10.0; // 10.0 makes it effectively linear.
 
-  protected static final double DEADBAND = 0.15;
+  private static final double DEADBAND = 0.15;
 
   protected final Swerve swerve;
 
@@ -27,9 +25,9 @@ public class DriveTeleopCommand extends CommandBase {
   protected final Supplier<Double> vySupplier;
   protected final Supplier<Double> vrxSupplier;
   protected final Optional<Supplier<Double>> vrySupplier;
-  protected final SlewRateLimiter vxRateLimiter;
-  protected final SlewRateLimiter vyRateLimiter;
-  protected final SlewRateLimiter vrRateLimiter;
+  private final SlewRateLimiter vxRateLimiter;
+  private final SlewRateLimiter vyRateLimiter;
+  private final SlewRateLimiter vrRateLimiter;
   protected final boolean fieldOriented;
 
   private DriveTeleopCommand(
@@ -89,6 +87,7 @@ public class DriveTeleopCommand extends CommandBase {
   }
 
   private Rotation2d currentRotationCommand;
+
   @Override
   public void execute() {
     final double translationX = deadband(vxSupplier.get());
@@ -128,7 +127,6 @@ public class DriveTeleopCommand extends CommandBase {
     swerve.drive(dx, dy, dr, fieldOriented);
   }
 
-
   protected void driveRotationPositionMode(double dx, double dy, Rotation2d rotation) {
     Translation2d translation = scaleTranslationInput(new Translation2d(dx, dy));
     swerve.drive(translation.getX(), translation.getY(), rotation);
@@ -142,7 +140,7 @@ public class DriveTeleopCommand extends CommandBase {
     return new Translation2d(rotation.getCos() * mag, rotation.getSin() * mag);
   }
 
-  private static double deadband(double input) {
+  protected static double deadband(double input) {
     return Math.abs(input) > DEADBAND ? input : 0;
   }
 }
