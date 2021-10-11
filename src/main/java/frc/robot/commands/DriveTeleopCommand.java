@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
+
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /** Command to drive the swerve in teleop. Supplied left joystick x and y, and right joystick x. */
@@ -24,35 +26,25 @@ public class DriveTeleopCommand extends CommandBase {
   protected final Supplier<Double> vxSupplier;
   protected final Supplier<Double> vySupplier;
   protected final Supplier<Double> vrxSupplier;
-  protected final Supplier<Double> vrySupplier;
+  protected final Optional<Supplier<Double>> vrySupplier;
   protected final SlewRateLimiter vxRateLimiter;
   protected final SlewRateLimiter vyRateLimiter;
   protected final SlewRateLimiter vrRateLimiter;
   protected final boolean fieldOriented;
-  protected final boolean forEnabled; // Field Oriented Rotation
 
-  /**
-   * Constructs the DriveTeleopCommand.
-   *
-   * @param driverX Left joystick x, which acts as desired x translation of the swerve drive
-   * @param driverY Left joystick y, which acts as desired y translation of the swerve drive
-   * @param driverRotationX The X component of the rotation vector.
-   * @param driverRotationY The Y component of the rotation vector.
-   * @param swerve Instance of Swerve
-   */
-  public DriveTeleopCommand(
+  private DriveTeleopCommand(
       Supplier<Double> driverX,
       Supplier<Double> driverY,
       Supplier<Double> driverRotationX,
-      Supplier<Double> driverRotationY,
+      Optional<Supplier<Double>> driverRotationY,
+      boolean fieldOriented,
       Swerve swerve) {
     vxSupplier = driverX;
     vySupplier = driverY;
     vrxSupplier = driverRotationX;
     vrySupplier = driverRotationY;
 
-    this.fieldOriented = true;
-    this.forEnabled = true;
+    this.fieldOriented = fieldOriented;
 
     this.swerve = swerve;
     addRequirements(this.swerve);
@@ -77,20 +69,7 @@ public class DriveTeleopCommand extends CommandBase {
       Supplier<Double> driverRotation,
       boolean fieldOriented,
       Swerve swerve) {
-    vxSupplier = driverX;
-    vySupplier = driverY;
-    vrxSupplier = driverRotation;
-    vrySupplier = null;
-
-    this.fieldOriented = fieldOriented;
-    this.forEnabled = false;
-
-    this.swerve = swerve;
-    addRequirements(this.swerve);
-
-    vxRateLimiter = new SlewRateLimiter(MAX_TRANSLATIONAL_VELOCITY_RATE);
-    vyRateLimiter = new SlewRateLimiter(MAX_TRANSLATIONAL_VELOCITY_RATE);
-    vrRateLimiter = new SlewRateLimiter(MAX_ROTATION_VELOCITY_RATE);
+    this(driverX, driverY, driverRotation, Optional.empty(), fieldOriented, swerve);
   }
 
   /**
@@ -109,50 +88,22 @@ public class DriveTeleopCommand extends CommandBase {
     this(driverX, driverY, driverRotation, true, swerve);
   }
 
+  private Rotation2d currentRotationCommand;
   @Override
   public void execute() {
-    // Get driver input
-    double dx = vxSupplier.get();
-    double dy = vySupplier.get();
-    double drx = vrxSupplier.get();
-    dx = Math.abs(dx) > DEADBAND ? dx : 0;
-    dy = Math.abs(dy) > DEADBAND ? dy : 0;
-    drx = Math.abs(drx) > DEADBAND ? drx : 0;
-    Translation2d translation = new Translation2d(dx, dy);
-    double mag = translation.getNorm();
-    final double scale = 1.35;
-    mag = Math.pow(mag, scale);
-    final Rotation2d rotation = new Rotation2d(translation.getX(), translation.getY());
-    translation = new Translation2d(rotation.getCos() * mag, rotation.getSin() * mag);
-    dx = vxRateLimiter.calculate(translation.getX() * Swerve.maxVelocity);
-    dy = vyRateLimiter.calculate(translation.getY() * Swerve.maxVelocity);
-    if (!forEnabled) drx = vrRateLimiter.calculate(drx * Swerve.maxRotationalVelocity);
-    SmartDashboard.putNumber("Swerve vX", dx);
-    SmartDashboard.putNumber("Swerve vY", dy);
-    SmartDashboard.putNumber("Swerve vrX", drx);
+    final double translationX = deadband(vxSupplier.get());
+    final double translationY = deadband(vySupplier.get());
+    final double rotationX = deadband(vrxSupplier.get());
 
-    if (forEnabled) {
-      double dry = vrySupplier.get();
-      dry = Math.abs(dry) > DEADBAND ? dry : 0;
-      SmartDashboard.putNumber("Swerve vrY", dry);
-      Rotation2d rot = new Rotation2d(drx, dry);
-      if (drx == 0 && dry == 0) rot = Rotation2d.fromDegrees(90.0);
-      rot = rot.rotateBy(Rotation2d.fromDegrees(90));
-      System.out.println(rot);
-      swerve.drive(dx, dy, rot);
+    if (vrySupplier.isPresent()) {
+      final double rotationY = deadband(vrySupplier.get().get());
+      if (Math.abs(rotationX) > 0 || Math.abs(rotationY) > 0) {
+        currentRotationCommand = new Rotation2d(rotationX, rotationY);
+      }
+      driveRotationPositionMode(translationX, translationY, currentRotationCommand);
     } else {
-      swerve.drive(dx, dy, drx, fieldOriented);
+      driveRotationVelocityMode(translationX, translationX, rotationX);
     }
-  }
-
-  private Rotation2d convertJoystickToAngle(double drx, double dry) {
-    Translation2d joystickVec = new Translation2d(drx, dry);
-    Translation2d forwardVec = new Translation2d(0.0, 1.0);
-    double dotProduct =
-        (joystickVec.getX() * forwardVec.getX()) + (joystickVec.getY() * forwardVec.getY());
-    double magProduct = joystickVec.getNorm() * forwardVec.getNorm();
-    double angle = Math.toDegrees(Math.acos(dotProduct / magProduct));
-    return Rotation2d.fromDegrees(angle);
   }
 
   @Override
@@ -165,26 +116,33 @@ public class DriveTeleopCommand extends CommandBase {
     swerve.stop();
   }
 
-  /**
-   * Applys a controll curve to the given input. This function does two things:
-   *
-   * <p>1. Remove the effect of the deadband.
-   *
-   * <p>2. Map the control signal onto a normalized signum function.
-   *
-   * @param controlValue The control signal to map.
-   * @param curveStrength The strength of the signum function. Note that values between -1.0 and 0.0
-   *     will lead to bad results. Go to See <a
-   *     href="https://www.desmos.com/calculator/zzpkh9cujz">Desmos</a> to see how curveStrength (k)
-   *     affects the output.
-   * @return The mapped control value.
-   */
-  private double applyControlCurve(double controlValue, double curveStrength) {
-    // Get rid of the discontinuity that is caused by setting any value between -DEADBAND and
-    // DEADBAND to 0.
-    final double absControl = Math.abs(controlValue);
-    final double continuousControl = (absControl - DEADBAND) * (1.0 / (1.0 - DEADBAND));
-    return Math.signum(controlValue)
-        * ((curveStrength * continuousControl) / (curveStrength - continuousControl + 1));
+  protected void driveRotationVelocityMode(double dx, double dy, double dr) {
+    // Scale the tranlational input
+    Translation2d translation = scaleTranslationInput(new Translation2d(dx, dy));
+
+    // Apply Ramp Rates
+    dx = vxRateLimiter.calculate(translation.getX() * Swerve.maxVelocity);
+    dy = vyRateLimiter.calculate(translation.getY() * Swerve.maxVelocity);
+    dr = vrRateLimiter.calculate(dr * Swerve.maxRotationalVelocity);
+
+    swerve.drive(dx, dy, dr, fieldOriented);
+  }
+
+
+  protected void driveRotationPositionMode(double dx, double dy, Rotation2d rotation) {
+    Translation2d translation = scaleTranslationInput(new Translation2d(dx, dy));
+    swerve.drive(translation.getX(), translation.getY(), rotation);
+  }
+
+  private Translation2d scaleTranslationInput(Translation2d input) {
+    double mag = input.getNorm();
+    final double scale = 1.35;
+    mag = Math.pow(mag, scale);
+    final Rotation2d rotation = new Rotation2d(input.getX(), input.getY());
+    return new Translation2d(rotation.getCos() * mag, rotation.getSin() * mag);
+  }
+
+  private static double deadband(double input) {
+    return Math.abs(input) > DEADBAND ? input : 0;
   }
 }
