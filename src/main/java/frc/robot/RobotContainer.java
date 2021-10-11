@@ -58,7 +58,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Driver Button Bindings
     intakeButton.toggleWhenPressed(new IntakeCommand(intake, spindexer, accelerator));
-    aimButton.toggleWhenPressed(new AimCommand(
+    aimButton.toggleWhenPressed(
+        new AimCommand(
             driverController::getLeftJoystickX,
             driverController::getLeftJoystickY,
             () -> -driverController.getRightJoystickX(),
@@ -67,8 +68,7 @@ public class RobotContainer {
             shooter,
             accelerator,
             spindexer,
-            camera
-    ));
+            camera));
     shootButton.whenHeld(new ShootCommand(shooter, accelerator, spindexer));
 
     climbUpButton.whenHeld(
