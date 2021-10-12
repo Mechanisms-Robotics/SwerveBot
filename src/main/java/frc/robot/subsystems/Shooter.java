@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import io.github.oblarg.oblog.Loggable;
+import io.github.oblarg.oblog.annotations.Log;
 
 public class Shooter extends SubsystemBase implements Loggable {
   private static final int SHOOTER_MOTOR_ID = 50;
@@ -37,13 +38,14 @@ public class Shooter extends SubsystemBase implements Loggable {
 
     // TODO: Tune
     final var velocityLoopConfig = new SlotConfiguration();
-    velocityLoopConfig.kP = 0.0;
+    velocityLoopConfig.kP = 0.022555;
     velocityLoopConfig.kI = 0.0;
     velocityLoopConfig.kD = 0.0;
+    velocityLoopConfig.kF = 0.055;
     SHOOTER_MOTOR_CONFIG.slot0 = velocityLoopConfig;
 
-    SHOOTER_MOTOR_CONFIG.velocityMeasurementPeriod = VelocityMeasPeriod.Period_1Ms;
-    SHOOTER_MOTOR_CONFIG.velocityMeasurementWindow = 1;
+    SHOOTER_MOTOR_CONFIG.velocityMeasurementPeriod = VelocityMeasPeriod.Period_2Ms;
+    SHOOTER_MOTOR_CONFIG.velocityMeasurementWindow = 4;
   }
 
   private final WPI_TalonFX shooterMotor = new WPI_TalonFX(SHOOTER_MOTOR_ID);
@@ -75,9 +77,10 @@ public class Shooter extends SubsystemBase implements Loggable {
         ControlMode.Velocity,
         RPMToFalcon(rpm, SHOOTER_GEAR_RATIO),
         DemandType.ArbitraryFeedForward,
-        FEEDFORWARD.calculate(rpm));
+        FEEDFORWARD.calculate(rpm / 60.0));
   }
 
+  @Log
   public double getVelocity() {
     return falconToRPM(shooterMotor.getSelectedSensorVelocity(), SHOOTER_GEAR_RATIO);
   }

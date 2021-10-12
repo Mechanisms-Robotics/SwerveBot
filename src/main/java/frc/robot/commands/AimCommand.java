@@ -19,7 +19,6 @@ public class AimCommand extends ParallelCommandGroup {
       Accelerator accelerator,
       Spindexer spindexer,
       PhotonCamera camera) {
-    addRequirements(hood, swerve, shooter, accelerator, spindexer);
     addCommands(
         new InstantCommand(() -> camera.setLED(VisionLEDMode.kOn)),
         new SpinupCommand(shooter, accelerator, spindexer),

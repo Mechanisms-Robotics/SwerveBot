@@ -15,7 +15,7 @@ public class DriveTrajectoryCommand extends SwerveControllerCommand {
   // would all be updating the same control with would cause issues. However, in this case I didn't
   // want to recreate the large controller class every time a new trajectory is run.
   // I also know that because this command requires a system the scheduler will
-  // only ever run one DriveTrajectoryCommand at once. So this is 'safe' in this instance.
+  // only ever run one DriveTrajectoryCom/home/alexomand at once. So this is 'safe' in this instance.
 
   private static final double xGain = 0.0;
   private static final double yGain = 0.0;

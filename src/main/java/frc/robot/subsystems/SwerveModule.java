@@ -46,6 +46,12 @@ public class SwerveModule implements Loggable {
     // Configure wheel motor current limiting
     WHEEL_MOTOR_CONFIG.voltageCompSaturation = 12.0; // Volts
 
+    var wheelPID = new SlotConfiguration();
+    wheelPID.kP = 0.012;
+    wheelPID.kF = 0.05;
+
+    WHEEL_MOTOR_CONFIG.slot0 = wheelPID;
+
     WHEEL_MOTOR_CONFIG.velocityMeasurementPeriod = VelocityMeasPeriod.Period_5Ms;
     WHEEL_MOTOR_CONFIG.velocityMeasurementWindow = 8;
 

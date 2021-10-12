@@ -22,10 +22,10 @@ public final class Constants {
 
   // TODO: Change to velocity once PIDs are tuned.
   // Currently open loop precentage
-  public static final double shooterShootSpeed = 0.70;
+  public static final double shooterShootSpeed = 4800;
   public static final double acceleratorShootSpeed = 0.70;
-  public static final double spindexerShootSpeed = 0.75;
-  public static final double spindexerIntakeSpeed = 0.25;
+  public static final double spindexerShootSpeed = 0.55;
+  public static final double spindexerIntakeSpeed = 0.20;
   public static final double spindexerPrepSpeed = 0.15;
-  public static final double intakeSpeed = 0.5;
+  public static final double intakeSpeed = 0.6;
 }

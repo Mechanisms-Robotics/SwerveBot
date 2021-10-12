@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 import org.photonvision.PhotonCamera;
 
 public class AimSwerveDrive extends DriveTeleopCommand {
-  private static final PIDController aimPID = new PIDController(0.0, 0.0, 0.0, Constants.loopTime);
+  private final PIDController aimPID = new PIDController(0.05, 0.0, 0.0, Constants.loopTime);
 
   private final PhotonCamera camera;
   private final NetworkTable photonNetworkTable;
@@ -22,6 +22,7 @@ public class AimSwerveDrive extends DriveTeleopCommand {
       PhotonCamera camera) {
     super(driverX, driverY, rotation, swerve);
     this.camera = camera;
+    aimPID.setTolerance(1.0); // Degrees
 
     // TODO: Figure out bug with usenig camera results for these values
     photonNetworkTable =
