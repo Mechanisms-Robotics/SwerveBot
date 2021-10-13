@@ -17,9 +17,9 @@ public class DriveTrajectoryCommand extends SwerveControllerCommand {
   // I also know that because this command requires a system the scheduler will
   // only ever run one DriveTrajectoryCom/home/alexomand at once. So this is 'safe' in this instance.
 
-  private static final double xGain = 0.0;
-  private static final double yGain = 0.0;
-  private static final double thetaGain = 0.0;
+  private static final double xGain = 3.0;
+  private static final double yGain = 3.0;
+  private static final double thetaGain = 0.05;
   private static final double maxThetaVelocity = 1.571; // radians per second
   private static final double maxThetaAcceleration = maxThetaVelocity / 2.0;
 

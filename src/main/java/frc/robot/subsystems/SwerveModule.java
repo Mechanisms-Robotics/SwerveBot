@@ -47,7 +47,7 @@ public class SwerveModule implements Loggable {
     WHEEL_MOTOR_CONFIG.voltageCompSaturation = 12.0; // Volts
 
     var wheelPID = new SlotConfiguration();
-    wheelPID.kP = 0.012;
+    wheelPID.kP = 0.03; // 0.012
     wheelPID.kF = 0.05;
 
     WHEEL_MOTOR_CONFIG.slot0 = wheelPID;

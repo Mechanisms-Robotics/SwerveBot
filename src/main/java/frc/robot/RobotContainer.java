@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
+import frc.robot.commands.auto.TestYMovement;
 import frc.robot.subsystems.*;
 import frc.robot.util.PS4Controller;
 import frc.robot.util.PS4Controller.Direction;
@@ -36,9 +37,6 @@ public class RobotContainer {
       new Button(() -> driverController.getPOV() == Direction.Down);
   private final Button gyroResetButton = new Button(driverController::getShareButton);
 
-  // Secondary Driver Buttons
-  private final Button unjamButton = new Button(secondaryDriverController::getXButton);
-
   // Temporary Buttons
   private final Button hoodJogForward =
       new Button(() -> driverController.getPOV() == Direction.Right);
@@ -57,7 +55,7 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     // Driver Button Bindings
-    intakeButton.toggleWhenPressed(new IntakeCommand(intake, spindexer, accelerator));
+    intakeButton.toggleWhenPressed(new IntakeCommand(secondaryDriverController::getXButton, intake, spindexer, accelerator));
     aimButton.toggleWhenPressed(
         new AimCommand(
             driverController::getLeftJoystickX,
@@ -78,8 +76,6 @@ public class RobotContainer {
 
     gyroResetButton.whenPressed(new InstantCommand(swerve::zeroHeading));
 
-    // Secondary Driver Button Bindings
-    unjamButton.whenHeld(new UnjamCommand(spindexer));
 
     // Temporary Button Bindings
     hoodJogForward.whenHeld(new ContinuousJogHoodCommand(hood, false));
@@ -106,6 +102,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return null;
+    return new TestYMovement(swerve);
   }
 }

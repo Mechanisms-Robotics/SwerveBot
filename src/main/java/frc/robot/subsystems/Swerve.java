@@ -54,7 +54,7 @@ public class Swerve extends SubsystemBase implements Loggable {
 
   private static final int gyroID = 1;
 
-  private final SwerveDriveKinematics kinematics =
+  public static final SwerveDriveKinematics kinematics =
       new SwerveDriveKinematics(
           flModuleLocation, frModuleLocation, blModuleLocation, brModuleLocation);
 
