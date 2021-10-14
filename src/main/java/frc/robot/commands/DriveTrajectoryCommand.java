@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc.robot.Constants;
 import frc.robot.subsystems.Swerve;
 
 /** This command is used for driving a trajectories during autonomous. */
@@ -17,20 +18,25 @@ public class DriveTrajectoryCommand extends SwerveControllerCommand {
   // I also know that because this command requires a system the scheduler will
   // only ever run one DriveTrajectoryCom/home/alexomand at once. So this is 'safe' in this instance.
 
-  private static final double xGain = 3.0;
-  private static final double yGain = 3.0;
-  private static final double thetaGain = 0.05;
-  private static final double maxThetaVelocity = 1.571; // radians per second
-  private static final double maxThetaAcceleration = maxThetaVelocity / 2.0;
+  private static final double xGain = 0.0;
+  private static final double yGain = 0.0;
+  private static final double thetaGain = 0.000;
+  private static final double maxThetaVelocity = Math.PI; // radians per second
+  private static final double maxThetaAcceleration = Math.PI;
 
-  private static final PIDController xController = new PIDController(xGain, 0.0, 0.0);
-  private static final PIDController yController = new PIDController(yGain, 0.0, 0.0);
+  private static final PIDController xController = new PIDController(xGain, 0.0, 0.0, Constants.loopTime);
+  private static final PIDController yController = new PIDController(yGain, 0.0, 0.0, Constants.loopTime);
   private static final ProfiledPIDController thetaController =
       new ProfiledPIDController(
           thetaGain,
           0.0,
           0.0,
-          new TrapezoidProfile.Constraints(maxThetaVelocity, maxThetaAcceleration));
+          new TrapezoidProfile.Constraints(maxThetaVelocity, maxThetaAcceleration),
+              Constants.loopTime);
+
+  static {
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+  }
 
   /**
    * Drive a given trajectory. The heading along the trajectory will be the heading of the robot at

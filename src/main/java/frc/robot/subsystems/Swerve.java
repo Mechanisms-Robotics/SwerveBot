@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -58,7 +59,7 @@ public class Swerve extends SubsystemBase implements Loggable {
       new SwerveDriveKinematics(
           flModuleLocation, frModuleLocation, blModuleLocation, brModuleLocation);
 
-  private final SwerveDrivePoseEstimator poseEstimator;
+  private final SwerveDriveOdometry poseEstimator;
 
   private final SwerveModule flModule =
       new SwerveModule(
@@ -90,14 +91,7 @@ public class Swerve extends SubsystemBase implements Loggable {
 
   /** Constructs the Swerve subsystem. */
   public Swerve() {
-    poseEstimator =
-        new SwerveDrivePoseEstimator(
-            getHeading(),
-            new Pose2d(),
-            kinematics,
-            VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
-            VecBuilder.fill(Units.degreesToRadians(0.01)),
-            VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
+    poseEstimator = new SwerveDriveOdometry(kinematics, getHeading(), new Pose2d());
 
     this.register();
     this.setName("Swerve Drive");
@@ -139,7 +133,6 @@ public class Swerve extends SubsystemBase implements Loggable {
   private void setSwerveStates(ChassisSpeeds speeds) {
     SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
 
-    SwerveDriveKinematics.normalizeWheelSpeeds(states, maxVelocity);
     setModuleStates(states);
   }
 
@@ -203,7 +196,7 @@ public class Swerve extends SubsystemBase implements Loggable {
   @Log(methodName = "getX", name = "Drive Estimated X")
   @Log(methodName = "getY", name = "Drive Estimated Y")
   public Pose2d getPose() {
-    return poseEstimator.getEstimatedPosition();
+    return poseEstimator.getPoseMeters();
   }
 
   /** Stop all motors on the drive train */
@@ -212,5 +205,10 @@ public class Swerve extends SubsystemBase implements Loggable {
     frModule.stop();
     blModule.stop();
     brModule.stop();
+  }
+
+  public void resetSensors() {
+    zeroHeading();
+    poseEstimator.resetPosition(new Pose2d(), new Rotation2d());
   }
 }

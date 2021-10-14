@@ -70,9 +70,9 @@ public class RobotContainer {
     shootButton.whenHeld(new ShootCommand(shooter, accelerator, spindexer));
 
     climbUpButton.whenHeld(
-        new StartEndCommand(() -> climber.setOpenLoop(0.75), climber::stop, climber));
+        new StartEndCommand(() -> climber.setOpenLoop(0.20), climber::stop, climber));
     climbDownButton.whenHeld(
-        new StartEndCommand(() -> climber.setOpenLoop(-0.75), climber::stop, climber));
+        new StartEndCommand(() -> climber.setOpenLoop(-0.20), climber::stop, climber));
 
     gyroResetButton.whenPressed(new InstantCommand(swerve::zeroHeading));
 
@@ -97,11 +97,14 @@ public class RobotContainer {
             true,
             swerve));
 
+
+
     climber.setDefaultCommand(
         new ClimberCommand(secondaryDriverController::getRightJoystickY, climber));
   }
 
   public Command getAutonomousCommand() {
+    //return new RunCommand(() -> swerve.drive(0.0, 1.0, 0.0, false), swerve).withTimeout(2.0);
     return new TestYMovement(swerve);
   }
 }

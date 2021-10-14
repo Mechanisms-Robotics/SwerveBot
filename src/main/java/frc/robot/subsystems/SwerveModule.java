@@ -29,6 +29,7 @@ public class SwerveModule implements Loggable {
   private static final double STEER_GEAR_RATIO = 12.8; // : 1
   private static final int VELOCITY_PID_SLOT = 0;
   private static final int MOTION_MAGIC_PID_SLOT = 1;
+  private static final double STEERING_KS = 0.075;
 
   private static final TalonFXConfiguration WHEEL_MOTOR_CONFIG = new TalonFXConfiguration();
   private static final TalonFXConfiguration STEERING_MOTOR_CONFIG = new TalonFXConfiguration();
@@ -47,7 +48,7 @@ public class SwerveModule implements Loggable {
     WHEEL_MOTOR_CONFIG.voltageCompSaturation = 12.0; // Volts
 
     var wheelPID = new SlotConfiguration();
-    wheelPID.kP = 0.03; // 0.012
+    wheelPID.kP = 0.08; // 0.012
     wheelPID.kF = 0.05;
 
     WHEEL_MOTOR_CONFIG.slot0 = wheelPID;
@@ -66,14 +67,15 @@ public class SwerveModule implements Loggable {
     STEERING_MOTOR_CONFIG.voltageCompSaturation = 8.0; // Volts
 
     var steeringPID = new SlotConfiguration();
-    steeringPID.kP = 0.1;
-    steeringPID.kI = 0.0;
-    steeringPID.kD = 3.0;
-    steeringPID.allowableClosedloopError = 100; // ticks
+    steeringPID.kP = 0.30; // 0.1
+    steeringPID.kI = 0.00012;
+    steeringPID.kD = 3.0; // 0.1
+    steeringPID.kF = 0.0008;
+    steeringPID.allowableClosedloopError = 10; // ticks
     STEERING_MOTOR_CONFIG.slot1 = steeringPID;
 
-    STEERING_MOTOR_CONFIG.velocityMeasurementPeriod = VelocityMeasPeriod.Period_5Ms;
-    STEERING_MOTOR_CONFIG.velocityMeasurementWindow = 8;
+    STEERING_MOTOR_CONFIG.velocityMeasurementPeriod = VelocityMeasPeriod.Period_50Ms;
+    STEERING_MOTOR_CONFIG.velocityMeasurementWindow = 64;
 
     CONFIGURATION.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
     CONFIGURATION.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
