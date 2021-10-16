@@ -3,7 +3,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
-import frc.robot.commands.auto.TestYMovement;
+import frc.robot.commands.auto.Basic3Ball;
 import frc.robot.subsystems.*;
 import frc.robot.util.PS4Controller;
 import frc.robot.util.PS4Controller.Direction;
@@ -12,7 +12,7 @@ import org.photonvision.PhotonCamera;
 /** The container for the robot. Contains subsystems, OI devices, and commands. */
 public class RobotContainer {
 
-  private static final boolean TUNING_MODE = false;
+  private static final boolean TUNING_MODE = true;
 
   // Subsystems
   public final Swerve swerve = new Swerve();
@@ -37,6 +37,12 @@ public class RobotContainer {
       new Button(() -> driverController.getPOV() == Direction.Down);
   private final Button gyroResetButton = new Button(driverController::getShareButton);
 
+  // Secondary Driver Buttons
+  private final Button secondaryClimbUpButton =
+      new Button(() -> secondaryDriverController.getPOV() == Direction.Up);
+  private final Button secondaryClimbDownButton =
+      new Button(() -> secondaryDriverController.getPOV() == Direction.Down);
+
   // Temporary Buttons
   private final Button hoodJogForward =
       new Button(() -> driverController.getPOV() == Direction.Right);
@@ -55,7 +61,9 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     // Driver Button Bindings
-    intakeButton.toggleWhenPressed(new IntakeCommand(secondaryDriverController::getXButton, intake, spindexer, accelerator));
+    intakeButton.toggleWhenPressed(
+        new IntakePulseCommand(
+            secondaryDriverController::getXButton, intake, spindexer, accelerator));
     aimButton.toggleWhenPressed(
         new AimCommand(
             driverController::getLeftJoystickX,
@@ -74,8 +82,12 @@ public class RobotContainer {
     climbDownButton.whenHeld(
         new StartEndCommand(() -> climber.setOpenLoop(-0.20), climber::stop, climber));
 
-    gyroResetButton.whenPressed(new InstantCommand(swerve::zeroHeading));
+    // secondaryClimbUpButton.whenHeld(
+    //        new StartEndCommand(() -> climber.setOpenLoop(0.75), climber::stop, climber));
+    // secondaryClimbDownButton.whenHeld(
+    //        new StartEndCommand(() -> climber.setOpenLoop(-0.75), climber::stop, climber));
 
+    gyroResetButton.whenPressed(new InstantCommand(swerve::zeroHeading));
 
     // Temporary Button Bindings
     hoodJogForward.whenHeld(new ContinuousJogHoodCommand(hood, false));
@@ -97,14 +109,12 @@ public class RobotContainer {
             true,
             swerve));
 
-
-
     climber.setDefaultCommand(
         new ClimberCommand(secondaryDriverController::getRightJoystickY, climber));
   }
 
   public Command getAutonomousCommand() {
-    //return new RunCommand(() -> swerve.drive(0.0, 1.0, 0.0, false), swerve).withTimeout(2.0);
-    return new TestYMovement(swerve);
+    // return new RunCommand(() -> swerve.drive(0.0, 1.0, 0.0, false), swerve).withTimeout(2.0);
+    return new Basic3Ball(hood, swerve, shooter, accelerator, spindexer, camera);
   }
 }

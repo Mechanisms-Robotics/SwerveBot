@@ -65,7 +65,6 @@ public class Shooter extends SubsystemBase implements Loggable {
     // CAN Bus Usage Optimisation.
     shooterFollowMotor.setStatusFramePeriod(StatusFrame.Status_1_General, 255);
     shooterFollowMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
-
   }
 
   public void setOpenLoop(double percentOutput) {

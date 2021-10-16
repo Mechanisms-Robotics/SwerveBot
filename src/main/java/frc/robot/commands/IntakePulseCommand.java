@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Accelerator;
@@ -7,14 +8,19 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Spindexer;
 import java.util.function.Supplier;
 
-public class IntakeCommand extends CommandBase {
+public class IntakePulseCommand extends CommandBase {
   private final Intake intake;
   private final Spindexer spindexer;
   private final Accelerator accelerator;
 
   private final Supplier<Boolean> unjam;
 
-  public IntakeCommand(
+  private final Timer spindexerRunTimer = new Timer();
+  private final Timer spindexerStopTimer = new Timer();
+  private final double spindexerPulseTime = 0.75; // seconds
+  private boolean spindexerIsRunning = true;
+
+  public IntakePulseCommand(
       Supplier<Boolean> unjam, Intake intake, Spindexer spindexer, Accelerator accelerator) {
     this.intake = intake;
     this.spindexer = spindexer;
@@ -23,7 +29,7 @@ public class IntakeCommand extends CommandBase {
     addRequirements(intake, spindexer, accelerator);
   }
 
-  public IntakeCommand(Intake intake, Spindexer spindexer, Accelerator accelerator) {
+  public IntakePulseCommand(Intake intake, Spindexer spindexer, Accelerator accelerator) {
     this(null, intake, spindexer, accelerator);
   }
 
@@ -37,6 +43,8 @@ public class IntakeCommand extends CommandBase {
     spindexer.deployGate();
     spindexer.retractRamp();
     spindexer.setOpenLoop(Constants.spindexerIntakeSpeed);
+
+    spindexerRunTimer.start();
   }
 
   @Override
@@ -44,8 +52,31 @@ public class IntakeCommand extends CommandBase {
     if (unjam != null) {
       if (unjam.get()) {
         spindexer.setOpenLoop(-0.15);
+        spindexer.retractGate();
+        System.out.println("RETRACTED GATE");
       } else {
-        spindexer.setOpenLoop(Constants.spindexerIntakeSpeed);
+        if (!spindexer.isGateDeployed()) spindexer.deployGate();
+        if (spindexerIsRunning) {
+          spindexer.setOpenLoop(Constants.spindexerIntakeSpeed);
+
+          if (spindexerRunTimer.hasElapsed(spindexerPulseTime)) {
+            spindexerRunTimer.stop();
+            spindexerRunTimer.reset();
+            spindexerStopTimer.start();
+
+            spindexerIsRunning = false;
+          }
+        } else {
+          spindexer.stop();
+
+          if (spindexerStopTimer.hasElapsed(spindexerPulseTime)) {
+            spindexerStopTimer.stop();
+            spindexerStopTimer.reset();
+            spindexerRunTimer.start();
+
+            spindexerIsRunning = true;
+          }
+        }
       }
     }
   }

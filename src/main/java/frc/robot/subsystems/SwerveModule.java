@@ -67,10 +67,10 @@ public class SwerveModule implements Loggable {
     STEERING_MOTOR_CONFIG.voltageCompSaturation = 8.0; // Volts
 
     var steeringPID = new SlotConfiguration();
-    steeringPID.kP = 0.30; // 0.1
-    steeringPID.kI = 0.00012;
-    steeringPID.kD = 3.0; // 0.1
-    steeringPID.kF = 0.0008;
+    steeringPID.kP = 0.6; // 0.3
+    steeringPID.kI = 0.0; // 0.00012
+    steeringPID.kD = 12.0; // 3.0
+    steeringPID.kF = 0.0; // 0.0008
     steeringPID.allowableClosedloopError = 10; // ticks
     STEERING_MOTOR_CONFIG.slot1 = steeringPID;
 

@@ -82,7 +82,7 @@ public class Spindexer extends SubsystemBase implements Loggable {
   }
 
   public void deployGate() {
-    gateSolenoid.set(GATE_RETRACTED);
+    gateSolenoid.set(GATE_DEPLOYED);
   }
 
   public void retractGate() {

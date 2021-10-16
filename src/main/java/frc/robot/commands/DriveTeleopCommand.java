@@ -93,7 +93,7 @@ public class DriveTeleopCommand extends CommandBase {
     final double translationX = deadband(vxSupplier.get());
     final double translationY = deadband(vySupplier.get());
     final double rotationX = deadband(vrxSupplier.get());
-/*
+    /*
     if (vrySupplier.isPresent()) {
       final double rotationY = deadband(vrySupplier.get().get());
       if (Math.abs(rotationX) > 0 || Math.abs(rotationY) > 0) {

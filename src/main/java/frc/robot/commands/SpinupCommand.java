@@ -30,6 +30,7 @@ public class SpinupCommand extends CommandBase {
   @Override
   public void initialize() {
     accelerator.coast();
+    spindexer.retractGate();
     spindexer.setOpenLoop(spindexerShootSpeed + SPINDEXER_EXTRA_SPIN_UP_SPEED);
     shooter.setOpenLoop(Constants.shooterShootSpeed);
     timer.reset();
