@@ -32,7 +32,7 @@ public class SpinupCommand extends CommandBase {
     accelerator.coast();
     spindexer.retractGate();
     spindexer.setOpenLoop(spindexerShootSpeed + SPINDEXER_EXTRA_SPIN_UP_SPEED);
-    shooter.setOpenLoop(Constants.shooterShootSpeed);
+    shooter.setVelocity(Constants.shooterShootSpeed);
     timer.reset();
     timer.start();
     spindexer.retractRamp();

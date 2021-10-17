@@ -15,6 +15,8 @@ public class AimSwerveDrive extends DriveTeleopCommand {
   private final PhotonCamera camera;
   private final NetworkTable photonNetworkTable;
 
+  private final double ANGLE_FUDGE_FACTOR = 3.0;
+
   public AimSwerveDrive(
       Supplier<Double> driverX,
       Supplier<Double> driverY,
@@ -34,7 +36,7 @@ public class AimSwerveDrive extends DriveTeleopCommand {
   public void execute() {
     var cameraResults = camera.getLatestResult();
     if (cameraResults.hasTargets()) {
-      final double yaw = photonNetworkTable.getEntry("targetYaw").getDouble(0.0);
+      final double yaw = photonNetworkTable.getEntry("targetYaw").getDouble(0.0) + ANGLE_FUDGE_FACTOR;
       final double pidOutput = aimPID.calculate(yaw);
       super.driveRotationVelocityMode(
           deadband(vxSupplier.get()), deadband(vySupplier.get()), pidOutput);

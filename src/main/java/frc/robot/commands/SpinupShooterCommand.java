@@ -25,7 +25,7 @@ public class SpinupShooterCommand extends CommandBase {
   @Override
   public void initialize() {
     accelerator.coast();
-    shooter.setOpenLoop(Constants.shooterShootSpeed);
+    shooter.setVelocity(Constants.shooterShootSpeed);
     timer.reset();
     timer.start();
   }

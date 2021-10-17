@@ -16,15 +16,15 @@ import io.github.oblarg.oblog.annotations.Log;
 public class Shooter extends SubsystemBase implements Loggable {
   private static final int SHOOTER_MOTOR_ID = 50;
   private static final int SHOOTER_FOLLOWER_MOTOR_ID = 51;
-  private static final double SHOOTER_GEAR_RATIO = 1.09;
+  private static final double SHOOTER_GEAR_RATIO = 1.00;
 
   private static final TalonFXConfiguration SHOOTER_MOTOR_CONFIG = new TalonFXConfiguration();
   private static final int SHOOTER_PID_SLOT = 0;
   private static final SimpleMotorFeedforward FEEDFORWARD =
       new SimpleMotorFeedforward(
-          0.0, // kS
-          0.0, // kV
-          0.0 // kA
+          0.6903 / 12.0, // kS
+          0.11002 / 12.0, // kV
+          0.014562 / 12.0 // kA
           );
 
   static {
@@ -38,10 +38,10 @@ public class Shooter extends SubsystemBase implements Loggable {
 
     // TODO: Tune
     final var velocityLoopConfig = new SlotConfiguration();
-    velocityLoopConfig.kP = 0.022555;
+    velocityLoopConfig.kP = 0.3;
     velocityLoopConfig.kI = 0.0;
     velocityLoopConfig.kD = 0.0;
-    velocityLoopConfig.kF = 0.055;
+    velocityLoopConfig.kF = 0.000;
     SHOOTER_MOTOR_CONFIG.slot0 = velocityLoopConfig;
 
     SHOOTER_MOTOR_CONFIG.velocityMeasurementPeriod = VelocityMeasPeriod.Period_2Ms;
@@ -67,16 +67,12 @@ public class Shooter extends SubsystemBase implements Loggable {
     shooterFollowMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
   }
 
-  public void setOpenLoop(double percentOutput) {
-    shooterMotor.set(ControlMode.PercentOutput, percentOutput);
-  }
-
   public void setVelocity(double rpm) {
     shooterMotor.set(
         ControlMode.Velocity,
         RPMToFalcon(rpm, SHOOTER_GEAR_RATIO),
-        DemandType.ArbitraryFeedForward,
-        FEEDFORWARD.calculate(rpm / 60.0));
+                DemandType.ArbitraryFeedForward,
+                FEEDFORWARD.calculate(rpm / 60.0));
   }
 
   @Log

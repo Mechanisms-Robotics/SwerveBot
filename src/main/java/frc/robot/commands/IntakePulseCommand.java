@@ -17,7 +17,7 @@ public class IntakePulseCommand extends CommandBase {
 
   private final Timer spindexerRunTimer = new Timer();
   private final Timer spindexerStopTimer = new Timer();
-  private final double spindexerPulseTime = 0.75; // seconds
+  private final double spindexerPulseTime = 0.5; // seconds
   private boolean spindexerIsRunning = true;
 
   public IntakePulseCommand(
