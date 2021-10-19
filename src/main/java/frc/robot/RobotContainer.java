@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
 import frc.robot.commands.auto.Basic3Ball;
+import frc.robot.commands.auto.Trench6Ball;
 import frc.robot.subsystems.*;
 import frc.robot.util.PS4Controller;
 import frc.robot.util.PS4Controller.Direction;
@@ -30,6 +31,7 @@ public class RobotContainer {
 
   // Primary Driver Buttons
   private final Button intakeButton = new Button(driverController::getLeftTriggerButton);
+  private final Button intakeToggleButton = new Button(driverController::getLeftBumperButton);
   private final Button aimButton = new Button(driverController::getRightBumperButton);
   private final Button shootButton = new Button(driverController::getRightTriggerButton);
   private final Button climbUpButton = new Button(() -> driverController.getPOV() == Direction.Up);
@@ -63,7 +65,7 @@ public class RobotContainer {
     // Driver Button Bindings
     intakeButton.toggleWhenPressed(
         new IntakePulseCommand(
-            secondaryDriverController::getXButton, intake, spindexer, accelerator));
+            driverController::getLeftBumperButton, secondaryDriverController::getXButton, intake, spindexer, accelerator));
     aimButton.toggleWhenPressed(
         new AimCommand(
             driverController::getLeftJoystickX,
@@ -82,10 +84,10 @@ public class RobotContainer {
     climbDownButton.whenHeld(
         new StartEndCommand(() -> climber.setOpenLoop(-0.20), climber::stop, climber));
 
-    // secondaryClimbUpButton.whenHeld(
-    //        new StartEndCommand(() -> climber.setOpenLoop(0.75), climber::stop, climber));
-    // secondaryClimbDownButton.whenHeld(
-    //        new StartEndCommand(() -> climber.setOpenLoop(-0.75), climber::stop, climber));
+    secondaryClimbUpButton.whenHeld(
+            new StartEndCommand(() -> climber.setOpenLoop(0.75), climber::stop, climber));
+    secondaryClimbDownButton.whenHeld(
+            new StartEndCommand(() -> climber.setOpenLoop(-0.75), climber::stop, climber));
 
     gyroResetButton.whenPressed(new InstantCommand(swerve::zeroHeading));
 
