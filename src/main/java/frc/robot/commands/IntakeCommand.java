@@ -13,10 +13,15 @@ public class IntakeCommand extends CommandBase {
   private final Accelerator accelerator;
 
   private final Supplier<Boolean> unjam;
+  private final Supplier<Boolean> toggleIntake;
+
+  private boolean isIntaking = true;
+  private boolean prevToggleIntake = false;
 
   public IntakeCommand(
-      Supplier<Boolean> unjam, Intake intake, Spindexer spindexer, Accelerator accelerator) {
+      Supplier<Boolean> unjam, Supplier<Boolean> toggleIntake, Intake intake, Spindexer spindexer, Accelerator accelerator) {
     this.intake = intake;
+    this.toggleIntake = toggleIntake;
     this.spindexer = spindexer;
     this.accelerator = accelerator;
     this.unjam = unjam;
@@ -24,13 +29,12 @@ public class IntakeCommand extends CommandBase {
   }
 
   public IntakeCommand(Intake intake, Spindexer spindexer, Accelerator accelerator) {
-    this(null, intake, spindexer, accelerator);
+    this(null, () -> false, intake, spindexer, accelerator);
   }
 
   @Override
   public void initialize() {
     intake.deploy();
-    intake.setOpenLoop(Constants.intakeSpeed);
 
     accelerator.coast();
 
@@ -41,6 +45,19 @@ public class IntakeCommand extends CommandBase {
 
   @Override
   public void execute() {
+    if (toggleIntake.get() && !prevToggleIntake) {
+      isIntaking = !isIntaking;
+      prevToggleIntake = true;
+    } else if (!toggleIntake.get() && prevToggleIntake) {
+      prevToggleIntake = false;
+    }
+
+    if (isIntaking) {
+      intake.setOpenLoop(Constants.intakeSpeed);
+    } else {
+      intake.stop();
+    }
+
     if (unjam != null) {
       if (unjam.get()) {
         spindexer.setOpenLoop(-0.15);

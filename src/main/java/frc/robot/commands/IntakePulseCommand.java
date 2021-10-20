@@ -20,23 +20,27 @@ public class IntakePulseCommand extends CommandBase {
   private final double spindexerPulseTime = 0.5; // seconds
   private boolean spindexerIsRunning = true;
 
-  public IntakePulseCommand(
+  private final Supplier<Boolean> toggleIntake;
+  private boolean isIntaking = true;
+  private boolean prevToggleIntake = false;
+
+  public IntakePulseCommand(Supplier<Boolean> toggleIntake,
       Supplier<Boolean> unjam, Intake intake, Spindexer spindexer, Accelerator accelerator) {
     this.intake = intake;
     this.spindexer = spindexer;
     this.accelerator = accelerator;
+    this.toggleIntake = toggleIntake;
     this.unjam = unjam;
     addRequirements(intake, spindexer, accelerator);
   }
 
   public IntakePulseCommand(Intake intake, Spindexer spindexer, Accelerator accelerator) {
-    this(null, intake, spindexer, accelerator);
+    this(() -> false, null, intake, spindexer, accelerator);
   }
 
   @Override
   public void initialize() {
     intake.deploy();
-    intake.setOpenLoop(Constants.intakeSpeed);
 
     accelerator.coast();
 
@@ -49,6 +53,19 @@ public class IntakePulseCommand extends CommandBase {
 
   @Override
   public void execute() {
+    if (toggleIntake.get() && !prevToggleIntake) {
+      isIntaking = !isIntaking;
+      prevToggleIntake = true;
+    } else if (!toggleIntake.get() && prevToggleIntake) {
+      prevToggleIntake = false;
+    }
+
+    if (isIntaking) {
+      intake.setOpenLoop(Constants.intakeSpeed);
+    } else {
+      intake.stop();
+    }
+
     if (unjam != null) {
       if (unjam.get()) {
         spindexer.setOpenLoop(-0.15);

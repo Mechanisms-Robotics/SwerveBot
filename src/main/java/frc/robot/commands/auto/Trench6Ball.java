@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -16,30 +17,23 @@ import org.photonvision.PhotonCamera;
 
 public class Trench6Ball extends SequentialCommandGroup {
 
-  private static final SwerveDriveKinematicsConstraint kinematicsConstraint =
+  private final SwerveDriveKinematicsConstraint kinematicsConstraint =
       new SwerveDriveKinematicsConstraint(Swerve.kinematics, Swerve.maxVelocity);
 
-  private static final TrajectoryConfig config = new TrajectoryConfig(2.0, 4.0);
+  private final TrajectoryConfig config = new TrajectoryConfig(2.0, 4.0).addConstraint(kinematicsConstraint);
 
-  private static final Trajectory trajectory1;
-  private static final Trajectory trajectory2;
-
-  static {
-    config.addConstraint(kinematicsConstraint);
-    trajectory1 =
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.fromDegrees(90.0)),
-            List.of(new Translation2d(-1.7, 3.0)),
-            new Pose2d(new Translation2d(-1.7, 4.9), Rotation2d.fromDegrees(90.0)),
-            config);
-
-    trajectory2 =
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(new Translation2d(-1.7, 4.9), Rotation2d.fromDegrees(90.0)),
-            List.of(),
-            new Pose2d(new Translation2d(-1.7, 3.0), Rotation2d.fromDegrees(90.0)),
-            config);
-  }
+  private final Trajectory trajectory1 =
+  TrajectoryGenerator.generateTrajectory(
+      new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.fromDegrees(90.0)),
+      List.of(new Translation2d(-1.7, 3.0)),
+      new Pose2d(new Translation2d(-1.7, 4.9), Rotation2d.fromDegrees(90.0)),
+      config);
+  private final Trajectory trajectory2 =
+  TrajectoryGenerator.generateTrajectory(
+      new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.fromDegrees(90.0)),
+      List.of(),
+      new Pose2d(new Translation2d(0.0, -4.9), Rotation2d.fromDegrees(90.0)),
+      config);
 
   public Trench6Ball(
       Intake intake,
@@ -66,7 +60,7 @@ public class Trench6Ball extends SequentialCommandGroup {
         new ShootCommand(shooter, accelerator, spindexer).withTimeout(1.0),
         // Deploy intake and drive trajectory1
         // TODO: Make intake a timeout so we can wait for the balls to settle in
-        new IntakeCommand(intake, spindexer, accelerator).deadlineWith(new DriveTrajectoryCommand(trajectory1, swerve)),
+        new DriveTrajectoryCommand(trajectory1, swerve),
         // Spinup shooter and spindexer, and drive trajectory2
         new ParallelCommandGroup(
             new SpinupCommand(shooter, accelerator, spindexer),

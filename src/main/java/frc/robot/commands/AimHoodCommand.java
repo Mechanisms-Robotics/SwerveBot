@@ -17,17 +17,20 @@ public class AimHoodCommand extends CommandBase {
   public static final double TARGET_HEIGHT = 2.5; // Meters
   public static final double CAMERA_HEIGHT = 0.63881; // Meters
   public static final double CAMERA_PITCH = Units.degreesToRadians(60); // Radians
+  
+  public static final double HOOD_OFFSET = 0.33;
+  public static final double TRENCH_HOOD_OFFSET = 0.6;
 
   private static final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble>
       RANGE_TO_HOOD_MAP = new InterpolatingTreeMap<>();
 
   static {
-    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(0.2), new InterpolatingDouble(-1.0));
-    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(1.1), new InterpolatingDouble(-1.0));
-    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(1.4), new InterpolatingDouble(-0.5));
-    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(1.63), new InterpolatingDouble(-0.45));
-    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(1.896), new InterpolatingDouble(-0.375));
-    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(5.33), new InterpolatingDouble(0.5));
+    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(0.2), new InterpolatingDouble(-1.0 + HOOD_OFFSET));
+    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(1.1), new InterpolatingDouble(-1.0 + HOOD_OFFSET));
+    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(1.4), new InterpolatingDouble(-0.5 + HOOD_OFFSET));
+    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(1.63), new InterpolatingDouble(-0.45 + HOOD_OFFSET));
+    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(1.896), new InterpolatingDouble(-0.375 + HOOD_OFFSET));
+    RANGE_TO_HOOD_MAP.put(new InterpolatingDouble(5.33), new InterpolatingDouble(0.5 + HOOD_OFFSET + TRENCH_HOOD_OFFSET));
   }
 
   private Hood hood;
