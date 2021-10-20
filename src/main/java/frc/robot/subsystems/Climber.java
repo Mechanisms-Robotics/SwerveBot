@@ -49,6 +49,7 @@ public class Climber extends SubsystemBase implements Loggable {
   }
 
   public void stop() {
+    climberMotor.setNeutralMode(NeutralMode.Brake);
     climberMotor.set(ControlMode.PercentOutput, 0.0);
   }
 }

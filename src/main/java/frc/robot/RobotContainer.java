@@ -114,8 +114,7 @@ public class RobotContainer {
             true,
             swerve));
 
-    climber.setDefaultCommand(
-        new ClimberCommand(secondaryDriverController::getRightJoystickY, climber));
+    climber.setDefaultCommand(new RunCommand(climber::stop, climber));
   }
 
   public Command getAutonomousCommand() {
