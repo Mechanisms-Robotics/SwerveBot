@@ -34,7 +34,7 @@ public class Basic3Ball extends SequentialCommandGroup {
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.fromDegrees(90.0)),
             List.of(),
-            new Pose2d(new Translation2d(0.0, 1.0), Rotation2d.fromDegrees(90.0)),
+            new Pose2d(new Translation2d(0.0, -1.0), Rotation2d.fromDegrees(90.0)),
             config);
   }
 
