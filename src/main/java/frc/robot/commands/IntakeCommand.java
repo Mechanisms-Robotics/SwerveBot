@@ -19,7 +19,11 @@ public class IntakeCommand extends CommandBase {
   private boolean prevToggleIntake = false;
 
   public IntakeCommand(
-      Supplier<Boolean> unjam, Supplier<Boolean> toggleIntake, Intake intake, Spindexer spindexer, Accelerator accelerator) {
+      Supplier<Boolean> unjam,
+      Supplier<Boolean> toggleIntake,
+      Intake intake,
+      Spindexer spindexer,
+      Accelerator accelerator) {
     this.intake = intake;
     this.toggleIntake = toggleIntake;
     this.spindexer = spindexer;

@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
 import frc.robot.commands.auto.Basic3Ball;
-import frc.robot.commands.auto.Trench6Ball;
 import frc.robot.subsystems.*;
 import frc.robot.util.PS4Controller;
 import frc.robot.util.PS4Controller.Direction;
@@ -65,7 +64,11 @@ public class RobotContainer {
     // Driver Button Bindings
     intakeButton.toggleWhenPressed(
         new IntakePulseCommand(
-            driverController::getLeftBumperButton, secondaryDriverController::getXButton, intake, spindexer, accelerator));
+            driverController::getLeftBumperButton,
+            secondaryDriverController::getXButton,
+            intake,
+            spindexer,
+            accelerator));
     aimButton.toggleWhenPressed(
         new AimCommand(
             driverController::getLeftJoystickX,
@@ -85,9 +88,9 @@ public class RobotContainer {
         new StartEndCommand(() -> climber.setOpenLoop(-0.20), climber::stop, climber));
 
     secondaryClimbUpButton.whenHeld(
-            new StartEndCommand(() -> climber.setOpenLoop(0.75), climber::stop, climber));
+        new StartEndCommand(() -> climber.setOpenLoop(0.75), climber::stop, climber));
     secondaryClimbDownButton.whenHeld(
-            new StartEndCommand(() -> climber.setOpenLoop(-0.75), climber::stop, climber));
+        new StartEndCommand(() -> climber.setOpenLoop(-0.75), climber::stop, climber));
 
     gyroResetButton.whenPressed(new InstantCommand(swerve::zeroHeading));
 

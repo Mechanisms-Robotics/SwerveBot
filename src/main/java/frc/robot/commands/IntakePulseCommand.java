@@ -24,8 +24,12 @@ public class IntakePulseCommand extends CommandBase {
   private boolean isIntaking = true;
   private boolean prevToggleIntake = false;
 
-  public IntakePulseCommand(Supplier<Boolean> toggleIntake,
-      Supplier<Boolean> unjam, Intake intake, Spindexer spindexer, Accelerator accelerator) {
+  public IntakePulseCommand(
+      Supplier<Boolean> toggleIntake,
+      Supplier<Boolean> unjam,
+      Intake intake,
+      Spindexer spindexer,
+      Accelerator accelerator) {
     this.intake = intake;
     this.spindexer = spindexer;
     this.accelerator = accelerator;

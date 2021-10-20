@@ -71,8 +71,8 @@ public class Shooter extends SubsystemBase implements Loggable {
     shooterMotor.set(
         ControlMode.Velocity,
         RPMToFalcon(rpm, SHOOTER_GEAR_RATIO),
-                DemandType.ArbitraryFeedForward,
-                FEEDFORWARD.calculate(rpm / 60.0));
+        DemandType.ArbitraryFeedForward,
+        FEEDFORWARD.calculate(rpm / 60.0));
   }
 
   @Log

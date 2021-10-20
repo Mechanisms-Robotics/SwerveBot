@@ -1,14 +1,20 @@
 package frc.robot.commands.auto;
 
+import static frc.robot.Constants.*;
+
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.trajectory.constraint.SwerveDriveKinematicsConstraint;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import java.util.List;
@@ -23,6 +29,16 @@ public class Trench8Ball extends SequentialCommandGroup {
 
   private static final Trajectory trajectory1;
   private static final Trajectory trajectory2;
+
+  private final PIDController xController = new PIDController(linearGain, 0.0, 0.0, loopTime);
+  private final PIDController yController = new PIDController(linearGain, 0.0, 0.0, loopTime);
+  private final ProfiledPIDController thetaController =
+      new ProfiledPIDController(
+          headingGain,
+          0.0,
+          0.0,
+          new TrapezoidProfile.Constraints(headingMaxVelocity, headingMaxVelocity),
+          loopTime);
 
   static {
     config.addConstraint(kinematicsConstraint);
@@ -52,37 +68,51 @@ public class Trench8Ball extends SequentialCommandGroup {
     addCommands(
         // Aim for 2 seconds
         new AimCommand(
-            () -> 0.0,
-            () -> 0.0,
-            () -> 0.0,
-            hood,
-            swerve,
-            shooter,
-            accelerator,
-            spindexer,
-            camera)
+                () -> 0.0,
+                () -> 0.0,
+                () -> 0.0,
+                hood,
+                swerve,
+                shooter,
+                accelerator,
+                spindexer,
+                camera)
             .withTimeout(2.0),
         // Shoot for 1 second
         new ShootCommand(shooter, accelerator, spindexer).withTimeout(1.0),
+            new SwerveControllerCommand(
+                    trajectory1,
+                    swerve::getPose,
+                    swerve.getKinematics(),
+                    xController,
+                    yController,
+                    thetaController,
+                    () -> Rotation2d.fromDegrees(0.0),
+                    swerve::setModuleStates,
+                    swerve).deadlineWith(new IntakeCommand(intake, spindexer, accelerator)),
         // Deploy intake and drive trajectory1
-        // TODO: Make intake a timeout so we can wait for the balls to settle in
-        new IntakeCommand(intake, spindexer, accelerator).deadlineWith(new DriveTrajectoryCommand(trajectory1, swerve)),
         // Spinup shooter and spindexer, and drive trajectory2
-        new ParallelCommandGroup(
-            new SpinupCommand(shooter, accelerator, spindexer),
-            new DriveTrajectoryCommand(trajectory2, swerve)
-        ),
+        new SwerveControllerCommand(
+            trajectory2,
+            swerve::getPose,
+            swerve.getKinematics(),
+            xController,
+            yController,
+            thetaController,
+            () -> Rotation2d.fromDegrees(0.0),
+            swerve::setModuleStates,
+            swerve).deadlineWith(new WaitCommand(1.0).andThen(new SpinupCommand(shooter, accelerator, spindexer))),
         // Aim for 1 seconds
         new AimCommand(
-            () -> 0.0,
-            () -> 0.0,
-            () -> 0.0,
-            hood,
-            swerve,
-            shooter,
-            accelerator,
-            spindexer,
-            camera)
+                () -> 0.0,
+                () -> 0.0,
+                () -> 0.0,
+                hood,
+                swerve,
+                shooter,
+                accelerator,
+                spindexer,
+                camera)
             .withTimeout(1.0),
         // Shoot for 1.375 seconds
         new ShootCommand(shooter, accelerator, spindexer).withTimeout(1.375));
