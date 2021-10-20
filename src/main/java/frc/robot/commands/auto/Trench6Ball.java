@@ -35,6 +35,7 @@ public class Trench6Ball extends SequentialCommandGroup {
           List.of(new Translation2d(-1.7, 3.0)),
           new Pose2d(new Translation2d(-1.7, 4.9), Rotation2d.fromDegrees(90.0)),
           config);
+
   private static final Trajectory trajectory2 =
       TrajectoryGenerator.generateTrajectory(
           new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.fromDegrees(90.0)),
@@ -62,6 +63,7 @@ public class Trench6Ball extends SequentialCommandGroup {
       PhotonCamera camera) {
     addCommands(
         // Aim for 2 seconds
+        new ResetHeading(Rotation2d.fromDegrees(180.0), swerve),
         new AimCommand(
                 () -> 0.0,
                 () -> 0.0,
@@ -78,28 +80,31 @@ public class Trench6Ball extends SequentialCommandGroup {
         // Deploy intake and drive trajectory1
         // TODO: Make intake a timeout so we can wait for the balls to settle in
         new SwerveControllerCommand(
-            trajectory1,
-            swerve::getPose,
-            swerve.getKinematics(),
-            xController,
-            yController,
-            thetaController,
-            () -> Rotation2d.fromDegrees(0.0),
-            swerve::setModuleStates,
-            swerve).deadlineWith(new IntakeCommand(intake, spindexer, accelerator)),
-        // Spinup shooter and spindexer, and drive trajectory2
-        new ParallelCommandGroup(
-            new SpinupCommand(shooter, accelerator, spindexer),
-            new SwerveControllerCommand(
-                trajectory2,
+                trajectory1,
                 swerve::getPose,
                 swerve.getKinematics(),
                 xController,
                 yController,
                 thetaController,
-                () -> Rotation2d.fromDegrees(0.0),
+                () -> Rotation2d.fromDegrees(180.0),
                 swerve::setModuleStates,
-                swerve)).deadlineWith(new WaitCommand(1.0).andThen(new SpinupCommand(shooter, accelerator, spindexer))),
+                swerve)
+            .deadlineWith(new IntakeCommand(intake, spindexer, accelerator)),
+        // Spinup shooter and spindexer, and drive trajectory2
+        new ParallelCommandGroup(
+                new SpinupCommand(shooter, accelerator, spindexer),
+                new SwerveControllerCommand(
+                    trajectory2,
+                    swerve::getPose,
+                    swerve.getKinematics(),
+                    xController,
+                    yController,
+                    thetaController,
+                    () -> Rotation2d.fromDegrees(180.0),
+                    swerve::setModuleStates,
+                    swerve))
+            .deadlineWith(
+                new WaitCommand(1.0).andThen(new SpinupCommand(shooter, accelerator, spindexer))),
         // Aim for 1 seconds
         new AimCommand(
                 () -> 0.0,

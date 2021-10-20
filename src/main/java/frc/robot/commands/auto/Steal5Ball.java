@@ -66,29 +66,32 @@ public class Steal5Ball extends SequentialCommandGroup {
       Spindexer spindexer,
       PhotonCamera camera) {
     addCommands(
+        new ResetHeading(Rotation2d.fromDegrees(180.0), swerve),
         // Deploy intake and drive trajectory1
         new SwerveControllerCommand(
-            trajectory1,
-            swerve::getPose,
-            swerve.getKinematics(),
-            xController,
-            yController,
-            thetaController,
-            () -> Rotation2d.fromDegrees(0.0),
-            swerve::setModuleStates,
-            swerve).deadlineWith(new IntakeCommand(intake, spindexer, accelerator)),
+                trajectory1,
+                swerve::getPose,
+                swerve.getKinematics(),
+                xController,
+                yController,
+                thetaController,
+                () -> Rotation2d.fromDegrees(180.0),
+                swerve::setModuleStates,
+                swerve)
+            .deadlineWith(new IntakeCommand(intake, spindexer, accelerator)),
         // Spinup shooter and spindexer, and drive trajectory2
         new SwerveControllerCommand(
-            trajectory2,
-            swerve::getPose,
-            swerve.getKinematics(),
-            xController,
-            yController,
-            thetaController,
-            () -> Rotation2d.fromDegrees(0.0),
-            swerve::setModuleStates,
-            swerve).deadlineWith(
-                    new WaitCommand(1.0).andThen(new SpinupCommand(shooter, accelerator, spindexer))),
+                trajectory2,
+                swerve::getPose,
+                swerve.getKinematics(),
+                xController,
+                yController,
+                thetaController,
+                () -> Rotation2d.fromDegrees(180.0),
+                swerve::setModuleStates,
+                swerve)
+            .deadlineWith(
+                new WaitCommand(1.0).andThen(new SpinupCommand(shooter, accelerator, spindexer))),
         // Aim for 1 seconds
         new AimCommand(
                 () -> 0.0,

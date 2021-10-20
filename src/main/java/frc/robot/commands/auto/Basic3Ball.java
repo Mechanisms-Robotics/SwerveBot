@@ -56,6 +56,7 @@ public class Basic3Ball extends SequentialCommandGroup {
       Spindexer spindexer,
       PhotonCamera camera) {
     addCommands(
+        new ResetHeading(Rotation2d.fromDegrees(180.0), swerve),
         new AimCommand(
                 () -> 0.0,
                 () -> 0.0,
@@ -75,7 +76,7 @@ public class Basic3Ball extends SequentialCommandGroup {
             xController,
             yController,
             thetaController,
-            () -> Rotation2d.fromDegrees(0.0),
+            () -> Rotation2d.fromDegrees(180.0),
             swerve::setModuleStates,
             swerve));
   }

@@ -208,4 +208,8 @@ public class Swerve extends SubsystemBase implements Loggable {
     zeroHeading();
     poseEstimator.resetPosition(new Pose2d(), new Rotation2d());
   }
+
+  public void setHeading(Rotation2d rotation) {
+    gyro.setYaw(rotation.getDegrees());
+  }
 }
