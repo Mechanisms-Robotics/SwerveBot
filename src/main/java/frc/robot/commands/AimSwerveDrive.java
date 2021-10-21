@@ -15,7 +15,7 @@ public class AimSwerveDrive extends DriveTeleopCommand {
   private final PhotonCamera camera;
   private final NetworkTable photonNetworkTable;
 
-  private final double ANGLE_FUDGE_FACTOR = 3.0;
+  private final double ANGLE_FUDGE_FACTOR = -3.0;
 
   public AimSwerveDrive(
       Supplier<Double> driverX,
