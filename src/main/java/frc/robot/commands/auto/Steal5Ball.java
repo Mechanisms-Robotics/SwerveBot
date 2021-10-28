@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.trajectory.constraint.SwerveDriveKinematicsConstraint;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import java.util.List;
@@ -91,7 +90,9 @@ public class Steal5Ball extends SequentialCommandGroup {
                 swerve::setModuleStates,
                 swerve)
             .deadlineWith(
-                new IntakeCommand(intake, spindexer, accelerator).withTimeout(2.0).andThen(new SpinupCommand(spindexer, accelerator, shooter, camera))),
+                new IntakeCommand(intake, spindexer, accelerator)
+                    .withTimeout(2.0)
+                    .andThen(new SpinupCommand(spindexer, accelerator, shooter, camera))),
         // Aim for 1 seconds
         new AimCommand(
                 () -> 0.0,

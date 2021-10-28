@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;

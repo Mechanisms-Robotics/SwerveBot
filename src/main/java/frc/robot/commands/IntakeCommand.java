@@ -6,8 +6,6 @@ import frc.robot.Constants;
 import frc.robot.subsystems.Accelerator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Spindexer;
-
-import java.sql.Time;
 import java.util.function.Supplier;
 
 public class IntakeCommand extends CommandBase {

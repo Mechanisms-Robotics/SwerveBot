@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
@@ -61,6 +63,11 @@ public class RobotContainer {
     if (TUNING_MODE) {
       CommandScheduler.getInstance().schedule(new PerpetualCommand(new TuneHood(hood, camera)));
     }
+    autoChooser.setDefaultOption(Autos.BASIC_3_BALL.name(), Autos.BASIC_3_BALL);
+    autoChooser.addOption(Autos.TRENCH_6_BALL.name(), Autos.TRENCH_6_BALL);
+    autoChooser.addOption(Autos.TRENCH_8_BALL.name(), Autos.TRENCH_8_BALL);
+    autoChooser.addOption(Autos.STEAL_5_BALL.name(), Autos.STEAL_5_BALL);
+    SmartDashboard.putData(autoChooser);
   }
 
   private void configureButtonBindings() {
@@ -121,9 +128,25 @@ public class RobotContainer {
     climber.setDefaultCommand(new RunCommand(climber::stop, climber));
   }
 
+  public enum Autos {
+    BASIC_3_BALL,
+    TRENCH_6_BALL,
+    TRENCH_8_BALL,
+    STEAL_5_BALL
+  }
+
+  private SendableChooser<Autos> autoChooser = new SendableChooser<>();
+
   public Command getAutonomousCommand() {
-    // return new RunCommand(() -> swerve.drive(0.0, 1.0, 0.0, false), swerve).withTimeout(2.0);
-   // return new Basic3Ball(hood, swerve, shooter, accelerator, spindexer, camera);
-    return new Steal5Ball(intake, hood, swerve, shooter, accelerator, spindexer, camera);
+    switch (autoChooser.getSelected()) {
+      case TRENCH_6_BALL:
+        return new Trench6Ball(intake, hood, swerve, shooter, accelerator, spindexer, camera);
+      case TRENCH_8_BALL:
+        return new Trench8Ball(intake, hood, swerve, shooter, accelerator, spindexer, camera);
+      case STEAL_5_BALL:
+        return new Steal5Ball(intake, hood, swerve, shooter, accelerator, spindexer, camera);
+      default:
+        return new Basic3Ball(hood, swerve, shooter, accelerator, spindexer, camera);
+    }
   }
 }

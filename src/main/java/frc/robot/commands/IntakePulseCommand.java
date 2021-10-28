@@ -89,7 +89,7 @@ public class IntakePulseCommand extends CommandBase {
         spindexer.setOpenLoop(-0.15);
         spindexer.retractGate();
         System.out.println("RETRACTED GATE");
-      } else if (accleratorUnjam != null && accleratorUnjam.get()){
+      } else if (accleratorUnjam != null && accleratorUnjam.get()) {
         spindexer.setOpenLoop(-0.15);
         accelerator.setOpenLoop(-0.10);
         spindexer.retractGate();

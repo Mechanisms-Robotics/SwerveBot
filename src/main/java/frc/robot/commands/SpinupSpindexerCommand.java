@@ -4,9 +4,7 @@ import static frc.robot.Constants.spindexerShootSpeed;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.Accelerator;
-import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Spindexer;
 
 public class SpinupSpindexerCommand extends CommandBase {

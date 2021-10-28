@@ -24,8 +24,7 @@ public class Trench6Ball extends SequentialCommandGroup {
       new SwerveDriveKinematicsConstraint(Swerve.kinematics, Swerve.maxVelocity);
 
   private static final TrajectoryConfig configFast =
-          new TrajectoryConfig(4.0, 8.0).addConstraint(kinematicsConstraint);
-
+      new TrajectoryConfig(4.0, 8.0).addConstraint(kinematicsConstraint);
 
   private static final TrajectoryConfig configSlow =
       new TrajectoryConfig(1.5, 8.0).addConstraint(kinematicsConstraint);
@@ -94,18 +93,19 @@ public class Trench6Ball extends SequentialCommandGroup {
         new InstantCommand(intake::deploy, intake),
         new InstantCommand(() -> intake.setOpenLoop(0.30), intake),
         // Spinup shooter and spindexer, and drive trajectory2
-            new SwerveControllerCommand(
-                    trajectory2,
-                    swerve::getPose,
-                    swerve.getKinematics(),
-                    xController,
-                    yController,
-                    thetaController,
-                    () -> Rotation2d.fromDegrees(0.0),
-                    swerve::setModuleStates,
-                    swerve)
+        new SwerveControllerCommand(
+                trajectory2,
+                swerve::getPose,
+                swerve.getKinematics(),
+                xController,
+                yController,
+                thetaController,
+                () -> Rotation2d.fromDegrees(0.0),
+                swerve::setModuleStates,
+                swerve)
             .deadlineWith(
-                new WaitCommand(0.5).andThen(new SpinupCommand(spindexer, accelerator, shooter, camera))),
+                new WaitCommand(0.5)
+                    .andThen(new SpinupCommand(spindexer, accelerator, shooter, camera))),
         // Aim for 1 seconds
         new AimCommand(
                 () -> 0.0,

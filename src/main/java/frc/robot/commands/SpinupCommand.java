@@ -8,10 +8,10 @@ import org.photonvision.PhotonCamera;
 
 public class SpinupCommand extends ParallelCommandGroup {
 
-    public SpinupCommand(Spindexer spindexer, Accelerator accelerator, Shooter shooter, PhotonCamera camera) {
-        addCommands(
-                new SpinupSpindexerCommand(accelerator, spindexer),
-                new SpinupShooterCommand(shooter, camera)
-        );
-    }
+  public SpinupCommand(
+      Spindexer spindexer, Accelerator accelerator, Shooter shooter, PhotonCamera camera) {
+    addCommands(
+        new SpinupSpindexerCommand(accelerator, spindexer),
+        new SpinupShooterCommand(shooter, camera));
+  }
 }

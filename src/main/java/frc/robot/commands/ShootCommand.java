@@ -29,9 +29,9 @@ public class ShootCommand extends CommandBase {
     // shooter.setVelocity(SHOOTER_RPM);
     // accelerator.setVelocity(ACCELERATOR_RPM);
 
-    //shooter.setVelocity(Constants.shooterShootSpeed);
+    // shooter.setVelocity(Constants.shooterShootSpeed);
     accelerator.setOpenLoop(Constants.acceleratorShootSpeed);
-    //spindexer.deployRamp();
+    // spindexer.deployRamp();
     spindexer.retractGate();
     spindexer.setOpenLoop(Constants.spindexerShootSpeed);
     timer.reset();
