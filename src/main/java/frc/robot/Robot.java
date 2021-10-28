@@ -4,9 +4,13 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import io.github.oblarg.oblog.Logger;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,6 +22,8 @@ public class Robot extends TimedRobot {
 
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+
+  private final Compressor compressor = new Compressor(0);
 
   protected Robot() {
     super(Constants.loopTime);
@@ -32,6 +38,10 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
+    Logger.configureLoggingAndConfig(robotContainer, false);
+    LiveWindow.disableAllTelemetry();
+
+    // robotContainer.swerve.zeroHeading();
   }
 
   /**
@@ -48,11 +58,14 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    Logger.updateEntries();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    compressor.stop();
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -61,6 +74,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     autonomousCommand = robotContainer.getAutonomousCommand();
+    robotContainer.swerve.resetSensors();
 
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
@@ -82,6 +96,7 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+    compressor.start();
   }
 
   /** This function is called periodically during Teleop mode. */
