@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Accelerator;
@@ -11,6 +12,9 @@ public class ShootCommand extends CommandBase {
   private final Shooter shooter;
   private final Accelerator accelerator;
   private final Spindexer spindexer;
+
+  private final Timer timer = new Timer();
+  private static final double ACCEL_TIME = 0.1;
 
   public ShootCommand(Shooter shooter, Accelerator accelerator, Spindexer spindexer) {
     this.shooter = shooter;
@@ -25,11 +29,20 @@ public class ShootCommand extends CommandBase {
     // shooter.setVelocity(SHOOTER_RPM);
     // accelerator.setVelocity(ACCELERATOR_RPM);
 
-    shooter.setVelocity(Constants.shooterShootSpeed);
+    //shooter.setVelocity(Constants.shooterShootSpeed);
     accelerator.setOpenLoop(Constants.acceleratorShootSpeed);
-    spindexer.deployRamp();
+    //spindexer.deployRamp();
     spindexer.retractGate();
     spindexer.setOpenLoop(Constants.spindexerShootSpeed);
+    timer.reset();
+    timer.start();
+  }
+
+  @Override
+  public void execute() {
+    if (timer.hasElapsed(ACCEL_TIME)) {
+      spindexer.deployRamp();
+    }
   }
 
   @Override
@@ -39,5 +52,6 @@ public class ShootCommand extends CommandBase {
     spindexer.stop();
     spindexer.deployGate();
     spindexer.retractRamp();
+    timer.stop();
   }
 }

@@ -26,6 +26,32 @@ public class AimHoodCommand extends CommandBase {
 
   static {
     RANGE_TO_HOOD_MAP.put(
+            new InterpolatingDouble(0.0), new InterpolatingDouble(1.0)
+    );
+    RANGE_TO_HOOD_MAP.put(
+            new InterpolatingDouble(0.95), new InterpolatingDouble(-.899)
+    );
+    RANGE_TO_HOOD_MAP.put(
+            new InterpolatingDouble(1.219), new InterpolatingDouble(-0.559)
+    );
+    RANGE_TO_HOOD_MAP.put(
+            new InterpolatingDouble(1.446), new InterpolatingDouble(-0.2384)
+    );
+    // TRENCH
+    RANGE_TO_HOOD_MAP.put(
+            new InterpolatingDouble(1.612), new InterpolatingDouble(-0.078)
+    );
+    RANGE_TO_HOOD_MAP.put(
+            new InterpolatingDouble(1.943), new InterpolatingDouble(0.122)
+    );
+    RANGE_TO_HOOD_MAP.put(
+            new InterpolatingDouble(2.147), new InterpolatingDouble(0.222)
+    );
+    RANGE_TO_HOOD_MAP.put(
+            new InterpolatingDouble(10.0), new InterpolatingDouble(0.222)
+    );
+    /*
+    RANGE_TO_HOOD_MAP.put(
         new InterpolatingDouble(0.2), new InterpolatingDouble(-1.0 + HOOD_OFFSET));
     RANGE_TO_HOOD_MAP.put(
         new InterpolatingDouble(1.1), new InterpolatingDouble(-1.0 + HOOD_OFFSET));
@@ -38,6 +64,8 @@ public class AimHoodCommand extends CommandBase {
     RANGE_TO_HOOD_MAP.put(
         new InterpolatingDouble(5.33),
         new InterpolatingDouble(0.5 + HOOD_OFFSET + TRENCH_HOOD_OFFSET));
+
+     */
   }
 
   private Hood hood;

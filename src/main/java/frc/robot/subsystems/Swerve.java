@@ -17,7 +17,7 @@ import io.github.oblarg.oblog.annotations.Log;
 public class Swerve extends SubsystemBase implements Loggable {
 
   public static final double maxVelocity = 4.5; // m / s
-  public static final double maxRotationalVelocity = Math.PI; // rads/s
+  public static final double maxRotationalVelocity = 1.5 * Math.PI; // rads/s
 
   // The center of the robot is the origin point for all locations
   private static final double driveBaseWidth = 0.5969; // m
@@ -211,5 +211,6 @@ public class Swerve extends SubsystemBase implements Loggable {
 
   public void setHeading(Rotation2d rotation) {
     gyro.setYaw(rotation.getDegrees());
+    poseEstimator.resetPosition(poseEstimator.getPoseMeters(), rotation);
   }
 }

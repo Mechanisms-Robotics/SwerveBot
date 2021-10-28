@@ -14,19 +14,25 @@ public class IntakePulseCommand extends CommandBase {
   private final Accelerator accelerator;
 
   private final Supplier<Boolean> unjam;
+  private final Supplier<Boolean> accleratorUnjam;
 
   private final Timer spindexerRunTimer = new Timer();
   private final Timer spindexerStopTimer = new Timer();
-  private final double spindexerPulseTime = 0.5; // seconds
+  private final double spindexerPulseTime = 1.0; // seconds
+  private final double intakeStopTime = 0.25; // seconds
   private boolean spindexerIsRunning = true;
 
   private final Supplier<Boolean> toggleIntake;
   private boolean isIntaking = true;
   private boolean prevToggleIntake = false;
 
+  private static final double INTAKE_DELAY = 0.5;
+  private final Timer timer = new Timer();
+
   public IntakePulseCommand(
       Supplier<Boolean> toggleIntake,
       Supplier<Boolean> unjam,
+      Supplier<Boolean> accleratorUnjam,
       Intake intake,
       Spindexer spindexer,
       Accelerator accelerator) {
@@ -35,15 +41,19 @@ public class IntakePulseCommand extends CommandBase {
     this.accelerator = accelerator;
     this.toggleIntake = toggleIntake;
     this.unjam = unjam;
+    this.accleratorUnjam = accleratorUnjam;
+
     addRequirements(intake, spindexer, accelerator);
   }
 
   public IntakePulseCommand(Intake intake, Spindexer spindexer, Accelerator accelerator) {
-    this(() -> false, null, intake, spindexer, accelerator);
+    this(() -> false, null, null, intake, spindexer, accelerator);
   }
 
   @Override
   public void initialize() {
+    timer.reset();
+    timer.start();
     intake.deploy();
 
     accelerator.coast();
@@ -57,6 +67,10 @@ public class IntakePulseCommand extends CommandBase {
 
   @Override
   public void execute() {
+    if (!timer.hasElapsed(INTAKE_DELAY)) {
+      return;
+    }
+
     if (toggleIntake.get() && !prevToggleIntake) {
       isIntaking = !isIntaking;
       prevToggleIntake = true;
@@ -75,6 +89,11 @@ public class IntakePulseCommand extends CommandBase {
         spindexer.setOpenLoop(-0.15);
         spindexer.retractGate();
         System.out.println("RETRACTED GATE");
+      } else if (accleratorUnjam != null && accleratorUnjam.get()){
+        spindexer.setOpenLoop(-0.15);
+        accelerator.setOpenLoop(-0.10);
+        spindexer.retractGate();
+        System.out.println("RETRACTED GATE");
       } else {
         if (!spindexer.isGateDeployed()) spindexer.deployGate();
         if (spindexerIsRunning) {
@@ -88,9 +107,9 @@ public class IntakePulseCommand extends CommandBase {
             spindexerIsRunning = false;
           }
         } else {
-          spindexer.stop();
+          spindexer.setOpenLoop(-0.15);
 
-          if (spindexerStopTimer.hasElapsed(spindexerPulseTime)) {
+          if (spindexerStopTimer.hasElapsed(intakeStopTime)) {
             spindexerStopTimer.stop();
             spindexerStopTimer.reset();
             spindexerRunTimer.start();

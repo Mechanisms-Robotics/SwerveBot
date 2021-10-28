@@ -25,7 +25,7 @@ public class Steal5Ball extends SequentialCommandGroup {
   private static final SwerveDriveKinematicsConstraint kinematicsConstraint =
       new SwerveDriveKinematicsConstraint(Swerve.kinematics, Swerve.maxVelocity);
 
-  private static final TrajectoryConfig config = new TrajectoryConfig(2.0, 4.0);
+  private static final TrajectoryConfig config = new TrajectoryConfig(3.0, 4.0);
 
   private static final Trajectory trajectory1;
   private static final Trajectory trajectory2;
@@ -41,9 +41,9 @@ public class Steal5Ball extends SequentialCommandGroup {
 
     trajectory2 =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(new Translation2d(0.0, 3.3), Rotation2d.fromDegrees(90.0)),
-            List.of(new Translation2d(0.0, 2.2)),
-            new Pose2d(new Translation2d(-4.875, 1.0), Rotation2d.fromDegrees(90.0)),
+            new Pose2d(new Translation2d(0.0, 3.3), Rotation2d.fromDegrees(-90.0)),
+            List.of(new Translation2d(-2.5, 1.0)),
+            new Pose2d(new Translation2d(-4.875, 1.0), Rotation2d.fromDegrees(-90.0)),
             config);
   }
 
@@ -75,7 +75,7 @@ public class Steal5Ball extends SequentialCommandGroup {
                 xController,
                 yController,
                 thetaController,
-                () -> Rotation2d.fromDegrees(180.0),
+                () -> Rotation2d.fromDegrees(0.0),
                 swerve::setModuleStates,
                 swerve)
             .deadlineWith(new IntakeCommand(intake, spindexer, accelerator)),
@@ -87,11 +87,11 @@ public class Steal5Ball extends SequentialCommandGroup {
                 xController,
                 yController,
                 thetaController,
-                () -> Rotation2d.fromDegrees(180.0),
+                () -> Rotation2d.fromDegrees(0.0),
                 swerve::setModuleStates,
                 swerve)
             .deadlineWith(
-                new WaitCommand(1.0).andThen(new SpinupCommand(shooter, accelerator, spindexer))),
+                new IntakeCommand(intake, spindexer, accelerator).withTimeout(2.0).andThen(new SpinupCommand(spindexer, accelerator, shooter, camera))),
         // Aim for 1 seconds
         new AimCommand(
                 () -> 0.0,

@@ -21,7 +21,8 @@ public class AimCommand extends ParallelCommandGroup {
       PhotonCamera camera) {
     addCommands(
         new InstantCommand(() -> camera.setLED(VisionLEDMode.kOn)),
-        new SpinupCommand(shooter, accelerator, spindexer),
+        new SpinupSpindexerCommand(accelerator, spindexer),
+        new SpinupShooterCommand(shooter, camera),
         new AimHoodCommand(camera, hood),
         new AimSwerveDrive(driverX, driverY, rotation, swerve, camera));
   }

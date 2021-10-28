@@ -1,10 +1,13 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Accelerator;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Spindexer;
+
+import java.sql.Time;
 import java.util.function.Supplier;
 
 public class IntakeCommand extends CommandBase {
@@ -17,6 +20,9 @@ public class IntakeCommand extends CommandBase {
 
   private boolean isIntaking = true;
   private boolean prevToggleIntake = false;
+
+  private static final double INTAKE_DELAY = 0.5;
+  private final Timer timer = new Timer();
 
   public IntakeCommand(
       Supplier<Boolean> unjam,
@@ -38,6 +44,8 @@ public class IntakeCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    timer.reset();
+    timer.start();
     intake.deploy();
 
     accelerator.coast();
@@ -49,6 +57,10 @@ public class IntakeCommand extends CommandBase {
 
   @Override
   public void execute() {
+    if (!timer.hasElapsed(INTAKE_DELAY)) {
+      return;
+    }
+
     if (toggleIntake.get() && !prevToggleIntake) {
       isIntaking = !isIntaking;
       prevToggleIntake = true;
@@ -73,6 +85,7 @@ public class IntakeCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
+    timer.stop();
     spindexer.stop(); // TODO: Remove
     intake.stop();
     intake.retract();

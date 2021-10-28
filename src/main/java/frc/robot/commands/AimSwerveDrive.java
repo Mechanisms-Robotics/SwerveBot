@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Constants;
 import frc.robot.subsystems.Swerve;
 import java.util.function.Supplier;
@@ -38,7 +39,8 @@ public class AimSwerveDrive extends DriveTeleopCommand {
     if (cameraResults.hasTargets()) {
       final double yaw =
           photonNetworkTable.getEntry("targetYaw").getDouble(0.0) + ANGLE_FUDGE_FACTOR;
-      final double pidOutput = aimPID.calculate(yaw);
+      double pidOutput = aimPID.calculate(yaw);
+      pidOutput = MathUtil.clamp(pidOutput, -Math.PI, Math.PI);
       super.driveRotationVelocityMode(
           deadband(vxSupplier.get()), deadband(vySupplier.get()), pidOutput);
     } else {

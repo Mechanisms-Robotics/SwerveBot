@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.trajectory.constraint.SwerveDriveKinematicsConstraint;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -25,7 +26,12 @@ public class Trench8Ball extends SequentialCommandGroup {
   private static final SwerveDriveKinematicsConstraint kinematicsConstraint =
       new SwerveDriveKinematicsConstraint(Swerve.kinematics, Swerve.maxVelocity);
 
-  private static final TrajectoryConfig config = new TrajectoryConfig(2.0, 4.0);
+  private static final TrajectoryConfig configFast =
+          new TrajectoryConfig(4.5, 8.0).addConstraint(kinematicsConstraint);
+
+
+  private static final TrajectoryConfig configSlow =
+          new TrajectoryConfig(1.5, 8.0).addConstraint(kinematicsConstraint);
 
   private static final Trajectory trajectory1;
   private static final Trajectory trajectory2;
@@ -41,20 +47,21 @@ public class Trench8Ball extends SequentialCommandGroup {
           loopTime);
 
   static {
-    config.addConstraint(kinematicsConstraint);
+    configSlow.addConstraint(kinematicsConstraint);
+    configFast.addConstraint(kinematicsConstraint);
     trajectory1 =
         TrajectoryGenerator.generateTrajectory(
             new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.fromDegrees(90.0)),
-            List.of(new Translation2d(-1.7, 3.0)),
-            new Pose2d(new Translation2d(-1.7, 6.6), Rotation2d.fromDegrees(90.0)),
-            config);
+            List.of(new Translation2d(-1.5, 1.5)),
+            new Pose2d(new Translation2d(-1.5, 6.6), Rotation2d.fromDegrees(90.0)),
+            configSlow);
 
     trajectory2 =
         TrajectoryGenerator.generateTrajectory(
-            new Pose2d(new Translation2d(-1.7, 6.6), Rotation2d.fromDegrees(90.0)),
-            List.of(),
-            new Pose2d(new Translation2d(-1.7, 3.0), Rotation2d.fromDegrees(90.0)),
-            config);
+            new Pose2d(new Translation2d(-1.5, 6.6), Rotation2d.fromDegrees(-90.0)),
+            List.of(new Translation2d(-1.5, 3.0)),
+            new Pose2d(new Translation2d(0.0, 1.5), Rotation2d.fromDegrees(-90.0)),
+            configFast);
   }
 
   public Trench8Ball(
@@ -78,7 +85,7 @@ public class Trench8Ball extends SequentialCommandGroup {
                 accelerator,
                 spindexer,
                 camera)
-            .withTimeout(2.0),
+            .withTimeout(1.0),
         // Shoot for 1 second
         new ShootCommand(shooter, accelerator, spindexer).withTimeout(1.0),
         new SwerveControllerCommand(
@@ -88,7 +95,7 @@ public class Trench8Ball extends SequentialCommandGroup {
                 xController,
                 yController,
                 thetaController,
-                () -> Rotation2d.fromDegrees(180.0),
+                () -> Rotation2d.fromDegrees(0.0),
                 swerve::setModuleStates,
                 swerve)
             .deadlineWith(new IntakeCommand(intake, spindexer, accelerator)),
@@ -101,11 +108,11 @@ public class Trench8Ball extends SequentialCommandGroup {
                 xController,
                 yController,
                 thetaController,
-                () -> Rotation2d.fromDegrees(180.0),
+                () -> Rotation2d.fromDegrees(0.0),
                 swerve::setModuleStates,
                 swerve)
             .deadlineWith(
-                new WaitCommand(1.0).andThen(new SpinupCommand(shooter, accelerator, spindexer))),
+                new IntakeCommand(intake, spindexer, accelerator).withTimeout(2.0).andThen(new SpinupCommand(spindexer, accelerator, shooter, camera))),
         // Aim for 1 seconds
         new AimCommand(
                 () -> 0.0,

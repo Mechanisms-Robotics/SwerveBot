@@ -4,6 +4,9 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.Button;
 import frc.robot.commands.*;
 import frc.robot.commands.auto.Basic3Ball;
+import frc.robot.commands.auto.Steal5Ball;
+import frc.robot.commands.auto.Trench6Ball;
+import frc.robot.commands.auto.Trench8Ball;
 import frc.robot.subsystems.*;
 import frc.robot.util.PS4Controller;
 import frc.robot.util.PS4Controller.Direction;
@@ -12,7 +15,7 @@ import org.photonvision.PhotonCamera;
 /** The container for the robot. Contains subsystems, OI devices, and commands. */
 public class RobotContainer {
 
-  private static final boolean TUNING_MODE = true;
+  private static final boolean TUNING_MODE = false;
 
   // Subsystems
   public final Swerve swerve = new Swerve();
@@ -66,6 +69,7 @@ public class RobotContainer {
         new IntakePulseCommand(
             driverController::getLeftBumperButton,
             secondaryDriverController::getXButton,
+            secondaryDriverController::getCircleButton,
             intake,
             spindexer,
             accelerator));
@@ -100,7 +104,7 @@ public class RobotContainer {
     prepShootButton.whenPressed(new PrepShootCommand(spindexer, accelerator));
     justShootButton.toggleWhenPressed(
         new SequentialCommandGroup(
-            new SpinupShooterCommand(shooter, accelerator),
+            new SpinupCommand(spindexer, accelerator, shooter, camera),
             new ShootCommand(shooter, accelerator, spindexer)));
   }
 
@@ -119,6 +123,7 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // return new RunCommand(() -> swerve.drive(0.0, 1.0, 0.0, false), swerve).withTimeout(2.0);
-    return new Basic3Ball(hood, swerve, shooter, accelerator, spindexer, camera);
+   // return new Basic3Ball(hood, swerve, shooter, accelerator, spindexer, camera);
+    return new Steal5Ball(intake, hood, swerve, shooter, accelerator, spindexer, camera);
   }
 }
