@@ -18,7 +18,7 @@ public class IntakePulseCommand extends CommandBase {
 
   private final Timer spindexerRunTimer = new Timer();
   private final Timer spindexerStopTimer = new Timer();
-  private final double spindexerPulseTime = 1.0; // seconds
+  private final double spindexerPulseTime = 0.75; // seconds
   private final double intakeStopTime = 0.25; // seconds
   private boolean spindexerIsRunning = true;
 
@@ -107,7 +107,7 @@ public class IntakePulseCommand extends CommandBase {
             spindexerIsRunning = false;
           }
         } else {
-          spindexer.setOpenLoop(-0.15);
+          spindexer.setOpenLoop(-0.10);
 
           if (spindexerStopTimer.hasElapsed(intakeStopTime)) {
             spindexerStopTimer.stop();

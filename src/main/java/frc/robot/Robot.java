@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpiutil.net.PortForwarder;
 import io.github.oblarg.oblog.Logger;
 
 /**
@@ -39,6 +40,7 @@ public class Robot extends TimedRobot {
     robotContainer = new RobotContainer();
     Logger.configureLoggingAndConfig(robotContainer, false);
     LiveWindow.disableAllTelemetry();
+    PortForwarder.add(8888, "limelight.local", 5800);
 
     // robotContainer.swerve.zeroHeading();
   }
